@@ -1,0 +1,3 @@
+displayName = Better DPS
+author = Erky
+version = 0.1

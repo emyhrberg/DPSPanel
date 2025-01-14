@@ -1,0 +1,5 @@
+This mod adds:
+- A better damage per second calculation always updated displayed in a Menu Panel.
+
+Todo:
+- A summary after each boss by: (Player, Weapon, Damage, Time, DPS)
