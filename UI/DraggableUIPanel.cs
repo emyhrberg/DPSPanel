@@ -3,10 +3,11 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace BetterDPS.Content.UI
+namespace BetterDPS.UI
 {
     public class DraggableUIPanel : UIPanel
     {
+        // Variables for dragging the panel
         private Vector2 offset;
         private bool dragging;
 

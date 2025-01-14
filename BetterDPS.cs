@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria.UI;
-using BetterDPS.Content.UI;
 using Terraria;
 
 namespace BetterDPS
@@ -14,9 +13,5 @@ namespace BetterDPS
 	public class BetterDPS : Mod
 	{
 
-        public override void Load()
-        {
-
-        }
     }
 }
