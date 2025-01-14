@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria.UI;
 using BetterDPS.Content.UI;
+using Terraria;
 
 namespace BetterDPS
 {
@@ -15,16 +16,7 @@ namespace BetterDPS
 
         public override void Load()
         {
-            MenuBar menuBar = new MenuBar();
-            menuBar.Activate();
-            UserInterface _menuBar = new UserInterface();
-            _menuBar.SetState(menuBar);
-        }
 
-        public override void Unload()
-        {
-            base.Unload();
         }
-
     }
 }

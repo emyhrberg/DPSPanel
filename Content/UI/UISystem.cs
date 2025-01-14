@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BetterDPS.Content.UI;
+using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
@@ -6,23 +7,22 @@ using Terraria.UI;
 
 namespace BetterDPS.Content.UI
 {
-    [Autoload(Side = ModSide.Client)]
-    public class MenuBarSystem : ModSystem
+    public class ExampleUISystem : ModSystem
     {
-        internal MenuBar MenuBar;
-        private UserInterface _menuBar;
+        private UserInterface exampleInterface;
+        internal ExampleUIState exampleUIState;
 
         public override void Load()
         {
-            MenuBar = new MenuBar();
-            MenuBar.Activate();
-            _menuBar = new UserInterface();
-            _menuBar.SetState(MenuBar);
+            exampleUIState = new ExampleUIState();
+            exampleUIState.Activate();
+            exampleInterface = new UserInterface();
+            exampleInterface.SetState(exampleUIState);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            _menuBar?.Update(gameTime);
+            exampleInterface?.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -31,10 +31,9 @@ namespace BetterDPS.Content.UI
             if (mouseTextIndex != -1)
             {
                 layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
-                    "YourMod: A Description",
-                    delegate
-                    {
-                        _menuBar.Draw(Main.spriteBatch, new GameTime());
+                    "ExampleMod: Example UI",
+                    delegate {
+                        exampleInterface.Draw(Main.spriteBatch, new GameTime());
                         return true;
                     },
                     InterfaceScaleType.UI)
