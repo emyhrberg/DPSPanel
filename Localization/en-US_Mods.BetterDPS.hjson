@@ -1,1 +1,12 @@
+Configs: {
+	DPSConfig: {
+		EnableDPSPanel: {
+			Tooltip: If true, the DPS panel is enabled. If false, it is disabled.
+			Label: Enable DPS Panel
+		}
 
+		DisplayName: DPS Panel Settings
+	}
+}
+
+"Keybinds.Toggle DPS Panel.DisplayName": Toggle  D P S  Panel

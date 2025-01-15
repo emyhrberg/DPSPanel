@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace BetterDPS.UI
+namespace BetterDPS.UI.DPS
 {
     /// <summary>
     /// Manages the lifecycle and integration of a UIState with Terraria's interface layers.

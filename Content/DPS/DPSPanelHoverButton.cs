@@ -3,7 +3,7 @@ using ReLogic.Content;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.UI;
 
-namespace BetterDPS.UI
+namespace BetterDPS.UI.DPS
 {
     // This ExampleUIHoverImageButton class inherits from UIImageButton. 
     // Inheriting is a great tool for UI design. 

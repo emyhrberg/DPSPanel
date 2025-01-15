@@ -3,7 +3,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
 
-namespace BetterDPS.UI
+namespace BetterDPS.UI.DPS
 {
     public class DPSPanel : UIPanel
     {
@@ -21,6 +21,12 @@ namespace BetterDPS.UI
             Left.Set(400f, 0f); // distance from the left edge
             Top.Set(200f, 0f); // distance from the top edge
             BackgroundColor = new Color(73, 94, 171); // Light blue background
+
+            // adjust padding for adding child elements
+            PaddingTop = 10;
+            PaddingLeft = 10;
+            PaddingRight = 10;
+            PaddingBottom = 10;
         }
 
         public override void LeftMouseDown(UIMouseEvent evt)
@@ -31,6 +37,9 @@ namespace BetterDPS.UI
             {
                 DragStart(evt);
                 clickStartedInsidePanel = true;
+
+                // Prevent other UI elements from interacting
+                Main.LocalPlayer.mouseInterface = true;
             }
         }
 
@@ -67,7 +76,7 @@ namespace BetterDPS.UI
             base.Update(gameTime);
 
             // If the mouse is inside the panel, set the mouse interface to true to prevent other UI elements from interacting
-            if (clickStartedInsidePanel && ContainsPoint(Main.MouseScreen))
+            if (dragging || clickStartedInsidePanel && ContainsPoint(Main.MouseScreen))
             {
                 Main.LocalPlayer.mouseInterface = true;
             }

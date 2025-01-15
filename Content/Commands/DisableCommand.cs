@@ -1,22 +1,22 @@
 ﻿using Terraria;
 using Terraria.ModLoader;
-using BetterDPS.UI;
-using Microsoft.Xna.Framework; // For Color
+using Microsoft.Xna.Framework;
+using BetterDPS.UI.DPS;
 
-namespace BetterDPS.Commands
+namespace BetterDPS.UI.Commands
 {
-    public class EnableCommand : ModCommand
+    public class DisableCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat; // Makes the command available in chat
-        public override string Command => "enable"; // The main command is "/enable"
-        public override string Usage => "Use: /enable dps"; // Usage instructions
-        public override string Description => "Enable DPS UI panels.";
+        public override string Command => "disable"; // The main command is "/disable"
+        public override string Usage => "Use: /disable dps"; // Usage instructions
+        public override string Description => "Disable DPS UI panel.";
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length < 1)
             {
-                throw new UsageException("[BetterDPS] Use: /enable dps");
+                throw new UsageException("[BetterDPS] Use: /disable dps");
             }
 
             // Access the UISystem to manage the panels
@@ -27,12 +27,11 @@ namespace BetterDPS.Commands
 
             if (target == "dps")
             {
-                uiSystem.container.ShowDPSPanel();
-                Main.NewText("[BetterDPS] DPS Panel enabled.", Color.Green);
+                uiSystem.container.HideDPSPanel();
             }
             else
             {
-                throw new UsageException("[BetterDPS] Invalid target. Use: /enable dps");
+                throw new UsageException("[BetterDPS] Invalid target. Use: /disable dps");
             }
         }
     }
