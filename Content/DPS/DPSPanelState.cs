@@ -36,10 +36,7 @@ namespace BetterDPS.UI.DPS
 
         public void UpdateDPSPanel(Dictionary<string, int> bossDamage)
         {
-            foreach (var entry in bossDamage)
-            {
-                dpsPanel.AddItem($"{entry.Key}: {entry.Value} damage");
-            }
+            dpsPanel.UpdateBossDamage(bossDamage);
         }
 
         /*
