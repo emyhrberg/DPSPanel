@@ -8,6 +8,8 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
+using BetterDPS.Content.DPS;
+using System.Collections.Generic;
 
 namespace BetterDPS.UI.DPS
 {
@@ -27,8 +29,26 @@ namespace BetterDPS.UI.DPS
 
         public override void OnInitialize()
         {
-            // Add the draggable panel which shows dps
             dpsPanel = new DPSPanel();
+            initializeButtons(dpsPanel);
+            Append(dpsPanel);
+        }
+
+        public void UpdateDPSPanel(Dictionary<string, int> bossDamage)
+        {
+            foreach (var entry in bossDamage)
+            {
+                dpsPanel.AddItem($"{entry.Key}: {entry.Value} damage");
+            }
+        }
+
+        /*
+         * Button methods
+         */////////////////////////////////////////////////////////////////////////////////////
+
+        private void initializeButtons(DPSPanel dpsPanel)
+        {
+            // Add the draggable panel which shows dps
 
             // Add play button to the panel
             Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
@@ -41,18 +61,10 @@ namespace BetterDPS.UI.DPS
             // this one loads from Assets/ButtonClose.png
             Asset<Texture2D> buttonCloseTexture = ModContent.Request<Texture2D>("BetterDPS/Content/Assets/ButtonClose");
             DPSPanelHoverButton buttonClose = new DPSPanelHoverButton(buttonCloseTexture, "Close");
-            SetRectangle(buttonClose, 300-40, 0, 40, 40); // top right corner
+            SetRectangle(buttonClose, 300 - 40, 0, 40, 40); // top right corner
             buttonClose.OnLeftClick += new MouseEvent(CloseButtonClicked);
             dpsPanel.Append(buttonClose);
 
-            // Add the items
-            for (int i = 1; i <= 6; i++)
-            {
-                //dpsPanel.AddItem($"Item {i}");
-            }
-
-            // Add the entire DPS panel to the UIState
-            Append(dpsPanel);
         }
 
         private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)
@@ -81,7 +93,9 @@ namespace BetterDPS.UI.DPS
             uiElement.Height.Set(height, 0f);
         }
 
-        // Methods to toggle DPS Panel
+        /*
+         * Methods to toggle DPS Panel
+         */////////////////////////////////////////////////////////////////////////////////////
         public void ShowDPSPanel()
         {
             if (!Children.Contains(dpsPanel))

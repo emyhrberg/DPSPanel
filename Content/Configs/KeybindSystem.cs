@@ -1,5 +1,6 @@
 ﻿using Terraria.ModLoader;
 using BetterDPS.UI.DPS;
+using Terraria;
 
 namespace BetterDPS.Content.Configs
 {
@@ -25,15 +26,17 @@ namespace BetterDPS.Content.Configs
         }
 
 
+        /*
+         * Actually update the input state.
+         */
         public override void PostUpdateInput()
         {
             if (toggleDPSPanelKeybind.JustPressed)
             {
                 // Toggle the DPS panel
-                var container = ModContent.GetInstance<DPSPanelSystem>().container;
+                var container = ModContent.GetInstance<DPSPanelState>();
                 container.ToggleDPSPanel();
             }
-
         }
     }
 }

@@ -27,7 +27,7 @@ namespace BetterDPS.UI.Commands
 
             if (target == "dps")
             {
-                uiSystem.container.HideDPSPanel();
+                uiSystem.state.HideDPSPanel();
             }
             else
             {

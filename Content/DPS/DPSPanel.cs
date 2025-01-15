@@ -1,6 +1,10 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Collections.Generic;
+using System.Linq;
+using BetterDPS.Content.DPS;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace BetterDPS.UI.DPS
@@ -12,42 +16,38 @@ namespace BetterDPS.UI.DPS
         private bool dragging;
         private bool clickStartedInsidePanel;
 
-        // For resizing items
-        private const float ItemHeight = 20f; // Height of each item (label)
+        // Panel items
+        private const float ItemHeight = 30f; // Height of each item (label)
         private const float Padding = 10f; // Padding for the panel
-        private const float InitialOffset = 30f; // Initial offset for the first item
         private int itemCount = 0; // Track the number of items added
+        private float currentYOffset = 10f; // Initial offset for the first row
 
-        // constructor
         public DPSPanel()
         {
             // Set the panel size and background color
             Width.Set(300f, 0f);
             Height.Set(150f, 0f);
-            Left.Set(400f, 0f); // distance from the left edge
-            Top.Set(200f, 0f); // distance from the top edge
+            //Left.Set(400f, 0f); // distance from the left edge
+            //Top.Set(200f, 0f); // distance from the top edge
             BackgroundColor = new Color(73, 94, 171); // Light blue background
 
             // adjust padding for adding child elements
-            PaddingTop = 10;
-            PaddingLeft = 10;
-            PaddingRight = 10;
-            PaddingBottom = 10;
+            SetPadding(10);
+
+            // add initial text
+            AddItem("DPS Panel");
         }
 
         public void AddItem(string text)
         {
-            // Create a new label for the item
-            var label = new UIText(text);
-            // Position
-            float top = InitialOffset + itemCount * ItemHeight;
-            label.Left.Set(Padding, 0f);
-            label.Top.Set(top, 0f);
-            // Append the label to the panel
+            var label = new UIText(text)
+            {
+                Top = new StyleDimension(currentYOffset, 0f),
+                Left = new StyleDimension(10f, 0f)
+            };
             Append(label);
 
-            // Increase item count and check if the panel needs resizing
-            itemCount++;
+            currentYOffset += 20f; // Increment Y offset for the next item
             ResizeToFitItems();
         }
 
@@ -63,6 +63,10 @@ namespace BetterDPS.UI.DPS
                 Recalculate(); // Recalculate UI layout
             }
         }
+
+        /*
+         * DRAGGING FUNCTIONALITY
+         */////////////////////////////////////////////////////////////
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
