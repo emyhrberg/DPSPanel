@@ -20,6 +20,9 @@ namespace BetterDPS.UI.DPS
         private UserInterface ui;
         internal DPSPanelState container;
 
+        // Bools
+        public bool isDPSPanelVisible { get; private set; }
+
         public override void Load()
         {
             // initialization code for the UI system
@@ -27,6 +30,13 @@ namespace BetterDPS.UI.DPS
             container.Activate();
             ui = new UserInterface();
             ui.SetState(container);
+        }
+
+        public override void Unload()
+        {
+            // cleanup code for the UI system
+            ui = null;
+            container = null;
         }
 
         public override void UpdateUI(GameTime gameTime)

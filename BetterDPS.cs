@@ -17,21 +17,5 @@ namespace BetterDPS
     public class BetterDPS : Mod
 	{
 
-        // Variables
-        ModKeybind toggleDPSPanelKeybind;
-
-        public override void Load()
-        {
-            // Register keybind
-            toggleDPSPanelKeybind = KeybindLoader.RegisterKeybind(this, "Toggle DPS Panel", "K");
-            
-        }
-
-
-        public override void Unload()
-        {
-            // Unregister keybind
-            toggleDPSPanelKeybind = null;
-        }
     }
 }

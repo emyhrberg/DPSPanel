@@ -23,6 +23,7 @@ namespace BetterDPS.UI.DPS
     {
         // Variables
         private DPSPanel dpsPanel;
+        private bool isVisible = true;
 
         public override void OnInitialize()
         {
@@ -74,24 +75,30 @@ namespace BetterDPS.UI.DPS
         // Methods to toggle DPS Panel
         public void ShowDPSPanel()
         {
-            if (Children.Contains(dpsPanel))
+            if (!Children.Contains(dpsPanel))
             {
-                return;
+                Append(dpsPanel); // Append the panel to the UIState
+                Main.NewText("[BetterDPS] DPS Panel enabled.", Color.Green);
             }
-
-            // Add the panel to the UIState
-            Append(dpsPanel);
-            Main.NewText("[BetterDPS] DPS Panel enabled.", Color.Green);
-
-            // Test print value of EnableDPSPanel
-            bool enableDPSPanel = ModContent.GetInstance<Config.DPSConfig>().EnableDPSPanel;
-            Main.NewText($"EnableDPSPanel: {enableDPSPanel}");
         }
 
         public void HideDPSPanel()
         {
             dpsPanel.Remove();
-            Main.NewText("[BetterDPS] DPS Panel disabled. Use /enable dps to enable it again.", Color.Red);
+            Main.NewText("[BetterDPS] DPS Panel disabled. Use /enable dps or 'K' to enable it again.", Color.Red);
+        }
+
+        public void ToggleDPSPanel()
+        {
+            if (isVisible)
+            {
+                HideDPSPanel();
+            }
+            else
+            {
+                ShowDPSPanel();
+            }
+            isVisible = !isVisible;
         }
     }
 }

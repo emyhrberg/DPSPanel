@@ -9,4 +9,7 @@ Configs: {
 	}
 }
 
-"Keybinds.Toggle DPS Panel.DisplayName": Toggle  D P S  Panel
+Keybinds: {
+	"Toggle DPS Panel.DisplayName": Toggle  D P S  Panel
+	ToggleDPSPanel.DisplayName: Toggle D P S Panel
+}
