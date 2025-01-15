@@ -12,6 +12,12 @@ namespace BetterDPS.UI.DPS
         private bool dragging;
         private bool clickStartedInsidePanel;
 
+        // For resizing items
+        private const float ItemHeight = 20f; // Height of each item (label)
+        private const float Padding = 10f; // Padding for the panel
+        private const float InitialOffset = 30f; // Initial offset for the first item
+        private int itemCount = 0; // Track the number of items added
+
         // constructor
         public DPSPanel()
         {
@@ -27,6 +33,35 @@ namespace BetterDPS.UI.DPS
             PaddingLeft = 10;
             PaddingRight = 10;
             PaddingBottom = 10;
+        }
+
+        public void AddItem(string text)
+        {
+            // Create a new label for the item
+            var label = new UIText(text);
+            // Position
+            float top = InitialOffset + itemCount * ItemHeight;
+            label.Left.Set(Padding, 0f);
+            label.Top.Set(top, 0f);
+            // Append the label to the panel
+            Append(label);
+
+            // Increase item count and check if the panel needs resizing
+            itemCount++;
+            ResizeToFitItems();
+        }
+
+        private void ResizeToFitItems()
+        {
+            // Calculate the required height based on the number of items
+            float requiredHeight = Padding * 2 + itemCount * ItemHeight;
+
+            // Resize the panel if needed
+            if (Height.Pixels < requiredHeight)
+            {
+                Height.Set(requiredHeight, 0f);
+                Recalculate(); // Recalculate UI layout
+            }
         }
 
         public override void LeftMouseDown(UIMouseEvent evt)

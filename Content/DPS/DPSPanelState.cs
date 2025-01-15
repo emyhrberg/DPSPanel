@@ -45,6 +45,12 @@ namespace BetterDPS.UI.DPS
             buttonClose.OnLeftClick += new MouseEvent(CloseButtonClicked);
             dpsPanel.Append(buttonClose);
 
+            // Add the items
+            for (int i = 1; i <= 6; i++)
+            {
+                //dpsPanel.AddItem($"Item {i}");
+            }
+
             // Add the entire DPS panel to the UIState
             Append(dpsPanel);
         }
@@ -55,6 +61,9 @@ namespace BetterDPS.UI.DPS
             // Calculate DPS by getting the player source
             int dps = Main.LocalPlayer.getDPS();
             Main.NewText($"DPS: {dps}");
+
+            // add panel item
+            dpsPanel.AddItem($"DPS: {dps}");
         }
 
         private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)
