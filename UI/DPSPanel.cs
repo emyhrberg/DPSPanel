@@ -5,40 +5,58 @@ using Terraria.UI;
 
 namespace BetterDPS.UI
 {
-    public class DraggableUIPanel : UIPanel
+    public class DPSPanel : UIPanel
     {
         // Variables for dragging the panel
         private Vector2 offset;
         private bool dragging;
+        private bool clickStartedInsidePanel;
+
+        // constructor
+        public DPSPanel()
+        {
+            // Set the panel size and background color
+            Width.Set(300f, 0f);
+            Height.Set(150f, 0f);
+            Left.Set(400f, 0f); // distance from the left edge
+            Top.Set(200f, 0f); // distance from the top edge
+            BackgroundColor = new Color(73, 94, 171); // Light blue background
+        }
 
         public override void LeftMouseDown(UIMouseEvent evt)
         {
+            // When the mouse is pressed, start dragging the panel
             base.LeftMouseDown(evt);
             if (evt.Target == this)
             {
                 DragStart(evt);
+                clickStartedInsidePanel = true;
             }
         }
 
         public override void LeftMouseUp(UIMouseEvent evt)
         {
+            // When the mouse is released, stop dragging the panel
             base.LeftMouseUp(evt);
-            if (evt.Target == this)
+            if (clickStartedInsidePanel)
             {
                 DragEnd(evt);
             }
+            clickStartedInsidePanel = false; // default to false
         }
 
         private void DragStart(UIMouseEvent evt)
         {
+            // Start dragging the panel
             offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
             dragging = true;
         }
 
         private void DragEnd(UIMouseEvent evt)
         {
-            Vector2 endMousePosition = evt.MousePosition;
+            // Stop dragging the panel
             dragging = false;
+            Vector2 endMousePosition = evt.MousePosition;
             Left.Set(endMousePosition.X - offset.X, 0f);
             Top.Set(endMousePosition.Y - offset.Y, 0f);
             Recalculate();
@@ -48,11 +66,13 @@ namespace BetterDPS.UI
         {
             base.Update(gameTime);
 
-            if (ContainsPoint(Main.MouseScreen))
+            // If the mouse is inside the panel, set the mouse interface to true to prevent other UI elements from interacting
+            if (clickStartedInsidePanel && ContainsPoint(Main.MouseScreen))
             {
                 Main.LocalPlayer.mouseInterface = true;
             }
 
+            // Drag the panel
             if (dragging)
             {
                 Left.Set(Main.mouseX - offset.X, 0f);
@@ -60,6 +80,7 @@ namespace BetterDPS.UI
                 Recalculate();
             }
 
+            // Keep the panel within bounds
             var parentSpace = Parent.GetDimensions().ToRectangle();
             if (!GetDimensions().ToRectangle().Intersects(parentSpace))
             {

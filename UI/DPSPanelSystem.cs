@@ -14,16 +14,16 @@ namespace BetterDPS.UI
     /// It ensures the UI is rendered correctly by injecting it into Terraria's interface layers via ModifyInterfaceLayers.
     /// This class is also used to manage whether the UIState is currently active and visible.
     /// </remarks>
-    public class UISystem : ModSystem
+    public class DPSPanelSystem : ModSystem
     {
         // Variables
         private UserInterface ui;
-        internal UIContainer container;
+        internal DPSPanelState container;
 
         public override void Load()
         {
             // initialization code for the UI system
-            container = new UIContainer();
+            container = new DPSPanelState();
             container.Activate();
             ui = new UserInterface();
             ui.SetState(container);

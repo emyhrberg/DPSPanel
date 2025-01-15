@@ -9,18 +9,18 @@ namespace BetterDPS.Commands
     {
         public override CommandType Type => CommandType.Chat; // Makes the command available in chat
         public override string Command => "enable"; // The main command is "/enable"
-        public override string Usage => "Usage: /enable dps or /enable panel"; // Usage instructions
-        public override string Description => "Enable specific UI panels.";
+        public override string Usage => "Use: /enable dps"; // Usage instructions
+        public override string Description => "Enable DPS UI panels.";
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length < 1)
             {
-                throw new UsageException("Usage: /enable dps or /enable panel");
+                throw new UsageException("[BetterDPS] Use: /enable dps");
             }
 
             // Access the UISystem to manage the panels
-            var uiSystem = ModContent.GetInstance<UISystem>();
+            var uiSystem = ModContent.GetInstance<DPSPanelSystem>();
 
             // Determine the target
             string target = args[0].ToLower(); // "dps" or "panel"
@@ -28,16 +28,11 @@ namespace BetterDPS.Commands
             if (target == "dps")
             {
                 uiSystem.container.ShowDPSPanel();
-                Main.NewText("DPS Panel enabled.", Color.Green);
-            }
-            else if (target == "panel")
-            {
-                uiSystem.container.ShowExamplePanel();
-                Main.NewText("Example Panel enabled.", Color.Green);
+                Main.NewText("[BetterDPS] DPS Panel enabled.", Color.Green);
             }
             else
             {
-                throw new UsageException("Invalid target. Usage: / enable dps or / enable panel");
+                throw new UsageException("[BetterDPS] Invalid target. Use: /enable dps");
             }
         }
     }
