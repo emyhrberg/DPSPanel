@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace BetterDPS.UI.DPS
+namespace DPSPanel.MainCode.Panel
 {
     /// <summary>
     /// Manages the lifecycle and integration of a UIState with Terraria's interface layers.
@@ -55,7 +55,7 @@ namespace BetterDPS.UI.DPS
             if (mouseTextIndex != -1)
             {
                 layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
-                    "BetterDPS: UI System",
+                    "DPSPanel: UI System",
                     delegate
                     {
                         ui.Draw(Main.spriteBatch, new GameTime());

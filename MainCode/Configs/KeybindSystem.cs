@@ -1,8 +1,8 @@
 ﻿using Terraria.ModLoader;
-using BetterDPS.UI.DPS;
 using Terraria;
+using DPSPanel.MainCode.Panel;
 
-namespace BetterDPS.Content.Configs
+namespace DPSPanel.MainCode.Configs
 {
     // Acts as a container for keybinds registered by this mod.
     // See Common/Players/ExampleKeybindPlayer for usage.
@@ -25,7 +25,6 @@ namespace BetterDPS.Content.Configs
             toggleDPSPanelKeybind = null;
         }
 
-
         /*
          * Actually update the input state.
          */
@@ -34,8 +33,8 @@ namespace BetterDPS.Content.Configs
             if (toggleDPSPanelKeybind.JustPressed)
             {
                 // Toggle the DPS panel
-                var container = ModContent.GetInstance<DPSPanelState>();
-                container.ToggleDPSPanel();
+                var uiSystem = ModContent.GetInstance<DPSPanelSystem>();
+                uiSystem.state.ToggleDPSPanel();
             }
         }
     }

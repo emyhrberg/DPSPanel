@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BetterDPS.Content.DPS;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace BetterDPS.UI.DPS
+namespace DPSPanel.MainCode.Panel
 {
     public class DPSPanel : UIPanel
     {
@@ -39,37 +38,8 @@ namespace BetterDPS.UI.DPS
             AddItem("DPS Panel");
         }
 
-        public void UpdateBossDamage(Dictionary<string, int> bossesAndDamage)
-        {
-            foreach (var entry in bossesAndDamage)
-            {
-                if (bossLabels.ContainsKey(entry.Key))
-                {
-                    // Update existing label
-                    bossLabels[entry.Key].SetText($"{entry.Key}: {entry.Value} damage");
-                }
-                else
-                {
-                    // Add new label for this boss
-                    var label = new UIText($"{entry.Key}: {entry.Value} damage")
-                    {
-                        Top = new StyleDimension(bossLabels.Count * 20 + 10, 0f),
-                        Left = new StyleDimension(10f, 0f)
-                    };
-                    Append(label);
-                    bossLabels[entry.Key] = label;
-
-                    // Resize the panel to fit
-                    ResizeToFitItems();
-                }
-            }
-        }
-
         public void AddItem(string text)
         {
-            // Add a new item to the panel
-            RemoveAllChildren(); // Clear the panel to add new items
-
             var label = new UIText(text)
             {
                 Top = new StyleDimension(currentYOffset, 0f),

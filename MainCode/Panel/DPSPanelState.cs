@@ -8,10 +8,9 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
-using BetterDPS.Content.DPS;
 using System.Collections.Generic;
 
-namespace BetterDPS.UI.DPS
+namespace DPSPanel.MainCode.Panel
 {
     /// <summary>
     /// Represents a container for UI elements in Terraria's modding framework.
@@ -34,11 +33,6 @@ namespace BetterDPS.UI.DPS
             Append(dpsPanel);
         }
 
-        public void UpdateDPSPanel(Dictionary<string, int> bossDamage)
-        {
-            dpsPanel.UpdateBossDamage(bossDamage);
-        }
-
         /*
          * Button methods
          */////////////////////////////////////////////////////////////////////////////////////
@@ -48,15 +42,15 @@ namespace BetterDPS.UI.DPS
             // Add the draggable panel which shows dps
 
             // Add play button to the panel
-            Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
-            DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Calculate DPS");
-            SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
-            buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
-            dpsPanel.Append(buttonPlay);
+            //Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
+            //DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Calculate DPS");
+            //SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
+            //buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
+            //dpsPanel.Append(buttonPlay);
 
             // Add close button to the panel
             // this one loads from Assets/ButtonClose.png
-            Asset<Texture2D> buttonCloseTexture = ModContent.Request<Texture2D>("BetterDPS/Content/Assets/ButtonClose");
+            Asset<Texture2D> buttonCloseTexture = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/ButtonClose");
             DPSPanelHoverButton buttonClose = new DPSPanelHoverButton(buttonCloseTexture, "Close");
             SetRectangle(buttonClose, 300 - 40, 0, 40, 40); // top right corner
             buttonClose.OnLeftClick += new MouseEvent(CloseButtonClicked);
@@ -93,19 +87,24 @@ namespace BetterDPS.UI.DPS
         /*
          * Methods to toggle DPS Panel
          */////////////////////////////////////////////////////////////////////////////////////
+        public void ClearDPSPanel()
+        {
+            Main.NewText("[DPSPanel] DPS Panel cleared.", Color.Green);
+        }
+
         public void ShowDPSPanel()
         {
             if (!Children.Contains(dpsPanel))
             {
                 Append(dpsPanel); // Append the panel to the UIState
-                Main.NewText("[BetterDPS] DPS Panel enabled.", Color.Green);
+                Main.NewText("[DPSPanel] DPS Panel enabled.", Color.Green);
             }
         }
 
         public void HideDPSPanel()
         {
             dpsPanel.Remove();
-            Main.NewText("[BetterDPS] DPS Panel disabled. Use /enable dps or 'K' to enable it again.", Color.Red);
+            Main.NewText("[DPSPanel] DPS Panel hidden. Use /dps show to show it again.", Color.Red);
         }
 
         public void ToggleDPSPanel()
