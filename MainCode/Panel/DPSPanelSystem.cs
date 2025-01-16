@@ -4,7 +4,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace DPSPanel.UI.DPS
+namespace DPSPanel.MainCode.Panel
 {
     /// <summary>
     /// Manages the lifecycle and integration of a UIState with Terraria's interface layers.

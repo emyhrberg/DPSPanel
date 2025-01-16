@@ -8,10 +8,11 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
-using DPSPanel.Content.DPS;
+using BetterDPS.Content.DPS;
 using System.Collections.Generic;
+using DPSPanel.MainCode.Configs;
 
-namespace DPSPanel.UI.DPS
+namespace DPSPanel.MainCode.Panel
 {
     /// <summary>
     /// Represents a container for UI elements in Terraria's modding framework.
@@ -43,32 +44,28 @@ namespace DPSPanel.UI.DPS
             // Add the draggable panel which shows dps
 
             // Add play button to the panel
-            //Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
-            //DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Calculate DPS");
-            //SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
-            //buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
-            //dpsPanel.Append(buttonPlay);
+            Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
+            DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Clear");
+            SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
+            buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
+            dpsPanel.Append(buttonPlay);
 
             // Add close button to the panel
             // this one loads from Assets/ButtonClose.png
-            Asset<Texture2D> buttonCloseTexture = ModContent.Request<Texture2D>("DPSPanel/Content/Assets/ButtonClose");
+            Asset<Texture2D> buttonCloseTexture = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/ButtonClose");
             DPSPanelHoverButton buttonClose = new DPSPanelHoverButton(buttonCloseTexture, "Close");
-            SetRectangle(buttonClose, 300 - 40, 0, 40, 40); // top right corner
+            SetRectangle(buttonClose, 320 - 40, 0, 40, 40); // top right corner
             buttonClose.OnLeftClick += new MouseEvent(CloseButtonClicked);
             dpsPanel.Append(buttonClose);
 
         }
 
-        //private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)
-        //{
-        //    SoundEngine.PlaySound(SoundID.MenuOpen);
-        //    // Calculate DPS by getting the player source
-        //    int dps = Main.LocalPlayer.getDPS();
-        //    Main.NewText($"DPS: {dps}");
-
-        //    // add panel item
-        //    dpsPanel.AddItem($"DPS: {dps}");
-        //}
+        private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)
+        {
+            SoundEngine.PlaySound(SoundID.MenuOpen);
+            // clear panel
+            dpsPanel.ClearItems();
+        }
 
         private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)
         {
@@ -90,26 +87,34 @@ namespace DPSPanel.UI.DPS
          */////////////////////////////////////////////////////////////////////////////////////
         public void ClearDPSPanel()
         {
-            if (Children.Contains(dpsPanel))
-            {
-                dpsPanel.clearAllItems();
-                Main.NewText(" DPS Panel cleared. /enable /disable /clear dps are available.", Color.PaleVioletRed);
-            }
+            dpsPanel.ClearItems();
+            Main.NewText("CLEAR dps panel.", Color.Green);
         }
 
         public void ShowDPSPanel()
         {
             if (!Children.Contains(dpsPanel))
             {
+                // get keybind
+                //KeybindSystem.toggleDPSPanelKeybind.GetAssignedKeys();
+                 //get the keybind for toggleDPSPanel
+                //if (KeybindSystem.toggleDPSPanelKeybind.GetAssignedKeys().Count == 0)
+                //{
+                    //Main.NewText("No keybind assigned for toggleDPSPanel. Please assign a keybind in the controls menu.", Color.Red);
+                    //return;
+                //}
+
+                isVisible = true;
                 Append(dpsPanel); // Append the panel to the UIState
-                Main.NewText("DPS Panel enabled.  /enable /disable /clear dps are available.", Color.Green);
+                Main.NewText("SHOW dps panel. Press K to toggle.", Color.Green);
             }
         }
 
         public void HideDPSPanel()
         {
+            isVisible = false;
             dpsPanel.Remove();
-            Main.NewText("DPS Panel disabled.  /enable /disable /clear dps are available.", Color.Red);
+            Main.NewText("HIDE dps panel. Press K to toggle.", Color.Red);
         }
 
         public void ToggleDPSPanel()
@@ -122,7 +127,6 @@ namespace DPSPanel.UI.DPS
             {
                 ShowDPSPanel();
             }
-            isVisible = !isVisible;
         }
     }
 }

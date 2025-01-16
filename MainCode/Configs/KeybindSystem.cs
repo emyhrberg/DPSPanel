@@ -1,15 +1,14 @@
 ﻿using Terraria.ModLoader;
-using DPSPanel.UI.DPS;
 using Terraria;
+using DPSPanel.MainCode.Panel;
 
-namespace DPSPanel.Content.Configs
+namespace DPSPanel.MainCode.Configs
 {
     // Acts as a container for keybinds registered by this mod.
     // See Common/Players/ExampleKeybindPlayer for usage.
     public class KeybindSystem : ModSystem
     {
         public static ModKeybind toggleDPSPanelKeybind { get; private set; }
-
 
         public override void Load()
         {
@@ -33,8 +32,8 @@ namespace DPSPanel.Content.Configs
             if (toggleDPSPanelKeybind.JustPressed)
             {
                 // Toggle the DPS panel
-                var container = ModContent.GetInstance<DPSPanelState>();
-                container.ToggleDPSPanel();
+                var uiSystem = ModContent.GetInstance<DPSPanelSystem>();
+                uiSystem.state.ToggleDPSPanel();
             }
         }
     }
