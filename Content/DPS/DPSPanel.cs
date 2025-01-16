@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BetterDPS.Content.DPS;
+using DPSPanel.Content.DPS;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace BetterDPS.UI.DPS
+namespace DPSPanel.UI.DPS
 {
     public class DPSPanel : UIPanel
     {
@@ -17,17 +17,14 @@ namespace BetterDPS.UI.DPS
         private bool clickStartedInsidePanel;
 
         // Panel items
-        private const float ItemHeight = 30f; // Height of each item (label)
-        private const float Padding = 10f; // Padding for the panel
+        public Dictionary<string, List<UIText>> bossEntries = new();
         private int itemCount = 0; // Track the number of items added
-        private float currentYOffset = 10f; // Initial offset for the first row
-        private readonly Dictionary<string, UIText> bossLabels = new();
 
         public DPSPanel()
         {
             // Set the panel size and background color
             Width.Set(300f, 0f);
-            Height.Set(150f, 0f);
+            Height.Set(50f, 0f);
             Left.Set(400f, 0f); // distance from the left edge
             Top.Set(200f, 0f); // distance from the top edge
             BackgroundColor = new Color(73, 94, 171); // Light blue background
@@ -36,62 +33,73 @@ namespace BetterDPS.UI.DPS
             SetPadding(10);
 
             // add initial text
-            AddItem("DPS Panel");
-        }
-
-        public void UpdateBossDamage(Dictionary<string, int> bossesAndDamage)
-        {
-            foreach (var entry in bossesAndDamage)
-            {
-                if (bossLabels.ContainsKey(entry.Key))
-                {
-                    // Update existing label
-                    bossLabels[entry.Key].SetText($"{entry.Key}: {entry.Value} damage");
-                }
-                else
-                {
-                    // Add new label for this boss
-                    var label = new UIText($"{entry.Key}: {entry.Value} damage")
-                    {
-                        Top = new StyleDimension(bossLabels.Count * 20 + 10, 0f),
-                        Left = new StyleDimension(10f, 0f)
-                    };
-                    Append(label);
-                    bossLabels[entry.Key] = label;
-
-                    // Resize the panel to fit
-                    ResizeToFitItems();
-                }
-            }
+            AddItem("DPS Panel (Type /help)");
         }
 
         public void AddItem(string text)
         {
-            // Add a new item to the panel
-            RemoveAllChildren(); // Clear the panel to add new items
-
-            var label = new UIText(text)
-            {
-                Top = new StyleDimension(currentYOffset, 0f),
-                Left = new StyleDimension(10f, 0f)
-            };
+            var label = new UIText(text);
+            label.Top.Set(itemCount * 20f, 0f); // Position the new item below existing ones
             Append(label);
 
-            currentYOffset += 20f; // Increment Y offset for the next item
-            ResizeToFitItems();
+            itemCount++;
+            RecalculateHeight();
         }
 
-        private void ResizeToFitItems()
+        public void AddItemForBoss(string bossKey, string text)
         {
-            // Calculate the required height based on the number of items
-            float requiredHeight = Padding * 2 + itemCount * ItemHeight;
-
-            // Resize the panel if needed
-            if (Height.Pixels < requiredHeight)
+            if (!bossEntries.ContainsKey(bossKey))
             {
-                Height.Set(requiredHeight, 0f);
-                Recalculate(); // Recalculate UI layout
+                bossEntries[bossKey] = new List<UIText>();
             }
+
+            var label = new UIText(text);
+            label.Top.Set(itemCount * 20f, 0f); // Position below the current items
+            Append(label);
+
+            bossEntries[bossKey].Add(label);
+            itemCount++;
+            RecalculateHeight(); 
+        }
+
+        public void ClearItemsForBoss(string bossKey)
+        {
+            if (bossEntries.ContainsKey(bossKey))
+            {
+                foreach (var entry in bossEntries[bossKey])
+                {
+                    RemoveChild(entry);
+                    itemCount--; 
+                }
+                bossEntries[bossKey].Clear();
+                RecalculateHeight(); 
+            }
+        }
+
+        public void ClearAllItems()
+        {
+            foreach (var boss in bossEntries)
+            {
+                foreach (var entry in boss.Value)
+                {
+                    RemoveChild(entry);
+                }
+            }
+
+            bossEntries.Clear();
+            RemoveAllChildren();
+            itemCount = 0; // Reset item count
+            AddItem("DPS Panel (Type /help)");
+            // TODO dont remove the close button lol
+        }
+
+        private void RecalculateHeight()
+        {
+            // Calculate the total height based on the number of rows (boss headers and damage rows)
+            int totalItems = bossEntries.Values.Sum(entries => entries.Count) + bossEntries.Count; // Include headers
+            float newHeight = 50f + totalItems * 20f; // Base height + 20 pixels per item
+            Height.Set(newHeight, 0f);
+            Recalculate();
         }
 
         /*

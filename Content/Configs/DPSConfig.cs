@@ -1,6 +1,6 @@
 ﻿//using Terraria.ModLoader.Config;
 
-//namespace BetterDPS.Config
+//namespace DPSPanel.Config
 //{
 //    [Label("DPS Panel Settings")]
 //    public class DPSConfig : ModConfig

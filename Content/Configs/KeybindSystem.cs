@@ -1,8 +1,8 @@
 ﻿using Terraria.ModLoader;
-using BetterDPS.UI.DPS;
+using DPSPanel.UI.DPS;
 using Terraria;
 
-namespace BetterDPS.Content.Configs
+namespace DPSPanel.Content.Configs
 {
     // Acts as a container for keybinds registered by this mod.
     // See Common/Players/ExampleKeybindPlayer for usage.
@@ -24,7 +24,6 @@ namespace BetterDPS.Content.Configs
             // Not required if your AssemblyLoadContext is unloading properly, but nulling out static fields can help you figure out what's keeping it loaded.
             toggleDPSPanelKeybind = null;
         }
-
 
         /*
          * Actually update the input state.
