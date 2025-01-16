@@ -9,6 +9,7 @@ using Terraria.Audio;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using DPSPanel.MainCode.Configs;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -23,7 +24,7 @@ namespace DPSPanel.MainCode.Panel
     public class DPSPanelState : UIState
     {
         // Variables
-        private DPSPanel dpsPanel;
+        public DPSPanel dpsPanel;
         private bool isVisible = true;
 
         public override void OnInitialize()
@@ -52,7 +53,7 @@ namespace DPSPanel.MainCode.Panel
             // this one loads from Assets/ButtonClose.png
             Asset<Texture2D> buttonCloseTexture = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/ButtonClose");
             DPSPanelHoverButton buttonClose = new DPSPanelHoverButton(buttonCloseTexture, "Close");
-            SetRectangle(buttonClose, 300 - 40, 0, 40, 40); // top right corner
+            SetRectangle(buttonClose, 320 - 40, 0, 40, 40); // top right corner
             buttonClose.OnLeftClick += new MouseEvent(CloseButtonClicked);
             dpsPanel.Append(buttonClose);
 
@@ -66,7 +67,7 @@ namespace DPSPanel.MainCode.Panel
             Main.NewText($"DPS: {dps}");
 
             // add panel item
-            dpsPanel.AddItem($"DPS: {dps}");
+            //dpsPanel.AddItem($"DPS: {dps}");
         }
 
         private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)
@@ -89,22 +90,34 @@ namespace DPSPanel.MainCode.Panel
          */////////////////////////////////////////////////////////////////////////////////////
         public void ClearDPSPanel()
         {
-            Main.NewText("[DPSPanel] DPS Panel cleared.", Color.Green);
+            dpsPanel.ClearItems();
+            Main.NewText("CLEAR dps panel.", Color.Green);
         }
 
         public void ShowDPSPanel()
         {
             if (!Children.Contains(dpsPanel))
             {
+                // get keybind
+                //KeybindSystem.toggleDPSPanelKeybind.GetAssignedKeys();
+                 //get the keybind for toggleDPSPanel
+                //if (KeybindSystem.toggleDPSPanelKeybind.GetAssignedKeys().Count == 0)
+                //{
+                    //Main.NewText("No keybind assigned for toggleDPSPanel. Please assign a keybind in the controls menu.", Color.Red);
+                    //return;
+                //}
+
+                isVisible = true;
                 Append(dpsPanel); // Append the panel to the UIState
-                Main.NewText("[DPSPanel] DPS Panel enabled.", Color.Green);
+                Main.NewText("SHOW dps panel. Press K to toggle.", Color.Green);
             }
         }
 
         public void HideDPSPanel()
         {
+            isVisible = false;
             dpsPanel.Remove();
-            Main.NewText("[DPSPanel] DPS Panel hidden. Use /dps show to show it again.", Color.Red);
+            Main.NewText("HIDE dps panel. Press K to toggle.", Color.Red);
         }
 
         public void ToggleDPSPanel()
@@ -117,7 +130,6 @@ namespace DPSPanel.MainCode.Panel
             {
                 ShowDPSPanel();
             }
-            isVisible = !isVisible;
         }
     }
 }

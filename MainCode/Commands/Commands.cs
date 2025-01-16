@@ -1,6 +1,4 @@
-﻿using Terraria;
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
+﻿using Terraria.ModLoader;
 using DPSPanel.MainCode.Panel;
 
 namespace DPSPanel.MainCode.Commands
@@ -16,7 +14,7 @@ namespace DPSPanel.MainCode.Commands
         {
             if (args.Length < 1)
             {
-                throw new UsageException("Error: Please enter an argument");
+                throw new UsageException("Error: Please enter an argument. Valid arguments are: hide, show, clear.");
             }
 
             // Access the UISystem to manage the panels
@@ -37,10 +35,9 @@ namespace DPSPanel.MainCode.Commands
             {
                 uiSystem.state.ClearDPSPanel();
             }
-
             else
             {
-                throw new UsageException("Error: Incorrect argument inputted");
+                throw new UsageException("Error: Incorrect argument. Valid arguments are: hide, show, clear.");
             }
         }
     }

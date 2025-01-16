@@ -10,7 +10,6 @@ namespace DPSPanel.MainCode.Configs
     {
         public static ModKeybind toggleDPSPanelKeybind { get; private set; }
 
-
         public override void Load()
         {
             // Registers a new keybind

@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace DPSPanel.MainCode.Panel
@@ -16,52 +14,74 @@ namespace DPSPanel.MainCode.Panel
         private bool clickStartedInsidePanel;
 
         // Panel items
-        private const float ItemHeight = 30f; // Height of each item (label)
+        private const float ItemHeight = 22f;
         private const float Padding = 10f; // Padding for the panel
-        private int itemCount = 0; // Track the number of items added
-        private float currentYOffset = 10f; // Initial offset for the first row
-        private readonly Dictionary<string, UIText> bossLabels = new();
+        private float currentYOffset = 22f; // Initial offset for the first row
+
+        // Store the labels for each boss
+        private Dictionary<string, UIText> bossLabels = new Dictionary<string, UIText>();
 
         public DPSPanel()
         {
             // Set the panel size and background color
-            Width.Set(300f, 0f);
-            Height.Set(150f, 0f);
+            Width.Set(322f, 0f);
+            Height.Set(60f, 0f);
             Left.Set(400f, 0f); // distance from the left edge
             Top.Set(200f, 0f); // distance from the top edge
             BackgroundColor = new Color(73, 94, 171); // Light blue background
-
-            // adjust padding for adding child elements
             SetPadding(10);
 
             // add initial text
-            AddItem("DPS Panel");
+            AddHeaderTextToPanel("DPS Panel (press K to toggle)");
         }
 
-        public void AddItem(string text)
+        private void AddHeaderTextToPanel(string text)
         {
-            var label = new UIText(text)
-            {
-                Top = new StyleDimension(currentYOffset, 0f),
-                Left = new StyleDimension(10f, 0f)
-            };
+            var label = new UIText(text);
+            label.TextColor = new Color(255,255,255);
             Append(label);
+        }
 
-            currentYOffset += 20f; // Increment Y offset for the next item
-            ResizeToFitItems();
+        public void UpdateItem(string key, string text, Color color)
+        {
+            // If we already have a label for this key, update its text
+            if (bossLabels.ContainsKey(key))
+            {
+                bossLabels[key].SetText(text);
+                bossLabels[key].TextColor = color;
+            }
+            // Otherwise, create a new label
+            else
+            {
+                var label = new UIText(text);
+                label.Top.Set(currentYOffset, 0f);
+                label.TextColor = color;
+
+                bossLabels.Add(key, label);
+                Append(label);
+                ResizeToFitItems();
+            }
         }
 
         private void ResizeToFitItems()
         {
-            // Calculate the required height based on the number of items
-            float requiredHeight = Padding * 2 + itemCount * ItemHeight;
+            currentYOffset += ItemHeight + 2f; // extra for padding
+            Height.Set(currentYOffset + Padding, 0f);
+            Recalculate();
+        }
 
-            // Resize the panel if needed
-            if (Height.Pixels < requiredHeight)
+        public void ClearItems()
+        {
+            // Remove only the items in bossLabels
+            foreach (var kvp in bossLabels)
             {
-                Height.Set(requiredHeight, 0f);
-                Recalculate(); // Recalculate UI layout
+                kvp.Value.Remove();
             }
+            bossLabels.Clear();
+
+            // Reset the Y offset to below the header
+            currentYOffset = 30f;
+            ResizeToFitItems();
         }
 
         /*
