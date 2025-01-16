@@ -43,11 +43,11 @@ namespace DPSPanel.MainCode.Panel
             // Add the draggable panel which shows dps
 
             // Add play button to the panel
-            //Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
-            //DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Calculate DPS");
-            //SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
-            //buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
-            //dpsPanel.Append(buttonPlay);
+            Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
+            DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Clear");
+            SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
+            buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
+            dpsPanel.Append(buttonPlay);
 
             // Add close button to the panel
             // this one loads from Assets/ButtonClose.png
@@ -62,12 +62,8 @@ namespace DPSPanel.MainCode.Panel
         private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)
         {
             SoundEngine.PlaySound(SoundID.MenuOpen);
-            // Calculate DPS by getting the player source
-            int dps = Main.LocalPlayer.getDPS();
-            Main.NewText($"DPS: {dps}");
-
-            // add panel item
-            //dpsPanel.AddItem($"DPS: {dps}");
+            // clear panel
+            dpsPanel.ClearItems();
         }
 
         private void CloseButtonClicked(UIMouseEvent evt, UIElement listeningElement)

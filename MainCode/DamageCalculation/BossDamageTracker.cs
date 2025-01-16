@@ -162,11 +162,11 @@ namespace DPSPanel.MainCode.Panel
                     lastHitWeapon.damage = 0;
             }
 
-            //Main.NewText(
-            //    $"[Boss Fight {bossIdCounter} - {currFight.bossName}] " +
-            //    $"Initial Life: {currFight.initialLife} | " +
-            //    $"Final Damage: {currFight.damageTaken} (Corrected by {discrepancy})."
-            //);
+            Main.NewText(
+                $"[Boss Fight {bossIdCounter} - {currFight.bossName}] " +
+                $"Initial Life: {currFight.initialLife} | " +
+                $"Final Damage: {currFight.damageTaken} (Corrected by {discrepancy})."
+            );
 
             // Update the panel after correction
             UpdateDPSPanel(currFight);
@@ -181,10 +181,15 @@ namespace DPSPanel.MainCode.Panel
             if (bossFights.Count == 0)
                 return;
 
-            // If we want to limit to 3 fights, for example:
+            // Max 3 bosses, then reset
             if (bossFights.Count > 3)
             {
+                // Clear the dictionary
                 bossFights.Clear();
+                var uiSystemClear = ModContent.GetInstance<DPSPanelSystem>();
+                uiSystemClear.state.dpsPanel.ClearItems();
+                bossIdCounter = 0;
+
                 return;
             }
 
