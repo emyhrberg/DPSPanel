@@ -1,4 +1,6 @@
-# BetterDPS
+# DPSPanel
+
+![icon_workshop](https://github.com/user-attachments/assets/60d67299-cbf9-47c7-a94b-21db788a14dd)
 
 WIP
 
