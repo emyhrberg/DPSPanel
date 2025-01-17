@@ -22,6 +22,7 @@ namespace DPSPanel.MainCode.Panel
         public class MyPlayer
         {
             public string playerName;
+            public int totalDamage;
             public List<Weapons> weapons = new List<Weapons>();
         }
 
@@ -84,9 +85,14 @@ namespace DPSPanel.MainCode.Panel
             var player = currentFight.players.FirstOrDefault(p => p.playerName == playerName);
             if (player == null)
             {
-                player = new MyPlayer { playerName = playerName, weapons = new List<Weapons>() };
+                player = new MyPlayer { 
+                    playerName = playerName, 
+                    weapons = new List<Weapons>(),
+                    totalDamage = 0
+                };
                 currentFight.players.Add(player);
             }
+            player.totalDamage += damageDone; // Always update the player damage
 
             // Find or add the weapon entry
             var weapon = player.weapons.FirstOrDefault(w => w.weaponName == weaponName);
@@ -120,6 +126,7 @@ namespace DPSPanel.MainCode.Panel
             foreach (var p in fight.players)
             {
                 packet.Write(p.playerName);
+                packet.Write(p.totalDamage);
                 packet.Write(p.weapons.Count);
                 foreach (var weapon in p.weapons)
                 {
