@@ -132,7 +132,7 @@ namespace DPSPanel.MainCode.Panel
             lastHitWeapon = existingWeapon;
             lastHitPlayer = existingPlayer;
 
-            // 8) Update the panel each time (optional)
+            // 8) Update the panel each time
             UpdateDPSPanel(currentFight);
         }
 
@@ -162,10 +162,13 @@ namespace DPSPanel.MainCode.Panel
                     lastHitWeapon.damage = 0;
             }
 
+            // Get players and damage and summarize like Player: Damage
+            string playersDamage = string.Join(", ", currFight.players
+                .Select(p => $"{p.playerName}: {p.weapons.Sum(w => w.damage)}"));
+
             Main.NewText(
-                $"[Boss Fight {bossIdCounter} - {currFight.bossName}] " +
-                $"Initial Life: {currFight.initialLife} | " +
-                $"Final Damage: {currFight.damageTaken} (Corrected by {discrepancy})."
+                $"[Boss Fight {bossIdCounter} - {currFight.bossName}] Damage: " +
+                $"{playersDamage}"
             );
 
             // Update the panel after correction
@@ -181,15 +184,13 @@ namespace DPSPanel.MainCode.Panel
             if (bossFights.Count == 0)
                 return;
 
-            // Max 3 bosses, then reset
-            if (bossFights.Count > 3)
+            // Max 5 bosses, then reset
+            if (bossFights.Count > 5)
             {
                 // Clear the dictionary
                 bossFights.Clear();
                 var uiSystemClear = ModContent.GetInstance<DPSPanelSystem>();
                 uiSystemClear.state.dpsPanel.ClearItems();
-                bossIdCounter = 0;
-
                 return;
             }
 

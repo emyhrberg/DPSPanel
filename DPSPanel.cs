@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using Terraria.ModLoader;
-using Terraria.UI;
-using Terraria;
+using System.IO;
 
 namespace DPSPanel
 {
@@ -14,5 +9,12 @@ namespace DPSPanel
     public class DPSPanel : Mod
 	{
 
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            Logger.Info("Packet received HandlePacket() called!");
+
+            string message = reader.ReadString();
+            Logger.Info("Packet received Message: " + message);
+        }
     }
 }

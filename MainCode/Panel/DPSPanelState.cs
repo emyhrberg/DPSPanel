@@ -8,7 +8,6 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Microsoft.Xna.Framework;
-using BetterDPS.Content.DPS;
 using System.Collections.Generic;
 using DPSPanel.MainCode.Configs;
 
@@ -25,13 +24,24 @@ namespace DPSPanel.MainCode.Panel
     public class DPSPanelState : UIState
     {
         // Variables
-        public DPSPanel dpsPanel;
+        public DPSPanelPanel dpsPanel;
         private bool isVisible = true;
 
         public override void OnInitialize()
         {
-            dpsPanel = new DPSPanel();
+            // Create the DPS panel
+            dpsPanel = new DPSPanelPanel();
+            dpsPanel.Width.Set(322f, 0f);
+            dpsPanel.Height.Set(72f, 0f);
+            dpsPanel.Left.Set(400f, 0f); // distance from the left edge
+            dpsPanel.Top.Set(200f, 0f); // distance from the top edge
+            dpsPanel.BackgroundColor = new Color(73, 94, 171); // Light blue background
+            SetPadding(10);
+
+            // buttons
             initializeButtons(dpsPanel);
+
+            // add the panel to the UIState
             Append(dpsPanel);
         }
 
@@ -39,12 +49,12 @@ namespace DPSPanel.MainCode.Panel
          * Button methods
          */////////////////////////////////////////////////////////////////////////////////////
 
-        public void initializeButtons(DPSPanel dpsPanel)
+        public void initializeButtons(DPSPanelPanel dpsPanel)
         {
             // Add the draggable panel which shows dps
 
             // Add play button to the panel
-            Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonPlay");
+            Asset<Texture2D> buttonPlayTexture = ModContent.Request<Texture2D>("Terraria/Images/UI/ButtonDelete");
             DPSPanelHoverButton buttonPlay = new DPSPanelHoverButton(buttonPlayTexture, "Clear");
             SetRectangle(buttonPlay, 0, 0, 40, 40); // top left corner
             buttonPlay.OnLeftClick += new MouseEvent(PlayButtonClicked);
@@ -57,7 +67,6 @@ namespace DPSPanel.MainCode.Panel
             SetRectangle(buttonClose, 320 - 40, 0, 40, 40); // top right corner
             buttonClose.OnLeftClick += new MouseEvent(CloseButtonClicked);
             dpsPanel.Append(buttonClose);
-
         }
 
         private void PlayButtonClicked(UIMouseEvent evt, UIElement listeningElement)

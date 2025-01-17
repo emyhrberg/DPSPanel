@@ -6,7 +6,7 @@ using Terraria.UI;
 
 namespace DPSPanel.MainCode.Panel
 {
-    public class DPSPanel : UIPanel
+    public class DPSPanelPanel : UIPanel
     {
         // Variables for dragging the panel
         private Vector2 offset;
@@ -16,28 +16,28 @@ namespace DPSPanel.MainCode.Panel
         // Panel items
         private const float ItemHeight = 22f;
         private const float Padding = 10f; // Padding for the panel
-        private float currentYOffset = 22f; // Initial offset for the first row
+        private float currentYOffset = 12f; // Initial offset for the first row
 
         // Store the labels for each boss
         private Dictionary<string, UIText> bossLabels = new Dictionary<string, UIText>();
 
-        public DPSPanel()
+        public DPSPanelPanel()
         {
-            // Set the panel size and background color
-            Width.Set(322f, 0f);
-            Height.Set(60f, 0f);
-            Left.Set(400f, 0f); // distance from the left edge
-            Top.Set(200f, 0f); // distance from the top edge
-            BackgroundColor = new Color(73, 94, 171); // Light blue background
-            SetPadding(10);
+            // empty constructor
+        }
 
-            // add initial text
+        public override void OnInitialize()
+        {
+            base.OnInitialize();
+
             AddHeaderTextToPanel("DPS Panel (press K to toggle)");
+            ResizeToFitItems();
         }
 
         private void AddHeaderTextToPanel(string text)
         {
             var label = new UIText(text);
+            label.Left.Set(30f, 0f);
             label.TextColor = new Color(255,255,255);
             Append(label);
         }

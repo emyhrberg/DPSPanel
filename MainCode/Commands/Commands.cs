@@ -1,5 +1,6 @@
-﻿using Terraria.ModLoader;
-using DPSPanel.MainCode.Panel;
+﻿using DPSPanel.MainCode.Panel;
+using log4net.Repository.Hierarchy;
+using Terraria.ModLoader;
 
 namespace DPSPanel.MainCode.Commands
 {
@@ -34,6 +35,13 @@ namespace DPSPanel.MainCode.Commands
             else if (target == "clear")
             {
                 uiSystem.state.ClearDPSPanel();
+            }
+            else if (target == "send")
+            {
+                // Send a packet to the server
+                ModPacket packet = Mod.GetPacket();
+                packet.Write("KingSlime");
+                packet.Send(); // Send the packet to the server
             }
             else
             {

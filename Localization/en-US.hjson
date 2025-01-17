@@ -1,0 +1,6 @@
+Keybinds: {
+	"Toggle DPS Panel.DisplayName": Toggle  DPS Panel
+	ToggleDPSPanel.DisplayName: Toggle DPS Panel
+}
+
+Mods.DPSPanel.Keybinds.ToggleDPSPanel.DisplayName: Toggle D P S Panel

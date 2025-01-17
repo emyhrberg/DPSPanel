@@ -1,3 +1,4 @@
-displayName = Better DPS
+displayName = DPSPanel
 author = Erky
 version = 0.1
+side=both

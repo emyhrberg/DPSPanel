@@ -17,16 +17,14 @@ namespace DPSPanel.MainCode.Panel
     public class DPSPanelSystem : ModSystem
     {
         // Variables
-        private UserInterface ui;
-        internal DPSPanelState state;
+        private UserInterface ui = new UserInterface();
+        internal DPSPanelState state = new DPSPanelState();
 
         public override void Load()
         {
             // initialization code for the UI system
-            state = new DPSPanelState();
-            state.Activate();
-            ui = new UserInterface();
-            ui.SetState(state);
+            //state = new DPSPanelState();
+            //ui = new UserInterface();
         }
 
         public override void Unload()
@@ -36,10 +34,24 @@ namespace DPSPanel.MainCode.Panel
             state = null;
         }
 
+        public override void PostSetupContent()
+        {
+            if (Main.dedServ)
+            {
+                return;
+            } // don't run the rest of the code on a dedicated server.
+              // ded means dedicated server meaning the server is running without a client meaning no UI is needed
+
+            state.Activate();
+            ui.SetState(state);
+        }
+
         public override void UpdateUI(GameTime gameTime)
         {
             // always update the UI (everything in the UIContainer)
             ui?.Update(gameTime);
+
+            
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
