@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ModLoader;
 using Terraria.UI;
+using static DPSPanel.MainCode.Panel.BossDamageTracker;
 
 namespace DPSPanel.MainCode.Panel
 {
-    public class DPSPanelPanel : UIPanel
+    public class DPSDraggablePanel : UIPanel
     {
         // Variables for dragging the panel
         private Vector2 offset;
@@ -21,7 +24,7 @@ namespace DPSPanel.MainCode.Panel
         // Store the labels for each boss
         private Dictionary<string, UIText> bossLabels = new Dictionary<string, UIText>();
 
-        public DPSPanelPanel()
+        public DPSDraggablePanel()
         {
             // empty constructor
         }
@@ -32,6 +35,40 @@ namespace DPSPanel.MainCode.Panel
 
             AddHeaderTextToPanel("DPS Panel (press K to toggle)");
             ResizeToFitItems();
+        }
+
+        public void UpdateDPSPanel(BossFight fight)
+        {
+            // Clear the UI for this boss to prevent duplication
+            string bossKey = $"Boss:{fight.bossId}";
+            if (bossLabels.ContainsKey(bossKey))
+            {
+                ClearItems(); // Clear UI items for re-adding updated data
+            }
+
+            // Update boss entry
+            string bossText = $"{fight.bossName} - {fight.damageTaken} damage";
+            Color bossColor = new Color(255, 225, 0);
+            UpdateItem(bossKey, bossText, bossColor);
+
+            // Update player entries
+            foreach (var plr in fight.players)
+            {
+                string playerKey = $"{fight.bossId}|Player:{plr.playerName}";
+                int playerTotal = plr.weapons.Sum(w => w.damage);
+                string playerText = $"  {plr.playerName} - {playerTotal} damage";
+                Color playerColor = new Color(85, 255, 85);
+                UpdateItem(playerKey, playerText, playerColor);
+
+                // Update weapon entries
+                foreach (var wpn in plr.weapons)
+                {
+                    string weaponKey = $"Boss:{fight.bossId}|Player:{plr.playerName}|Weapon:{wpn.weaponName}";
+                    string weaponText = $"    {wpn.weaponName} - {wpn.damage} damage";
+                    Color weaponColor = new Color(115, 195, 255);
+                    UpdateItem(weaponKey, weaponText, weaponColor);
+                }
+            }
         }
 
         private void AddHeaderTextToPanel(string text)

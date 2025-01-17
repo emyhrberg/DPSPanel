@@ -2,7 +2,9 @@
 using System.Linq;
 using Terraria;
 using Terraria.ModLoader;
-using Microsoft.Xna.Framework; // We'll use Microsoft.Xna.Framework.Color
+using Microsoft.Xna.Framework;
+using Terraria.ID;
+using log4net.Repository.Hierarchy; // We'll use Microsoft.Xna.Framework.Color
 // Remove or comment out using System.Drawing; to avoid conflicts
 
 namespace DPSPanel.MainCode.Panel
@@ -18,13 +20,13 @@ namespace DPSPanel.MainCode.Panel
             public int initialLife;
             public string bossName;
             public int damageTaken;
-            public List<MyPlayer> players = new List<MyPlayer>();
+            public List<MyPlayer> players = [];
         }
 
         public class MyPlayer
         {
             public string playerName;         // ID = playerName
-            public List<Weapons> weapons = new List<Weapons>();
+            public List<Weapons> weapons = [];
         }
 
         public class Weapons
@@ -38,9 +40,9 @@ namespace DPSPanel.MainCode.Panel
         // -------------------------------------------------
 
         // Dictionary of boss fights, keyed by bossId
-        public Dictionary<int, BossFight> bossFights = new Dictionary<int, BossFight>();
+        public Dictionary<int, BossFight> clientBossFights = new Dictionary<int, BossFight>();
 
-        // We'll increment this each time we start a new fight
+        // increment this each time we start a new fight
         private int bossIdCounter = 0;
 
         // Remember who dealt the last hit (so we can fix the final blow)
@@ -69,71 +71,36 @@ namespace DPSPanel.MainCode.Panel
             if (!npc.boss || npc.friendly)
                 return;
 
-            // If the boss has just died (life <= 0), fix final blow, increment counter, and return
-            if (npc.life <= 0)
+            // Create BossFight if it doesn't exist
+            if (!clientBossFights.ContainsKey(bossIdCounter))
             {
-                FixFinalBlowDiscrepancy();
-                bossIdCounter++;
-                //printBossFights(); // if you want to debug
-                return;
-            }
-
-            // 1) If we don't already have a BossFight for bossIdCounter, create one.
-            if (!bossFights.ContainsKey(bossIdCounter))
-            {
-                var newBossFight = new BossFight
+                clientBossFights[bossIdCounter] = new BossFight
                 {
                     bossId = bossIdCounter,
-                    initialLife = npc.lifeMax,
                     bossName = npc.FullName,
+                    initialLife = npc.lifeMax,
                     damageTaken = 0
                 };
-                bossFights.Add(bossIdCounter, newBossFight);
             }
 
-            // 2) Get our current fight
-            var currentFight = bossFights[bossIdCounter];
-
-            // 3) Update total damage for the boss
+            // Add damage to the current fight
+            var currentFight = clientBossFights[bossIdCounter];
             currentFight.damageTaken += damageDone;
 
-            // 4) Find or create player entry
+            // Create Player if it doesn't exist
             string playerName = Main.LocalPlayer.name;
-            var existingPlayer = currentFight.players
-                .FirstOrDefault(p => p.playerName == playerName);
+            var player = currentFight.players.FirstOrDefault(p => p.playerName == playerName) ?? new MyPlayer { playerName = playerName };
+            if (!currentFight.players.Contains(player)) 
+                currentFight.players.Add(player);
 
-            if (existingPlayer == null)
-            {
-                existingPlayer = new MyPlayer
-                {
-                    playerName = playerName
-                };
-                currentFight.players.Add(existingPlayer);
-            }
+            // Create Weapon if it doesnt exist
+            var weapon = player.weapons.FirstOrDefault(w => w.weaponName == weaponName) ?? new Weapons { weaponName = weaponName };
+            if (!player.weapons.Contains(weapon)) 
+                player.weapons.Add(weapon);
 
-            // 5) Find or create weapon entry
-            var existingWeapon = existingPlayer.weapons
-                .FirstOrDefault(w => w.weaponName == weaponName);
-
-            if (existingWeapon == null)
-            {
-                existingWeapon = new Weapons
-                {
-                    weaponName = weaponName,
-                    damage = 0
-                };
-                existingPlayer.weapons.Add(existingWeapon);
-            }
-
-            // 6) Add damage to the weapon
-            existingWeapon.damage += damageDone;
-
-            // 7) Store references for last hit
-            lastHitWeapon = existingWeapon;
-            lastHitPlayer = existingPlayer;
-
-            // 8) Update the panel each time
-            UpdateDPSPanel(currentFight);
+            // Update the weapon damage
+            weapon.damage += damageDone;
+            SendBossUpdateToServer(currentFight);
         }
 
         // -------------------------------------------------
@@ -141,10 +108,10 @@ namespace DPSPanel.MainCode.Panel
         // -------------------------------------------------
         private void FixFinalBlowDiscrepancy()
         {
-            if (!bossFights.ContainsKey(bossIdCounter))
-                return; // no fight to fix
+            if (!clientBossFights.ContainsKey(bossIdCounter))
+                return; // check if there even exists a fight to fix
 
-            var currFight = bossFights[bossIdCounter];
+            var currFight = clientBossFights[bossIdCounter];
 
             // If total damage != initial boss life, fix it
             int discrepancy = currFight.damageTaken - currFight.initialLife;
@@ -170,62 +137,44 @@ namespace DPSPanel.MainCode.Panel
                 $"[Boss Fight {bossIdCounter} - {currFight.bossName}] Damage: " +
                 $"{playersDamage}"
             );
-
-            // Update the panel after correction
-            UpdateDPSPanel(currFight);
         }
 
         // -------------------------------------------------
         // Send to DPS Panel
         // -------------------------------------------------
-        private void UpdateDPSPanel(BossFight fight)
+
+        private void SendBossUpdateToServer(BossFight fight)
         {
-            // If no fights or we somehow lost the current
-            if (bossFights.Count == 0)
+            // Disable if not in multiplayer
+            if (Main.netMode != NetmodeID.MultiplayerClient) 
                 return;
 
-            // Max 5 bosses, then reset
-            if (bossFights.Count > 5)
+            ModPacket packet = Mod.GetPacket();
+            packet.Write(fight.bossId);
+            packet.Write(fight.bossName);
+            packet.Write(fight.initialLife);
+            packet.Write(fight.damageTaken);
+            packet.Write(fight.players.Count);
+
+            // Add player and weapon data
+            foreach (var p in fight.players)
             {
-                // Clear the dictionary
-                bossFights.Clear();
-                var uiSystemClear = ModContent.GetInstance<DPSPanelSystem>();
-                uiSystemClear.state.dpsPanel.ClearItems();
-                return;
-            }
-
-            // Access the UISystem to manage the panels
-            var uiSystem = ModContent.GetInstance<DPSPanelSystem>();
-
-            // 1) Boss line
-            string bossKey = $"Boss:{fight.bossId}";
-            string bossText = $"{fight.bossName} - {fight.damageTaken} damage";
-            Color bossColor = new Color(255, 225, 0);
-            uiSystem.state.dpsPanel.UpdateItem(bossKey, bossText, bossColor);
-
-            // 2) Player lines
-            foreach (var plr in fight.players)
-            {
-                string playerKey = $"{fight.bossId}|Player:{plr.playerName}";
-                int playerTotal = plr.weapons.Sum(w => w.damage);
-                string playerText = $"  {plr.playerName} - {playerTotal} damage";
-                Color playerColor = new Color(85, 255, 85);
-                uiSystem.state.dpsPanel.UpdateItem(playerKey, playerText, playerColor);
-
-                // 3) Weapon lines
-                foreach (var wpn in plr.weapons)
+                packet.Write(p.playerName);
+                packet.Write(p.weapons.Count);
+                foreach (var weapon in p.weapons)
                 {
-                    string weaponKey = $"Boss:{fight.bossId}|Player:{plr.playerName}|Weapon:{wpn.weaponName}";
-                    string weaponText = $"    {wpn.weaponName} - {wpn.damage} damage";
-                    Color weaponColor = new Color(115, 195, 255);
-                    uiSystem.state.dpsPanel.UpdateItem(weaponKey, weaponText, weaponColor);
+                    packet.Write(weapon.weaponName);
+                    packet.Write(weapon.damage);
                 }
             }
+            // get logger
+            Mod.Logger.Info("Sending Boss Fight Data to Server");
+            packet.Send(); // Send to the server
         }
 
         private void printBossFights()
         {
-            foreach (var kvp in bossFights)
+            foreach (var kvp in clientBossFights)
             {
                 var bossFight = kvp.Value;
                 Main.NewText($"Boss ID: {bossFight.bossId} - {bossFight.bossName} - Damage: {bossFight.damageTaken}");

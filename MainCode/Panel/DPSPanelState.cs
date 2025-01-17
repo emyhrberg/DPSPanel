@@ -24,13 +24,13 @@ namespace DPSPanel.MainCode.Panel
     public class DPSPanelState : UIState
     {
         // Variables
-        public DPSPanelPanel dpsPanel;
+        public DPSDraggablePanel dpsPanel;
         private bool isVisible = true;
 
         public override void OnInitialize()
         {
             // Create the DPS panel
-            dpsPanel = new DPSPanelPanel();
+            dpsPanel = new DPSDraggablePanel();
             dpsPanel.Width.Set(322f, 0f);
             dpsPanel.Height.Set(72f, 0f);
             dpsPanel.Left.Set(400f, 0f); // distance from the left edge
@@ -49,7 +49,7 @@ namespace DPSPanel.MainCode.Panel
          * Button methods
          */////////////////////////////////////////////////////////////////////////////////////
 
-        public void initializeButtons(DPSPanelPanel dpsPanel)
+        public void initializeButtons(DPSDraggablePanel dpsPanel)
         {
             // Add the draggable panel which shows dps
 
