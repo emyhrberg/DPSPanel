@@ -21,56 +21,55 @@ namespace DPSPanel.MainCode.Panel
         private const float Padding = 10f; // Padding for the panel
         private float currentYOffset = 12f; // Initial offset for the first row
 
+        // Dictionary to store unique player-to-color mappings
+        private Dictionary<string, Color> playerColorMap = new Dictionary<string, Color>();
+
+        // Define predefined colors for players
+        private Color[] predefinedColors = new Color[]
+        {
+            new Color(240, 85, 85),   // Warm Red
+            new Color(85, 115, 240), // Cool Blue
+            new Color(255, 140, 0),  // Vivid Orange
+            new Color(60, 180, 170), // Teal
+            new Color(255, 215, 70)  // Gold
+        };
+
         // Store the labels for each boss
         private Dictionary<string, UIText> bossLabels = new Dictionary<string, UIText>();
 
-        public DPSDraggablePanel()
-        {
-            // empty constructor
-        }
-
         public override void OnInitialize()
         {
-            base.OnInitialize();
-
             AddHeaderTextToPanel("DPS Panel (press K to toggle)");
             ResizeToFitItems();
         }
 
         public void UpdateDPSPanel(BossFight fight)
         {
-            // Clear the UI for this boss to prevent duplication
+            // Update boss entry
             string bossKey = $"Boss:{fight.bossId}";
-            //if (bossLabels.ContainsKey(bossKey))
-            //{
-            //    ClearItems(); // Clear UI items for re-adding updated data
-            //}
-
-            // Update boss entry (boss header remains unchanged)
             string bossText = $"{fight.bossName} - {fight.damageTaken} damage";
-            Color bossColor = new Color(255, 225, 0);
+            Color bossColor = new Color(220, 220, 220);
             UpdateItem(bossKey, bossText, bossColor);
 
-            // Define 5 distinct unique colors for players and their weapons.
-            Color[] playerColors =
-            [
-                new Color(255, 0, 0),     // Red
-                new Color(0, 255, 0),     // Green
-                new Color(0, 0, 255),     // Blue
-                new Color(255, 165, 0),   // Orange
-                new Color(128, 0, 128)    // Purple
-            ];
-
-            // Update player and weapon entries, assigning each a distinct color.
-            for (int i = 0; i < fight.players.Count; i++)
+            // Update player and weapon entries
+            foreach (var plr in fight.players)
             {
-                var plr = fight.players[i];
+                // Check if the player already has a color assigned
+                if (!playerColorMap.ContainsKey(plr.playerName))
+                {
+                    // Assign the next available predefined color, cycling if necessary
+                    int currentCount = playerColorMap.Count;
+                    playerColorMap[plr.playerName] = predefinedColors[currentCount % predefinedColors.Length];
+                }
+
+                // Get the assigned color for the player
+                Color playerColor = playerColorMap[plr.playerName];
+
                 string playerKey = $"{fight.bossId}|Player:{plr.playerName}";
                 string playerText = $"    {plr.playerName} - {plr.totalDamage} damage";
-                Color playerColor = playerColors[i % playerColors.Length]; // assign distinct color
                 UpdateItem(playerKey, playerText, playerColor);
 
-                // Use the same color for each weapon of this player.
+                // Use the same color for each weapon of this player
                 foreach (var wpn in plr.weapons)
                 {
                     string weaponKey = $"Boss:{fight.bossId}|Player:{plr.playerName}|Weapon:{wpn.weaponName}";
