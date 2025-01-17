@@ -41,35 +41,45 @@ namespace DPSPanel.MainCode.Panel
         {
             // Clear the UI for this boss to prevent duplication
             string bossKey = $"Boss:{fight.bossId}";
-            if (bossLabels.ContainsKey(bossKey))
-            {
-                ClearItems(); // Clear UI items for re-adding updated data
-            }
+            //if (bossLabels.ContainsKey(bossKey))
+            //{
+            //    ClearItems(); // Clear UI items for re-adding updated data
+            //}
 
-            // Update boss entry
+            // Update boss entry (boss header remains unchanged)
             string bossText = $"{fight.bossName} - {fight.damageTaken} damage";
             Color bossColor = new Color(255, 225, 0);
             UpdateItem(bossKey, bossText, bossColor);
 
-            // Update player entries
-            foreach (var plr in fight.players)
+            // Define 5 distinct unique colors for players and their weapons.
+            Color[] playerColors =
+            [
+                new Color(255, 0, 0),     // Red
+                new Color(0, 255, 0),     // Green
+                new Color(0, 0, 255),     // Blue
+                new Color(255, 165, 0),   // Orange
+                new Color(128, 0, 128)    // Purple
+            ];
+
+            // Update player and weapon entries, assigning each a distinct color.
+            for (int i = 0; i < fight.players.Count; i++)
             {
+                var plr = fight.players[i];
                 string playerKey = $"{fight.bossId}|Player:{plr.playerName}";
-                int playerTotal = plr.weapons.Sum(w => w.damage);
-                string playerText = $"  {plr.playerName} - {playerTotal} damage";
-                Color playerColor = new Color(85, 255, 85);
+                string playerText = $"    {plr.playerName} - {plr.totalDamage} damage";
+                Color playerColor = playerColors[i % playerColors.Length]; // assign distinct color
                 UpdateItem(playerKey, playerText, playerColor);
 
-                // Update weapon entries
+                // Use the same color for each weapon of this player.
                 foreach (var wpn in plr.weapons)
                 {
                     string weaponKey = $"Boss:{fight.bossId}|Player:{plr.playerName}|Weapon:{wpn.weaponName}";
                     string weaponText = $"    {wpn.weaponName} - {wpn.damage} damage";
-                    Color weaponColor = new Color(115, 195, 255);
-                    UpdateItem(weaponKey, weaponText, weaponColor);
+                    UpdateItem(weaponKey, weaponText, playerColor);
                 }
             }
         }
+
 
         private void AddHeaderTextToPanel(string text)
         {

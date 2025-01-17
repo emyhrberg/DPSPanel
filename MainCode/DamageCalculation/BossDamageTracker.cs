@@ -78,11 +78,11 @@ namespace DPSPanel.MainCode.Panel
                 clientBossFights[bossIdCounter].damageTaken += damageDone;
             }
 
-            var currentFight = clientBossFights[bossIdCounter];
+            var fight = clientBossFights[bossIdCounter];
             string playerName = Main.LocalPlayer.name;
 
             // Find or add the player for this fight
-            var player = currentFight.players.FirstOrDefault(p => p.playerName == playerName);
+            var player = fight.players.FirstOrDefault(p => p.playerName == playerName);
             if (player == null)
             {
                 player = new MyPlayer { 
@@ -90,7 +90,7 @@ namespace DPSPanel.MainCode.Panel
                     weapons = new List<Weapons>(),
                     totalDamage = 0
                 };
-                currentFight.players.Add(player);
+                fight.players.Add(player);
             }
             player.totalDamage += damageDone; // Always update the player damage
 
@@ -107,36 +107,13 @@ namespace DPSPanel.MainCode.Panel
             }
 
             // Here you would call SendBossUpdateToServer if in multiplayer.
-            SendBossUpdateToServer(currentFight);
-        }
 
-        private void SendBossUpdateToServer(BossFight fight)
-        {
-            // Only send if running as a MultiplayerClient.
-            if (Main.netMode != NetmodeID.MultiplayerClient)
-                return;
-
-            ModPacket packet = Mod.GetPacket();
-            packet.Write(fight.bossId);
-            packet.Write(fight.bossName);
-            packet.Write(fight.initialLife);
-            packet.Write(fight.damageTaken);
-            packet.Write(fight.players.Count);
-
-            foreach (var p in fight.players)
+            if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                packet.Write(p.playerName);
-                packet.Write(p.totalDamage);
-                packet.Write(p.weapons.Count);
-                foreach (var weapon in p.weapons)
-                {
-                    packet.Write(weapon.weaponName);
-                    packet.Write(weapon.damage);
-                }
+                DPSPanel mainFile = ModContent.GetInstance<DPSPanel>();
+                ModPacket packet = mainFile.CreateBossFightPacket(fight);
+                packet.Send(); // Send the packet to the server
             }
-
-            Mod.Logger.Info("Sending Boss Fight Data to Server");
-            packet.Send();
         }
     }
 }
