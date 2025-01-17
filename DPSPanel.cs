@@ -1,4 +1,3 @@
-
 using Terraria.ModLoader;
 using System.IO;
 using Terraria.ID;
@@ -11,11 +10,10 @@ using System.Linq;
 
 namespace DPSPanel
 {
-    // Please read https://github.com/tModLoader/tModLoader/wiki/Basic-tModLoader-Modding-Guide#mod-skeleton-contents for more information about the various files in a mod.
-
     public class DPSPanel : Mod
-	{
-        private Dictionary<int, BossDamageTracker.BossFight> serverBossFights = new Dictionary<int, BossDamageTracker.BossFight>();
+    {
+        private Dictionary<int, BossDamageTracker.BossFight> serverBossFights
+            = new Dictionary<int, BossDamageTracker.BossFight>();
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
@@ -27,81 +25,112 @@ namespace DPSPanel
 
         private void HandleServerPacket(BinaryReader reader, int whoAmI)
         {
-            // Read the boss fight data
+            // Read the boss fight data from the packet
             int bossId = reader.ReadInt32();
             string bossName = reader.ReadString();
             int initialLife = reader.ReadInt32();
             int damageTaken = reader.ReadInt32();
             int playerCount = reader.ReadInt32();
 
-            // Create or update the boss fight struct
+            // Try to get an existing boss fight; if not, create one.
             BossDamageTracker.BossFight fight;
             if (!serverBossFights.TryGetValue(bossId, out fight))
             {
+                // Create a new boss fight structure
                 fight = new BossDamageTracker.BossFight
                 {
                     bossId = bossId,
                     bossName = bossName,
                     initialLife = initialLife,
                     damageTaken = damageTaken,
-                    // Create a new list for players.
+                    // Initialize the list of players
                     players = new List<BossDamageTracker.MyPlayer>()
                 };
                 serverBossFights[bossId] = fight;
             }
             else
             {
-                // If the fight already exists, update its basic values.
+                // If the fight already exists, update its basic fields.
                 fight.bossName = bossName;
                 fight.initialLife = initialLife;
                 fight.damageTaken = damageTaken;
             }
 
-            // Iterate through player data
-            fight.players.Clear(); // Clear previous list if necessary, or merge if you prefer.
+            // Process each player entry from the packet
             for (int i = 0; i < playerCount; i++)
             {
                 string playerName = reader.ReadString();
                 int weaponCount = reader.ReadInt32();
 
-                var player = new BossDamageTracker.MyPlayer
+                // See if this player already exists for the fight
+                var existingPlayer = fight.players.FirstOrDefault(p => p.playerName == playerName);
+                if (existingPlayer == null)
                 {
-                    playerName = playerName,
-                    weapons = new List<BossDamageTracker.Weapons>()
-                };
+                    // Create and add the player if not found.
+                    existingPlayer = new BossDamageTracker.MyPlayer
+                    {
+                        playerName = playerName,
+                        weapons = new List<BossDamageTracker.Weapons>()
+                    };
+                    fight.players.Add(existingPlayer);
+                }
 
-                // Iterate through weapon data for this player
+                // Process each weapon for that player
                 for (int j = 0; j < weaponCount; j++)
                 {
                     string weaponName = reader.ReadString();
                     int weaponDamage = reader.ReadInt32();
 
-                    player.weapons.Add(new BossDamageTracker.Weapons
+                    // Look for an existing weapon entry
+                    var existingWeapon = existingPlayer.weapons.FirstOrDefault(w => w.weaponName == weaponName);
+                    if (existingWeapon == null)
                     {
-                        weaponName = weaponName,
-                        damage = weaponDamage
-                    });
+                        // Add a new weapon if not found.
+                        existingWeapon = new BossDamageTracker.Weapons
+                        {
+                            weaponName = weaponName,
+                            damage = weaponDamage
+                        };
+                        existingPlayer.weapons.Add(existingWeapon);
+                    }
+                    else
+                    {
+                        // Update the damage value if it already exists (assuming the incoming value
+                        // is cumulative).
+                        existingWeapon.damage = weaponDamage;
+                    }
                 }
-                fight.players.Add(player);
             }
 
-            // Print out formatted information
+            // Print out the currently stored boss fight data.
             PrintBossFights();
         }
 
+        private void HandleClientPacket(BinaryReader reader, int whoAmI)
+        {
+            // Clientside processing if necessary.
+        }
+
+        /// <summary>
+        /// Prints every boss fight in a formatted way:
+        /// Boss Name (ID)
+        ///      Player1
+        ///          Weapon1 - Damage: X
+        ///          Weapon2 - Damage: Y
+        ///      Player2
+        ///          Weapon1 - Damage: Z
+        /// Total Boss Fights: N
+        /// </summary>
         private void PrintBossFights()
         {
-            // Iterate over all boss fights
             foreach (var kvp in serverBossFights)
             {
                 var boss = kvp.Value;
                 Logger.Info($"{boss.bossName} (ID: {boss.bossId})");
 
-                // Print each player for this boss fight
                 foreach (var player in boss.players)
                 {
                     Logger.Info($"\t{player.playerName}");
-                    // Print each weapon of the player
                     foreach (var weapon in player.weapons)
                     {
                         Logger.Info($"\t\t{weapon.weaponName} - Damage: {weapon.damage}");
@@ -109,13 +138,8 @@ namespace DPSPanel
                 }
             }
 
-            // Finally print the count of boss fights
             Logger.Info($"Total Boss Fights: {serverBossFights.Count}");
-        }
-
-        private void HandleClientPacket(BinaryReader reader, int whoAmI)
-        {
-            // chill for now
+            Logger.Info($"---------------------------------------------");
         }
     }
 }
