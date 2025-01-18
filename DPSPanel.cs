@@ -13,6 +13,8 @@ namespace DPSPanel
 {
     public class DPSPanel : Mod
     {
-
+        public override void Load()
+        {
+        }
     }
 }

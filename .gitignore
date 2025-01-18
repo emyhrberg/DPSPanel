@@ -8,3 +8,6 @@
 /.vs
 /obj
 /bin
+
+# Ignore files:
+/Properties/launchSettings.json

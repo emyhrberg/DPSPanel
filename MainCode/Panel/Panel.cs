@@ -3,7 +3,6 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace DPSPanel.MainCode.Panel
@@ -18,8 +17,9 @@ namespace DPSPanel.MainCode.Panel
 
         // Panel items
         private readonly float padding;
+        private readonly float headerHeight = 16f;
         private float currentYOffset = 0;
-        private const float ItemHeight = 16f;
+        private const float ItemHeight = 40f;
 
         public Panel(float padding)
         {
@@ -30,12 +30,13 @@ namespace DPSPanel.MainCode.Panel
         // Define predefined colors for each row
         private Color[] colorsToUse =
         [
-            new Color(240, 85, 85),   // Warm Red
             new Color(85, 115, 240), // Cool Blue
             new Color(255, 140, 0),  // Vivid Orange
             new Color(60, 180, 170), // Teal
-            new Color(255, 215, 70)  // Gold
+            new Color(255, 215, 70),  // Gold
+            new Color(240, 85, 85)   // Warm Red
         ];
+        private int colorIndex;
 
         // Panel item structure
         public struct DPSPanelItem
@@ -55,23 +56,34 @@ namespace DPSPanel.MainCode.Panel
         {
             // Header text
             UIText header = new("Damage dealt", 1.0f);
-            header.HAlign = 1.0f;
+            header.HAlign = 0.5f;
             Append(header);
+            currentYOffset += headerHeight + padding*2;
             ResizePanelHeight();
         }
 
         public void AddPanelItem(string itemName)
         {
-            UIText text = new(itemName, 1.0f);
-            text.Top.Set(currentYOffset, 0f);
-            text.HAlign = 1.0f;
+            // Cycle through colors
+            Color selectedColor = colorsToUse[colorIndex++ % colorsToUse.Length];
+
+            // Create uitextpanel
+            UITextPanel<string> text = new(itemName, 1.0f, large: false)
+            {
+                Width = new StyleDimension(0, 1.0f),
+                Height = new StyleDimension(ItemHeight, 0f),
+                Top = new StyleDimension(currentYOffset, 0f),
+                HAlign = 1.0f, // Horizontal align to left of panel
+                BackgroundColor = selectedColor
+            };
+
             Append(text);
+            currentYOffset += ItemHeight;
             ResizePanelHeight();
         }
 
         private void ResizePanelHeight()
         {
-            currentYOffset += ItemHeight + padding*2;
             Height.Set(currentYOffset, 0f);
             Recalculate();
         }

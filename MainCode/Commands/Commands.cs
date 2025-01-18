@@ -11,6 +11,8 @@ namespace DPSPanel.MainCode.Commands
         public override string Usage => "Use: /dps"; // Usage instructions
         public override string Description => "Usage: /dps show /dps hide /dps clear"; // Is shown when using "/help"
 
+        private int i = 0;
+
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length < 1)
@@ -34,7 +36,8 @@ namespace DPSPanel.MainCode.Commands
             }
             else if (target == "a")
             {
-                uiSystem.state.panel.AddPanelItem("Item 3");
+                uiSystem.state.panel.AddPanelItem($"Item {i}");
+                i++;
             }
             else
             {
