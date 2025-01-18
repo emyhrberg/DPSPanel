@@ -10,4 +10,8 @@
 /bin
 
 # Ignore files:
-/Properties/launchSettings.json
+Properties/launchSettings.json
+
+# Ignore more files:
+DPSPanel.csproj.user
+DPSPanel.csproj.sln
