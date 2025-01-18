@@ -8,35 +8,42 @@ namespace DPSPanel.MainCode.Panel
 {
     public class BossDamageTracker : ModPlayer
     {
+
+        // --------------------------------------------------------------------------------
+        // Classes
+        // --------------------------------------------------------------------------------
+
         // Class for storing the details for a boss fight
         public class BossFight
         {
-            public int bossId;            // incremental id
+            public required int bossId;            // incremental id 0, 1, 2, ...
             public int initialLife;
             public string bossName;
             public int damageTaken;
-            public List<MyPlayer> players = new List<MyPlayer>();
+            public HashSet<CustomPlayer> players = [];
         }
 
         // Class for storing a player's data for a boss fight
-        public class MyPlayer
+        public class CustomPlayer
         {
-            public string playerName;
+            public required string playerName;
             public int totalDamage;
-            public List<Weapons> weapons = new List<Weapons>();
+            public HashSet<Weapons> weapons = [];
         }
 
         // Class for storing weapon data
         public class Weapons
         {
-            public string weaponName;
+            public required string weaponName;
             public int damage;
         }
 
-        // Client-side boss fight storage (which sends update packets to the server)
-        public Dictionary<int, BossFight> clientBossFights = new Dictionary<int, BossFight>();
+        // Local storage for the boss fights.
+        // Key: bossId, Value: BossFight
+        public Dictionary<int, BossFight> fights = [];
 
-        private int bossIdCounter = 0;
+        // Incremental counter for each fight (0, 1, 2, ...)
+        private int fightId = 0;
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
@@ -56,64 +63,55 @@ namespace DPSPanel.MainCode.Panel
 
             if (npc.life <= 0)
             {
-                bossIdCounter++;
+                fightId++;
                 return;
             }
 
-            // Create the boss fight if not exists, otherwise merge update.
-            if (!clientBossFights.ContainsKey(bossIdCounter))
+            // Create the boss fight if it does not exist
+            BossFight fight = null;
+
+            if (!fights.ContainsKey(fightId)) // dictionary key indexer
             {
-                clientBossFights[bossIdCounter] = new BossFight
+                // Add the weapon to the player
+                Weapons weapon = new()
                 {
-                    bossId = bossIdCounter,
+                    weaponName = weaponName,
+                    damage = damageDone
+                };
+
+                // Add the player to the fight
+                CustomPlayer player = new()
+                {
+                    playerName = Main.LocalPlayer.name,
+                    totalDamage = damageDone,
+                    weapons = [weapon]
+                };
+
+                // Create the fight object
+                fight = new BossFight
+                {
+                    bossId = fightId,
                     bossName = npc.FullName,
                     initialLife = npc.lifeMax,
                     damageTaken = damageDone,
-                    players = new List<MyPlayer>()
+                    players = [player]
                 };
             }
             else
             {
-                // Update the damage value (in a cumulative snapshot this might just be overwritten)
-                clientBossFights[bossIdCounter].damageTaken += damageDone;
+                fight = fights[fightId];
+                fight.damageTaken += damageDone;
+
+                // Check if the player is already in the fight. use one liner
+                CustomPlayer player = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name);
+                if (player != null)
+                {
+
+                }
+
             }
 
-            var fight = clientBossFights[bossIdCounter];
-            string playerName = Main.LocalPlayer.name;
 
-            // Find or add the player for this fight
-            var player = fight.players.FirstOrDefault(p => p.playerName == playerName);
-            if (player == null)
-            {
-                player = new MyPlayer { 
-                    playerName = playerName, 
-                    weapons = new List<Weapons>(),
-                    totalDamage = 0
-                };
-                fight.players.Add(player);
-            }
-            player.totalDamage += damageDone; // Always update the player damage
-
-            // Find or add the weapon entry
-            var weapon = player.weapons.FirstOrDefault(w => w.weaponName == weaponName);
-            if (weapon == null)
-            {
-                weapon = new Weapons { weaponName = weaponName, damage = damageDone };
-                player.weapons.Add(weapon);
-            }
-            else
-            {
-                weapon.damage += damageDone;
-            }
-
-            // Here you would call SendBossUpdateToServer if in multiplayer.
-
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-                DPSPanel mainFile = ModContent.GetInstance<DPSPanel>();
-                ModPacket packet = mainFile.CreateBossFightPacket(fight);
-                packet.Send(); // Send the packet to the server
-            }
         }
     }
 }

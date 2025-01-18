@@ -6,52 +6,22 @@ using Terraria.UI;
 
 namespace DPSPanel.MainCode.Panel
 {
-    /// <summary>
-    /// Manages the lifecycle and integration of a UIState with Terraria's interface layers.
-    /// </summary>
-    /// <remarks>
-    /// The UISystem is responsible for initializing, updating, and toggling the visibility of a custom UIState.
-    /// It ensures the UI is rendered correctly by injecting it into Terraria's interface layers via ModifyInterfaceLayers.
-    /// This class is also used to manage whether the UIState is currently active and visible.
-    /// </remarks>
-    public class DPSPanelSystem : ModSystem
+    public class PanelSystem : ModSystem
     {
         // Variables
-        private UserInterface ui = new UserInterface();
-        internal DPSPanelState state = new DPSPanelState();
-
-        public override void Load()
-        {
-            // initialization code for the UI system
-            //state = new DPSPanelState();
-            //ui = new UserInterface();
-        }
-
-        public override void Unload()
-        {
-            // cleanup code for the UI system
-            ui = null;
-            state = null;
-        }
+        private UserInterface ui = new();
+        internal PanelState state = new();
 
         public override void PostSetupContent()
         {
-            if (Main.dedServ)
-            {
-                return;
-            } // don't run the rest of the code on a dedicated server.
-              // ded means dedicated server meaning the server is running without a client meaning no UI is needed
-
             state.Activate();
             ui.SetState(state);
         }
 
         public override void UpdateUI(GameTime gameTime)
         {
-            // always update the UI (everything in the UIContainer)
+            // always update the UI (everything in the PanelState, Panel, etc.)
             ui?.Update(gameTime);
-
-            
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -64,7 +34,7 @@ namespace DPSPanel.MainCode.Panel
             if (mouseTextIndex != -1)
             {
                 layers.Insert(mouseTextIndex, new LegacyGameInterfaceLayer(
-                    "DPSPanel: UI System",
+                    "DPSPanel: UI System", // this text doesn't matter but it's used for debugging when we want to see what's being rendered
                     delegate
                     {
                         ui.Draw(Main.spriteBatch, new GameTime());

@@ -32,7 +32,7 @@ namespace DPSPanel.MainCode.Configs
             if (toggleDPSPanelKeybind.JustPressed)
             {
                 // Toggle the DPS panel
-                var uiSystem = ModContent.GetInstance<DPSPanelSystem>();
+                var uiSystem = ModContent.GetInstance<PanelSystem>();
                 uiSystem.state.ToggleDPSPanel();
             }
         }

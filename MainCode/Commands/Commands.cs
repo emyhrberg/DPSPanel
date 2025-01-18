@@ -15,11 +15,11 @@ namespace DPSPanel.MainCode.Commands
         {
             if (args.Length < 1)
             {
-                throw new UsageException("Error: Please enter an argument. Valid arguments are: hide, show, clear.");
+                throw new UsageException("Error: Please enter an argument. Valid arguments are: /dps hide, show, clear.");
             }
 
             // Access the UISystem to manage the panels
-            var uiSystem = ModContent.GetInstance<DPSPanelSystem>();
+            var uiSystem = ModContent.GetInstance<PanelSystem>();
 
             // Determine the target
             string target = args[0].ToLower(); // "dps" or "panel"
@@ -32,20 +32,13 @@ namespace DPSPanel.MainCode.Commands
             {
                 uiSystem.state.ShowDPSPanel();
             }
-            else if (target == "clear")
+            else if (target == "a")
             {
-                uiSystem.state.ClearDPSPanel();
-            }
-            else if (target == "send")
-            {
-                // Send a packet to the server
-                ModPacket packet = Mod.GetPacket();
-                packet.Write("KingSlime");
-                packet.Send(); // Send the packet to the server
+                uiSystem.state.panel.AddPanelItem("Item 3");
             }
             else
             {
-                throw new UsageException("Error: Incorrect argument. Valid arguments are: hide, show, clear.");
+                throw new UsageException("Error: Incorrect argument. Valid arguments are: /dps hide, show, clear.");
             }
         }
     }
