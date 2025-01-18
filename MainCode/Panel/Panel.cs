@@ -12,6 +12,10 @@ namespace DPSPanel.MainCode.Panel
 {
     public class Panel : UIPanel
     {
+        /* -------------------------------------------------------------
+         * Variables
+         * -------------------------------------------------------------
+         */
         // Variables for dragging the panel
         private Vector2 offset;
         private bool dragging;
@@ -25,7 +29,8 @@ namespace DPSPanel.MainCode.Panel
         private const float ItemHeight = 40f;
 
         // Slider items
-        private Asset<Texture2D> sliderTexture;
+        private Asset<Texture2D> sliderEmpty;
+        private Asset<Texture2D> sliderFull;
 
         /* -------------------------------------------------------------
          * Panel Constructor
@@ -35,17 +40,27 @@ namespace DPSPanel.MainCode.Panel
         {
             this.padding = padding;
             SetPadding(padding);
-            sliderTexture = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/Slider");
+            sliderEmpty = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/SliderEmpty");
+            sliderFull = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/SliderFull");
         }
 
         // Define predefined colors for each row
-        private Color[] colorsToUse =
+        private readonly Color[] colorsToUse =
         [
+            //new Color(255, 140, 0),  // Vivid Orange
+            //new Color(242,206,109), // Gold v2
+            //new Color(207,195,191), // Silver-ish v2
+            //new Color(86,70,71), // Silver-ish
+            //new Color(65,37,8), // Bronze-ish
             new Color(85, 115, 240), // Cool Blue
-            new Color(255, 140, 0),  // Vivid Orange
             new Color(60, 180, 170), // Teal
+            new Color(186,137,87), // Bronze-ish v2
             new Color(255, 215, 70),  // Gold
-            new Color(240, 85, 85)   // Warm Red
+            new Color(240, 85, 85),   // Warm Red
+            new Color(255, 140, 0),  // Vivid Orange
+            new Color(242,206,109), // Gold v2
+            new Color(207,195,191), // Silver-ish v2
+
         ];
         private int colorIndex;
 
@@ -64,23 +79,26 @@ namespace DPSPanel.MainCode.Panel
             ResizePanelHeight();
         }
 
-        public void AddSlider()
+        public void AddSlider(string text, int value)
         {
+            // Select unused color
+            Color color = colorsToUse[colorIndex++ % colorsToUse.Length];
+
             // Create a slider
-            PanelSlider slider = new(sliderTexture)
+            PanelSlider slider = new(sliderEmpty, sliderFull, text, color, value)
             {
-                Width = new StyleDimension(0, 1.0f), // fill the width of the panel
-                Height = new StyleDimension(40, 0f), // obvious
+                Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
+                Height = new StyleDimension(ItemHeight, 0f), // Set height
                 Top = new StyleDimension(currentYOffset, 0f),
-                HAlign = 0.5f, // center
+                HAlign = 0.5f, // Center horizontally
             };
+
             Append(slider);
 
-            currentYOffset += 40 + 10; // Adjust Y offset for the next element
+            currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
         }
 
-        
 
         //public void AddPanelItem(string itemName)
         //{

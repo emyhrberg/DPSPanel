@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using System;
 using System.Linq;
-using static DPSPanel.MainCode.Panel.BossDamageTracker;
+using static DPSPanel.MainCode.Panel.BossDamageTrackerMP;
 
 namespace DPSPanel
 {

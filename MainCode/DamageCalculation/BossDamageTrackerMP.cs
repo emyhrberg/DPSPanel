@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace DPSPanel.MainCode.Panel
 {
-    public class BossDamageTracker : ModPlayer
+    public class BossDamageTrackerMP : ModPlayer
     {
 
         // --------------------------------------------------------------------------------
