@@ -36,7 +36,8 @@ namespace DPSPanel.MainCode.Commands
             }
             else if (target == "a")
             {
-                uiSystem.state.panel.AddPanelItem($"Item {i}");
+                //uiSystem.state.panel.AddPanelItem($"Item {i}");
+                uiSystem.state.panel.AddSlider();
                 i++;
             }
             else
