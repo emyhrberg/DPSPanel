@@ -30,15 +30,17 @@ namespace DPSPanel.MainCode.Panel
 
         // Panel items
         private readonly float padding;
-        private readonly float headerHeight = 16f;
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
-        private NPC currentBoss;
 
         // Slider items
         private Dictionary<string, PanelSlider> sliders = [];
         private readonly Asset<Texture2D> sliderEmpty;
         private readonly Asset<Texture2D> sliderFull;
+
+        // Header
+        private NPC currentBoss;
+        private const float headerHeight = 16f;
 
         private readonly Color[] colors =
         [
@@ -73,17 +75,48 @@ namespace DPSPanel.MainCode.Panel
          * Panel content
          * -------------------------------------------------------------
          */
-        public void AddBossTitle(string bossName = "UnnamedBoss", NPC npc = null)
+        public void AddBossTitle(string bossName = "Boss Name", NPC npc = null)
         {
-            // Store the boss NPC to be used in the Draw method
             currentBoss = npc;
-
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
 
             currentYOffset = headerHeight + padding * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            base.Draw(spriteBatch); // Ensure the panel is drawn
+
+            // Draw boss head icon if a boss is active
+            if (currentBoss != null && currentBoss.active && currentBoss.boss && currentBoss.life > 0)
+            {
+                int headIndex = currentBoss.GetBossHeadTextureIndex();
+                if (headIndex >= 0 && headIndex < TextureAssets.NpcHeadBoss.Length &&
+                    TextureAssets.NpcHeadBoss[headIndex]?.IsLoaded == true)
+                {
+                    // Get the boss head texture
+                    Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[headIndex].Value;
+
+                    // Get the dimensions of the panel and boss title
+                    CalculatedStyle dims = GetDimensions();
+                    Vector2 panelCenter = new Vector2(dims.X + dims.Width / 2, dims.Y + 10f); // Panel center
+                    float iconHeight = bossHeadTexture.Height;
+                    float textHeight = 16f; // Approximate height of the text
+                    float totalHeight = iconHeight + textHeight + 4f; // Space between icon and text
+
+                    // Calculate icon position to center it horizontally with the text
+                    Vector2 iconPosition = new Vector2(
+                        panelCenter.X - bossHeadTexture.Width / 2, // Center icon horizontally
+                        panelCenter.Y - totalHeight / 2            // Offset vertically to center text + icon
+                    );
+
+                    // Draw the boss head icon
+                    spriteBatch.Draw(bossHeadTexture, iconPosition, Color.White);
+                }
+            }
         }
 
         public void CreateSlider(string sliderName="Name")

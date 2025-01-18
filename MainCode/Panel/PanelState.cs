@@ -107,28 +107,6 @@ namespace DPSPanel.MainCode.Panel
          * -------------------------------------------------------------
          */
 
-        //public override void Draw(SpriteBatch spriteBatch)
-        //{
-        //    // Loop through NPCs to find active bosses
-        //    foreach (var npc in Main.npc)
-        //    {
-        //        if (npc != null && npc.active && npc.boss && npc.life > 0)
-        //        {
-        //            int headIndex = npc.GetBossHeadTextureIndex();
-        //            if (headIndex >= 0 && headIndex < TextureAssets.NpcHeadBoss.Length &&
-        //                TextureAssets.NpcHeadBoss[headIndex]?.IsLoaded == true)
-        //            {
-        //                // Get the boss head texture and name
-        //                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[headIndex].Value;
-        //                spriteBatch.Draw(bossHeadTexture, new Vector2(100, 100), Color.White);
-
-        //                // Add boss title to the panel
-        //                //panel.AddBossTitle(bossHeadTexture, bossName);
-        //            }
-        //        }
-        //    }
-        //}
-
         public void ShowDPSPanel()
         {
             if (!Children.Contains(panel))

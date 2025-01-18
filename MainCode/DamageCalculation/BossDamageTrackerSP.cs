@@ -98,7 +98,7 @@ namespace DPSPanel.MainCode.Panel
                 Mod.Logger.Info("New boss fight created: " + fight.bossName);
                 var panelSystem = ModContent.GetInstance<PanelSystem>();
                 panelSystem.state.panel.ClearPanelAndAllItems();
-                panelSystem.state.panel.AddBossTitle(npc.FullName);
+                panelSystem.state.panel.AddBossTitle(npc.FullName, npc);
             }
         }
 
