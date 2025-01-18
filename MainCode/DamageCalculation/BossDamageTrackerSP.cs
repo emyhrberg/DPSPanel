@@ -96,7 +96,18 @@ namespace DPSPanel.MainCode.Panel
 
         private void UpdateWeapon(string weaponName, int damageDone)
         {
+            if (fight == null || fight.weapons == null)
+            {
+                Mod.Logger.Warn("UpdateWeapon called with uninitialized fight or weapons list.");
+                return; // Exit early
+            }
+
             var panelSystem = ModContent.GetInstance<PanelSystem>();
+            if (panelSystem == null || panelSystem.state?.panel == null)
+            {
+                Mod.Logger.Warn("PanelSystem or panel is not initialized. Skipping slider update.");
+                return; // Exit early
+            }
 
             // Check if the weapon already exists
             var weapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
@@ -105,9 +116,13 @@ namespace DPSPanel.MainCode.Panel
                 // Add new weapon to the fight
                 weapon = new Weapon { weaponName = weaponName, damage = damageDone };
                 fight.weapons.Add(weapon);
+                fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
+
+                // Find this weapon's index
+                int index = fight.weapons.FindIndex(w => w.weaponName == weaponName);
 
                 // Create a new slider for this weapon
-                panelSystem.state.panel.CreateSlider(weaponName);
+                panelSystem.state.panel.CreateSlider(weaponName, index);
             }
             else
             {
@@ -115,10 +130,10 @@ namespace DPSPanel.MainCode.Panel
                 weapon.damage += damageDone;
             }
 
-            // Update all sliders
+            // Sort weapons by damage and update sliders
+            fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
             panelSystem.state.panel.UpdateSliders(fight.weapons);
         }
-
 
         private void TrackBossDamage(string weaponName, int damageDone, NPC npc)
         {

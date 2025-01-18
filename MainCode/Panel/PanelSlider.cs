@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria;
-using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
+using Terraria.GameContent.UI.Elements;
+using Terraria;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -12,67 +11,51 @@ namespace DPSPanel.MainCode.Panel
     {
         private readonly Asset<Texture2D> sliderEmpty; // Background slider texture
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
-        private readonly Color fillColor;             // Color for the fill
-        private int value;                   // Fill value (0-100)
-        private string text = "";                // Text for the slider
+        private Color fillColor;             // Color for the fill (no longer readonly)
+        private int percentage;              // Progress percentage (0-100)
         private UIText textElement;          // Text element for slider label
 
-        public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull, string text, Color color, int value)
+        public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull)
         {
             this.sliderEmpty = sliderEmpty;
             this.sliderFull = sliderFull;
-            this.text = text;
-            this.fillColor = color;
-            this.value = (int)MathHelper.Clamp(value, 0, 100); // Clamp value between 0 and 100
+            //this.fillColor = color;
+            this.percentage = 0; // initial progress
 
-            // Create and text element
-            textElement = new UIText(text, 0.8f)
+            // Create the text element centered on the slider.
+            textElement = new UIText("", 0.8f)
             {
-                HAlign = 0.5f, // Center horizontally
-                VAlign = 0.5f, // Center vertically
+                HAlign = 0.5f,
+                VAlign = 0.5f,
             };
-
             Append(textElement);
+        }
+
+        public void UpdateSlider(int highestDamage, string weaponName, int weaponDamage, Color newColor)
+        {
+            percentage = (int)((weaponDamage / (float)highestDamage) * 100);
+            fillColor = newColor;
+            textElement.SetText($"{weaponName} ({weaponDamage})");
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
 
-            // Get the dimensions of the element
-            CalculatedStyle dimensions = GetDimensions();
-            Vector2 position = new(dimensions.X, dimensions.Y);
+            CalculatedStyle dims = GetDimensions();
+            Vector2 pos = new Vector2(dims.X, dims.Y);
+            Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
 
-            // Draw the slider empty texture (full width, no distortion)
-            spriteBatch.Draw(
-                sliderEmpty.Value,
-                new Rectangle((int)position.X, (int)position.Y, (int)dimensions.Width, (int)dimensions.Height),
-                Color.DarkGray // Tint for the empty slider
-            );
+            // Draw background.
+            spriteBatch.Draw(sliderEmpty.Value, rect, Color.DarkGray);
 
-            // Calculate the width of the filled portion based on value (0-100)
-            int fillWidth = (int)(dimensions.Width * (value / 100f));
-
-            if (fillWidth > 0) // Only draw if there's some fill
+            // Draw filled portion based on percentage.
+            int fillWidth = (int)(dims.Width * (percentage / 100f));
+            if (fillWidth > 0)
             {
-                // Define the source rectangle for the SliderFull texture to avoid stretching
-                Rectangle sourceRect = new Rectangle(0, 0, (int)(sliderFull.Width() * (value / 100f)), sliderFull.Height());
-
-                // Draw the filled portion of the slider
-                spriteBatch.Draw(
-                    sliderFull.Value,
-                    new Rectangle((int)position.X, (int)position.Y, fillWidth, (int)dimensions.Height),
-                    sourceRect,
-                    fillColor // Tint for the full slider
-                );
+                Rectangle sourceRect = new Rectangle(0, 0, (int)(sliderFull.Width() * (percentage / 100f)), sliderFull.Height());
+                spriteBatch.Draw(sliderFull.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
             }
-        }
-
-        public void updateSliderValue(int damageDone, int newValue)
-        {
-            // Update the value and clamp it between 0 and 100
-            textElement.SetText($"{text} ({damageDone})");
-            value = (int)MathHelper.Clamp(newValue, 0, 100);
         }
     }
 }

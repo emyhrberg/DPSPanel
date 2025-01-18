@@ -36,6 +36,25 @@ namespace DPSPanel.MainCode.Panel
         private readonly Asset<Texture2D> sliderEmpty;
         private readonly Asset<Texture2D> sliderFull;
 
+        // Define predefined colors for each row
+        private readonly Color[] colorsToUse =
+        [
+            Color.Red,
+            Color.Green,
+            Color.Blue,
+            Color.Yellow,
+            Color.Purple,
+            Color.Orange,
+            Color.Cyan,
+            Color.Pink,
+            Color.LightGreen,
+            Color.LightBlue,
+            Color.LightCoral,
+            Color.LightGoldenrodYellow,
+
+        ];
+        private int colorIndex;
+
         /* -------------------------------------------------------------
          * Panel Constructor
          * -------------------------------------------------------------
@@ -48,35 +67,13 @@ namespace DPSPanel.MainCode.Panel
             sliderFull = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/SliderFull");
         }
 
-        // Define predefined colors for each row
-        private readonly Color[] colorsToUse =
-        [
-            //new Color(255, 140, 0),  // Vivid Orange
-            //new Color(242,206,109), // Gold v2
-            //new Color(207,195,191), // Silver-ish v2
-            //new Color(86,70,71), // Silver-ish
-            //new Color(65,37,8), // Bronze-ish
-            new Color(255, 215, 70),  // Gold
-            new Color(240, 85, 85),   // Warm Red
-            new Color(85, 115, 240), // Cool Blue
-            new Color(60, 180, 170), // Teal
-            new Color(186,137,87), // Bronze-ish v2
-            new Color(255, 140, 0),  // Vivid Orange
-            new Color(242,206,109), // Gold v2
-            new Color(207,195,191), // Silver-ish v2
-
-        ];
-        private int colorIndex;
-
         /* -------------------------------------------------------------
          * Panel content
          * -------------------------------------------------------------
          */
-
         public void AddBossTitle(string bossName="UnnamedBoss")
         {
             clearPanelAndAllItems();
-
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
@@ -84,13 +81,13 @@ namespace DPSPanel.MainCode.Panel
             ResizePanelHeight();
         }
 
-        public void CreateSlider(string sliderName="Name")
+        public void CreateSlider(string sliderName="Name", int index=0)
         {
             // Check if the slider already exists
             if (!sliders.ContainsKey(sliderName))
             {
                 // Create a new slider
-                PanelSlider slider = new(sliderEmpty, sliderFull, sliderName, SelectSliderColor(), 0)
+                PanelSlider slider = new(sliderEmpty, sliderFull)
                 {
                     Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
                     Height = new StyleDimension(ItemHeight, 0f), // Set height
@@ -108,36 +105,40 @@ namespace DPSPanel.MainCode.Panel
 
         public void UpdateSliders(List<Weapon> weapons)
         {
-            // Sort weapons by damage
+            // Reset vertical offset.
+            currentYOffset = headerHeight + padding * 2;
+
+            // Sort weapons by descending damage.
             weapons = weapons.OrderByDescending(w => w.damage).ToList();
+            int highest = weapons.FirstOrDefault()?.damage ?? 1;
 
-            int highestDamage = weapons.FirstOrDefault()?.damage ?? 1; // Avoid division by zero
-
-            foreach (var weapon in weapons)
+            for (int i = 0; i < weapons.Count; i++)
             {
-                if (!sliders.TryGetValue(weapon.weaponName, out var slider))
+                var wpn = weapons[i];
+                Color color = colorsToUse[i % colorsToUse.Length];
+                PanelSlider slider;
+
+                if (!sliders.TryGetValue(wpn.weaponName, out slider))
                 {
-                    // Slider does not exist, create it
-                    slider = new PanelSlider(sliderEmpty, sliderFull, weapon.weaponName, SelectSliderColor(), 0)
+                    // Create a new slider if it doesn't exist.
+                    slider = new PanelSlider(sliderEmpty, sliderFull)
                     {
-                        Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
-                        Height = new StyleDimension(ItemHeight, 0f), // Set height
-                        Top = new StyleDimension(currentYOffset, 0f),
-                        HAlign = 0.5f, // Center horizontally
+                        Width = new StyleDimension(0, 1f),
+                        Height = new StyleDimension(ItemHeight, 0f),
+                        HAlign = 0.5f,
                     };
-
+                    sliders[wpn.weaponName] = slider;
                     Append(slider);
-                    sliders[weapon.weaponName] = slider;
-
-                    currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
-                    ResizePanelHeight();
                 }
 
-                // Update slider value based on weapon damage and highest damage
-                int damageProgress = (int)(((float)weapon.damage / highestDamage) * 100);
-                slider.updateSliderValue(weapon.damage, damageProgress);
+                // Update the slider with the current data.
+                slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color);
+                slider.Top.Set(currentYOffset, 0f);
+                currentYOffset += ItemHeight + padding * 2;
             }
+            ResizePanelHeight();
         }
+
 
         public void clearPanelAndAllItems()
         {
@@ -149,29 +150,9 @@ namespace DPSPanel.MainCode.Panel
          * Panel helpers
          * -------------------------------------------------------------
          */
-        private Color SelectSliderColor()
+        private Color GetColorForIndex(int index)
         {
-            // More likely to select first color
-            // Very likely to select second or third
-            // Percentages: 1. 80%, 2/3. 10%, 4/5. 5%
-            Random rnd = new Random();
-            if (rnd.Next(1, 101) <= 80)
-            {
-                colorIndex = 0;
-            }
-            else if (rnd.Next(1, 101) <= 10)
-            {
-                colorIndex = 1;
-            }
-            else if (rnd.Next(1, 101) <= 5)
-            {
-                colorIndex = 2;
-            }
-            else
-            {
-                colorIndex = rnd.Next(3, colorsToUse.Length);
-            }
-            return colorsToUse[colorIndex];
+            return colorsToUse[index % colorsToUse.Length];
         }
 
         private void ResizePanelHeight()
