@@ -55,6 +55,22 @@ namespace DPSPanel.MainCode.Panel
             }
         }
 
+        public override void PreUpdate()
+        {
+            // Iterate all NPCs every 1 second (idk how computationally heavy this is)
+            if (Main.time % 60 == 0)
+            {
+                for (int i = 0; i < Main.npc.Length; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (IsValidBoss(npc))
+                    {
+                        CreateNewBossFight(npc);
+                    }
+                }
+            }
+        }
+
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TrackBossDamage(item.Name, damageDone, target);
@@ -69,38 +85,41 @@ namespace DPSPanel.MainCode.Panel
         // Main logic
         // --------------------------------------------------------------------------------
 
+        private void CreateNewBossFight(NPC npc)
+        {
+            if (fight == null)
+            {
+                // Create a new fight
+                fight = new BossFight
+                {
+                    bossId = fightId,
+                    initialLife = npc.lifeMax,
+                    bossName = npc.FullName,
+                    damageTaken = 0,
+                    player = new CustomPlayer
+                    {
+                        playerName = Main.LocalPlayer.name,
+                        totalDamage = 0
+                    }
+                };
+                var panelSystem = ModContent.GetInstance<PanelSystem>();
+                panelSystem.state.panel.AddBossTitle(npc.FullName);
+                panelSystem.state.panel.CreateSlider();
+            }
+        }
+
         private void TrackBossDamage(string weaponName, int damageDone, NPC npc)
         {
             // Check if NPC is a boss
             if (IsValidBoss(npc) && !IsNPCDead(npc))
             {
-                if (fight == null)
-                {
-                    // Create a new fight
-                    fight = new BossFight
-                    {
-                        bossId = fightId,
-                        initialLife = npc.lifeMax,
-                        bossName = npc.FullName,
-                        damageTaken = 0,
-                        player = new CustomPlayer
-                        {
-                            playerName = Main.LocalPlayer.name,
-                            totalDamage = damageDone
-                        }
-                    };
-                    var panelSystem = ModContent.GetInstance<PanelSystem>();
-                    panelSystem.state.panel.AddBossTitle(npc.FullName);
-                    panelSystem.state.panel.CreateSlider();
-                }
-                else
-                {
-                    // Add to existing fight
-                    fight.damageTaken += damageDone;
-                    fight.player.totalDamage += damageDone;
-                }
-                PrintBossFight();
+                // Add to existing fight
+                fight.damageTaken += damageDone;
+                fight.player.totalDamage += damageDone;
+
+                // Send boss fight data to show in UI
                 SendBossFightToPanel();
+                PrintBossFight();
             }
         }
 
