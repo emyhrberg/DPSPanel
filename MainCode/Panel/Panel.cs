@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -30,8 +31,8 @@ namespace DPSPanel.MainCode.Panel
 
         // Slider items
         private PanelSlider slider;
-        private Asset<Texture2D> sliderEmpty;
-        private Asset<Texture2D> sliderFull;
+        private readonly Asset<Texture2D> sliderEmpty;
+        private readonly Asset<Texture2D> sliderFull;
 
         /* -------------------------------------------------------------
          * Panel Constructor
@@ -53,11 +54,11 @@ namespace DPSPanel.MainCode.Panel
             //new Color(207,195,191), // Silver-ish v2
             //new Color(86,70,71), // Silver-ish
             //new Color(65,37,8), // Bronze-ish
+            new Color(255, 215, 70),  // Gold
+            new Color(240, 85, 85),   // Warm Red
             new Color(85, 115, 240), // Cool Blue
             new Color(60, 180, 170), // Teal
             new Color(186,137,87), // Bronze-ish v2
-            new Color(255, 215, 70),  // Gold
-            new Color(240, 85, 85),   // Warm Red
             new Color(255, 140, 0),  // Vivid Orange
             new Color(242,206,109), // Gold v2
             new Color(207,195,191), // Silver-ish v2
@@ -99,6 +100,28 @@ namespace DPSPanel.MainCode.Panel
             if (slider == null)
             {
                 // Select unused color
+                // More likely to select first color
+                // Very likely to select second or third
+                // Percentages: 1. 80%, 2/3. 10%, 4/5. 5%
+                Random rnd = new Random();
+                if (rnd.Next(1, 101) <= 80)
+                {
+                    colorIndex = 0;
+                }
+                else if (rnd.Next(1, 101) <= 10)
+                {
+                    colorIndex = 1;
+                }
+                else if (rnd.Next(1, 101) <= 5)
+                {
+                    colorIndex = 2;
+                }
+                else
+                {
+                    colorIndex = rnd.Next(3, colorsToUse.Length);
+                }
+
+
                 Color color = colorsToUse[colorIndex++ % colorsToUse.Length];
                 // Create a slider
                 slider = new(sliderEmpty, sliderFull, Main.LocalPlayer.name, color, 0)

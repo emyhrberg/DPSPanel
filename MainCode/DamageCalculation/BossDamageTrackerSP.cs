@@ -46,6 +46,15 @@ namespace DPSPanel.MainCode.Panel
             Main.NewText("Hello, " + Main.LocalPlayer.name + "! To use the DPS panel, type /dps show in chat or toggle with K (set the keybind in controls).", Color.Yellow);
         }
 
+        public override void OnHitAnything(float x, float y, Entity victim)
+        {
+            // check if golem was hit
+            if (victim is NPC npc && IsValidBoss(npc))
+            {
+                Mod.Logger.Info("Unknown NPC. Hopefully Golem? was hit!");
+            }
+        }
+
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TrackBossDamage(item.Name, damageDone, target);
