@@ -4,6 +4,9 @@ using ReLogic.Content;
 using Terraria.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria;
+using Terraria.GameContent;
+using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -16,6 +19,10 @@ namespace DPSPanel.MainCode.Panel
         private Texture2D weaponIcon;          // Icon for the weapon
         private Color fillColor;             // Color for the fill
         private int percentage;              // Progress percentage (0-100)
+
+        // Weapon icon
+        private int itemId;
+        private string itemType;
 
         public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull)
         {
@@ -32,12 +39,13 @@ namespace DPSPanel.MainCode.Panel
             Append(textElement);
         }
 
-        public void UpdateSlider(int highestDamage, string weaponName, int weaponDamage, Color newColor, Texture2D icon)
+        public void UpdateSlider(int highestDamage, string weaponName, int weaponDamage, Color newColor, int _itemId, string _itemType)
         {
             percentage = (int)((weaponDamage / (float)highestDamage) * 100);
             fillColor = newColor;
             textElement.SetText($"{weaponName} ({weaponDamage})");
-            weaponIcon = icon;
+            itemId = _itemId;
+            itemType = _itemType;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -68,9 +76,28 @@ namespace DPSPanel.MainCode.Panel
         private void DrawIcon(SpriteBatch spriteBatch)
         {
             CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new Vector2(dims.X, dims.Y);
-            Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
-            //spriteBatch.Draw(weaponIcon, new Rectangle((int)pos.X, (int)pos.Y, 20, 20), Color.White);
+            // Load texture (by default, zenith)
+            Texture2D texture = TextureAssets.Item[ItemID.Zenith].Value;
+            float scale = 0.75f;
+            Vector2 pos = new(dims.X, dims.Y);
+
+            // Check Item or Projectile
+            if (itemType == "Item")
+            {
+                ModContent.GetInstance<DPSPanel>().Logger.Info("Item ID: " + itemId);
+                texture = TextureAssets.Item[itemId].Value;
+            }
+            else if (itemType == "Projectile")
+            {
+                ModContent.GetInstance<DPSPanel>().Logger.Info("Projectile ID: " + itemId);
+                texture = TextureAssets.Projectile[itemId].Value;
+            }
+
+            // Draw texture
+            if (texture != null)
+            {
+                spriteBatch.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+            }
         }
     }
 }

@@ -26,6 +26,7 @@ namespace DPSPanel.MainCode.Panel
             public string weaponName;
             public int damage;
             public int itemID;
+            public string itemType;
         }
 
         // --------------------------------------------------------------------------------
@@ -60,12 +61,12 @@ namespace DPSPanel.MainCode.Panel
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            TrackBossDamage(item.type, item.Name, damageDone, target);
+            TrackBossDamage("Item", item.type, item.Name, damageDone, target);
         }
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            TrackBossDamage(proj.type, proj.Name, damageDone, target);
+            TrackBossDamage("Projectile", proj.type, proj.Name, damageDone, target);
         }
 
         // --------------------------------------------------------------------------------
@@ -94,7 +95,7 @@ namespace DPSPanel.MainCode.Panel
             }
         }
 
-        private void UpdateWeapon(int itemID, string weaponName, int damageDone)
+        private void UpdateWeapon(string _itemType, int itemID, string weaponName, int damageDone)
         {
             if (fight == null || fight.weapons == null)
             {
@@ -114,7 +115,7 @@ namespace DPSPanel.MainCode.Panel
             if (weapon == null)
             {
                 // Add new weapon to the fight
-                weapon = new Weapon { weaponName = weaponName, damage = damageDone, itemID = itemID};
+                weapon = new Weapon { weaponName = weaponName, damage = damageDone, itemID = itemID, itemType = _itemType};
                 fight.weapons.Add(weapon);
                 fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
 
@@ -135,13 +136,13 @@ namespace DPSPanel.MainCode.Panel
             panelSystem.state.panel.UpdateSliders(fight.weapons);
         }
 
-        private void TrackBossDamage(int itemID, string weaponName, int damageDone, NPC npc)
+        private void TrackBossDamage(string _itemType, int itemID, string weaponName, int damageDone, NPC npc)
         {
             // Check if NPC is a boss
             if (IsValidBoss(npc) && !HandleBossDeath(npc, weaponName))
             {
                 // Add weapon to player's weapon list
-                UpdateWeapon(itemID, weaponName, damageDone);
+                UpdateWeapon(_itemType, itemID, weaponName, damageDone);
 
                 // Add damage to existing fight
                 fight.damageTaken += damageDone;

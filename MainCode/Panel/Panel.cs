@@ -118,15 +118,12 @@ namespace DPSPanel.MainCode.Panel
             {
                 var wpn = weapons[i];
                 Color color = colorsToUse[i % colorsToUse.Length];
-                //Texture2D icon = TextureAssets.Item[here].Value;
-                Texture2D icon = null;
 
                 // Get the slider for this weapon.
                 PanelSlider slider = sliders[wpn.weaponName];
-                
 
                 // Update the slider with the current data.
-                slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color, icon);
+                slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color, wpn.itemID, wpn.itemType);
                 slider.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + padding * 2;
             }
