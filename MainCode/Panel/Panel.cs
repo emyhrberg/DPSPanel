@@ -100,17 +100,11 @@ namespace DPSPanel.MainCode.Panel
                     // Get the boss head texture
                     Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[headIndex].Value;
 
-                    // Get the dimensions of the panel and boss title
+                    // Calculate the icon's position (top-left aligned within the panel)
                     CalculatedStyle dims = GetDimensions();
-                    Vector2 panelCenter = new Vector2(dims.X + dims.Width / 2, dims.Y + 10f); // Panel center
-                    float iconHeight = bossHeadTexture.Height;
-                    float textHeight = 16f; // Approximate height of the text
-                    float totalHeight = iconHeight + textHeight + 4f; // Space between icon and text
-
-                    // Calculate icon position to center it horizontally with the text
                     Vector2 iconPosition = new Vector2(
-                        panelCenter.X - bossHeadTexture.Width / 2, // Center icon horizontally
-                        panelCenter.Y - totalHeight / 2            // Offset vertically to center text + icon
+                        dims.X + 4f,
+                        dims.Y - 2f
                     );
 
                     // Draw the boss head icon

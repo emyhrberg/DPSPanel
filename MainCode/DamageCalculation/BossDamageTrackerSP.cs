@@ -40,7 +40,7 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         public override void OnEnterWorld()
         {
-            Main.NewText("Hello, " + Main.LocalPlayer.name + "! To use the DPS panel, type /dps show in chat or toggle with K (set the keybind in controls).", Color.Yellow);
+            Main.NewText("Hello, " + Main.LocalPlayer.name + "! To use the DPS panel, type /dps toggle in chat or toggle with K (set the keybind in controls).", Color.Yellow);
         }
 
         public override void PreUpdate()
