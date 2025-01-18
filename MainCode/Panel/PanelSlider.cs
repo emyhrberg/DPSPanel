@@ -11,15 +11,14 @@ namespace DPSPanel.MainCode.Panel
     {
         private readonly Asset<Texture2D> sliderEmpty; // Background slider texture
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
-        private Color fillColor;             // Color for the fill (no longer readonly)
+        private readonly UIText textElement;          // Text element for slider label
+        private Color fillColor;             // Color for the fill
         private int percentage;              // Progress percentage (0-100)
-        private UIText textElement;          // Text element for slider label
 
         public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull)
         {
             this.sliderEmpty = sliderEmpty;
             this.sliderFull = sliderFull;
-            //this.fillColor = color;
             this.percentage = 0; // initial progress
 
             // Create the text element centered on the slider.

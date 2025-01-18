@@ -73,7 +73,7 @@ namespace DPSPanel.MainCode.Panel
          */
         public void AddBossTitle(string bossName="UnnamedBoss")
         {
-            clearPanelAndAllItems();
+            ClearPanelAndAllItems();
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
@@ -81,7 +81,7 @@ namespace DPSPanel.MainCode.Panel
             ResizePanelHeight();
         }
 
-        public void CreateSlider(string sliderName="Name", int index=0)
+        public void CreateSlider(string sliderName="Name")
         {
             // Check if the slider already exists
             if (!sliders.ContainsKey(sliderName))
@@ -116,20 +116,21 @@ namespace DPSPanel.MainCode.Panel
             {
                 var wpn = weapons[i];
                 Color color = colorsToUse[i % colorsToUse.Length];
-                PanelSlider slider;
+                //PanelSlider slider;
 
-                if (!sliders.TryGetValue(wpn.weaponName, out slider))
-                {
-                    // Create a new slider if it doesn't exist.
-                    slider = new PanelSlider(sliderEmpty, sliderFull)
-                    {
-                        Width = new StyleDimension(0, 1f),
-                        Height = new StyleDimension(ItemHeight, 0f),
-                        HAlign = 0.5f,
-                    };
-                    sliders[wpn.weaponName] = slider;
-                    Append(slider);
-                }
+                //if (!sliders.TryGetValue(wpn.weaponName, out slider))
+                //{
+                //    // Create a new slider if it doesn't exist.
+                //    slider = new PanelSlider(sliderEmpty, sliderFull)
+                //    {
+                //        Width = new StyleDimension(0, 1f),
+                //        Height = new StyleDimension(ItemHeight, 0f),
+                //        HAlign = 0.5f,
+                //    };
+                //    sliders[wpn.weaponName] = slider;
+                //    Append(slider);
+                //}
+                PanelSlider slider = sliders[wpn.weaponName];
 
                 // Update the slider with the current data.
                 slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color);
@@ -140,19 +141,11 @@ namespace DPSPanel.MainCode.Panel
         }
 
 
-        public void clearPanelAndAllItems()
+        public void ClearPanelAndAllItems()
         {
             RemoveAllChildren();
             sliders = []; // reset sliders
-        }
-
-        /* -------------------------------------------------------------
-         * Panel helpers
-         * -------------------------------------------------------------
-         */
-        private Color GetColorForIndex(int index)
-        {
-            return colorsToUse[index % colorsToUse.Length];
+            currentYOffset = headerHeight + padding * 2;
         }
 
         private void ResizePanelHeight()

@@ -122,7 +122,7 @@ namespace DPSPanel.MainCode.Panel
                 int index = fight.weapons.FindIndex(w => w.weaponName == weaponName);
 
                 // Create a new slider for this weapon
-                panelSystem.state.panel.CreateSlider(weaponName, index);
+                panelSystem.state.panel.CreateSlider(weaponName);
             }
             else
             {
@@ -138,7 +138,7 @@ namespace DPSPanel.MainCode.Panel
         private void TrackBossDamage(string weaponName, int damageDone, NPC npc)
         {
             // Check if NPC is a boss
-            if (IsValidBoss(npc) && !IsNPCDead(npc, weaponName))
+            if (IsValidBoss(npc) && !HandleBossDeath(npc, weaponName))
             {
                 // Add weapon to player's weapon list
                 UpdateWeapon(weaponName, damageDone);
@@ -158,18 +158,10 @@ namespace DPSPanel.MainCode.Panel
         private void SendBossFightToPanel()
         {
             if (fight == null || fight.weapons.Count == 0) return;
-
-            // Sort weapons by damage
             fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
-
-            // Update sliders for each weapon
             int highestDamage = fight.weapons.First().damage;
-            foreach (var weapon in fight.weapons)
-            {
-                int damageProgress = (int)(((float)weapon.damage / (float)highestDamage) * 100);
-                var panelSystem = ModContent.GetInstance<PanelSystem>();
-                panelSystem.state.panel.UpdateSliders(fight.weapons);
-            }
+            var panelSystem = ModContent.GetInstance<PanelSystem>();
+            panelSystem.state.panel.UpdateSliders(fight.weapons);
         }
 
         // --------------------------------------------------------------------------------
@@ -181,7 +173,7 @@ namespace DPSPanel.MainCode.Panel
             Mod.Logger.Info($"Name: {fight.bossName} | ID: {fight.bossId} | WeaponsDamages: {weaponsDamages} | DamageTaken: {fight.damageTaken} | InitialLife: {fight.initialLife}");
         }
 
-        private bool IsNPCDead(NPC npc, string weaponName)
+        private bool HandleBossDeath(NPC npc, string weaponName)
         {
             if (npc.life <= 0)
             {
