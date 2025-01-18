@@ -5,6 +5,7 @@ using log4net.Repository.Hierarchy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
+using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
@@ -32,14 +33,14 @@ namespace DPSPanel.MainCode.Panel
         private readonly float headerHeight = 16f;
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
+        private NPC currentBoss;
 
         // Slider items
         private Dictionary<string, PanelSlider> sliders = [];
         private readonly Asset<Texture2D> sliderEmpty;
         private readonly Asset<Texture2D> sliderFull;
 
-        // Define predefined colors for each row
-        private readonly Color[] colorsToUse =
+        private readonly Color[] colors =
         [
             Color.Red,
             Color.Green,
@@ -55,7 +56,6 @@ namespace DPSPanel.MainCode.Panel
             Color.LightGoldenrodYellow,
 
         ];
-        private int colorIndex;
 
         /* -------------------------------------------------------------
          * Panel Constructor
@@ -73,11 +73,15 @@ namespace DPSPanel.MainCode.Panel
          * Panel content
          * -------------------------------------------------------------
          */
-        public void AddBossTitle(string bossName="UnnamedBoss")
+        public void AddBossTitle(string bossName = "UnnamedBoss", NPC npc = null)
         {
+            // Store the boss NPC to be used in the Draw method
+            currentBoss = npc;
+
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
+
             currentYOffset = headerHeight + padding * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
         }
@@ -116,7 +120,7 @@ namespace DPSPanel.MainCode.Panel
             for (int i = 0; i < weapons.Count; i++)
             {
                 var wpn = weapons[i];
-                Color color = colorsToUse[i % colorsToUse.Length];
+                Color color = colors[i % colors.Length];
 
                 // Get the slider for this weapon.
                 PanelSlider slider = sliders[wpn.weaponName];

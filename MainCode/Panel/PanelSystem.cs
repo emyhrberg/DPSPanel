@@ -12,15 +12,18 @@ namespace DPSPanel.MainCode.Panel
         private UserInterface ui = new();
         internal PanelState state = new();
 
+        // This is called after everything in the game has been loaded
         public override void PostSetupContent()
         {
             state.Activate();
             ui.SetState(state);
         }
 
+        // This is always called after the world has been loaded
+        // This runs every tick
+        // Always update the UI (everything in the PanelState, Panel, etc.)
         public override void UpdateUI(GameTime gameTime)
         {
-            // always update the UI (everything in the PanelState, Panel, etc.)
             ui?.Update(gameTime);
         }
 

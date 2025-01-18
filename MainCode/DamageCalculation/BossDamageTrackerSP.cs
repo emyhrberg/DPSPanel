@@ -48,6 +48,14 @@ namespace DPSPanel.MainCode.Panel
             // Iterate all NPCs every 1 second (idk how computationally heavy this is)
             if (Main.time % 60 == 0)
             {
+                // If there's an active fight and the boss is no longer alive or present, stop tracking
+                if (fight != null && !Main.npc.Any(npc => npc.active && npc.boss && npc.FullName == fight.bossName))
+                {
+                    Mod.Logger.Info($"Boss {fight.bossName} despawned!");
+                    fight.isAlive = false;
+                    fight = null; // Stop tracking the fight
+                }
+
                 for (int i = 0; i < Main.npc.Length; i++)
                 {
                     NPC npc = Main.npc[i];
@@ -140,12 +148,6 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         // Helper methods
         // --------------------------------------------------------------------------------
-        private void PrintBossFight()
-        {
-            string weaponsDamages = string.Join(", ", fight.weapons.Select(w => w.weaponName + ": " + w.damage));
-            Mod.Logger.Info($"Name: {fight.bossName} | ID: {fight.bossId} | WeaponsDamages: {weaponsDamages} | DamageTaken: {fight.damageTaken} | InitialLife: {fight.initialLife}");
-        }
-
         private bool HandleBossDeath(NPC npc, string weaponName)
         {
             if (npc.life <= 0)
@@ -180,6 +182,12 @@ namespace DPSPanel.MainCode.Panel
         private bool IsValidBoss(NPC npc)
         {
             return npc.boss && !npc.friendly;
+        }
+
+        private void PrintBossFight()
+        {
+            string weaponsDamages = string.Join(", ", fight.weapons.Select(w => w.weaponName + ": " + w.damage));
+            Mod.Logger.Info($"Name: {fight.bossName} | ID: {fight.bossId} | WeaponsDamages: {weaponsDamages} | DamageTaken: {fight.damageTaken} | InitialLife: {fight.initialLife}");
         }
     }
 }

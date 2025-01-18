@@ -10,7 +10,7 @@ namespace DPSPanel.MainCode.Commands
         public override CommandType Type => CommandType.Chat; // Makes the command available in chat
         public override string Command => "dps"; // The main command is "/dps"
         public override string Usage => "Use: /dps"; // Usage instructions
-        public override string Description => "Usage: /dps show /dps hide /dps clear"; // Is shown when using "/help"
+        public override string Description => "Usage: /dps toggle"; // Is shown when using "/help"
 
         private int i = 0;
 
@@ -27,18 +27,15 @@ namespace DPSPanel.MainCode.Commands
             // Determine the target
             string target = args[0].ToLower(); // "dps" or "panel"
 
-            if (target == "hide")
+            if (target == "toggle")
             {
-                uiSystem.state.HideDPSPanel();
-            }
-            else if (target == "show")
-            {
-                uiSystem.state.ShowDPSPanel();
+                uiSystem.state.ToggleDPSPanel();
             }
             else if (target == "clear")
             {
-                uiSystem.state.panel.ClearPanelAndAllItems();
-                uiSystem.state.panel.AddBossTitle("Boss Name");
+                // Broken
+                //uiSystem.state.panel.ClearPanelAndAllItems();
+                //uiSystem.state.panel.AddBossTitle("Boss Name");
             }
             else
             {

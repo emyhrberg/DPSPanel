@@ -18,7 +18,6 @@ namespace DPSPanel.MainCode.Panel
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
         private readonly UIText textElement;          // Text element for slider label
 
-        private Texture2D weaponIcon;          // Icon for the weapon
         private Color fillColor;             // Color for the fill
         private int percentage;              // Progress percentage (0-100)
 
@@ -85,7 +84,7 @@ namespace DPSPanel.MainCode.Panel
             // Scale and position
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X, dims.Y);
-            Rectangle rectangleSize = new(0, 0, 48, 48); 
+            //Rectangle rectangleSize = new(0, 0, 48, 48); 
 
             // Check Item or Projectile
             if (itemType == "Item")
@@ -104,23 +103,39 @@ namespace DPSPanel.MainCode.Panel
             float w = texture.Width;
             float h = texture.Height;
 
-            // if the texture is too big, scale it down until its at least 48 width or height
-            float w2 = 0f;
-            float h2 = 0f;
-            if (w > 48 || h > 48)
-            {
-                float scale = 48 / Math.Max(w, h);
-                w2 = w*scale;
-                h2 = w*scale;
-                rectangleSize = new Rectangle(0, 0, (int)w2, (int)h2);
-
-            }
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH Before: {w}x{h} WxH After: {w2}x{h2}");
+            //ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH: {w}x{h}");
 
             // Draw texture
             if (texture != null)
             {
-                spriteBatch.Draw(texture, pos, rectangleSize, Color.White);
+                // if height is more than 70, its too damn big. try to crop it to only show top 70 pixels
+                if (h > 70)
+                {
+                    Rectangle sourceRect = new Rectangle(0, 0, 70, 70); // crop area
+                    float scaleFactor = 0.6f;
+                    int destWidth = (int)(sourceRect.Width * scaleFactor);
+                    int destHeight = (int)(sourceRect.Height * scaleFactor);
+                    CalculatedStyle dims2 = GetDimensions();
+                    Vector2 pos2 = new Vector2(dims2.X, dims2.Y);
+                    Rectangle destinationRect = new Rectangle((int)pos.X, (int)pos.Y, destWidth, destHeight);
+
+                    //ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} Cropped h > 70 scaled to: {destWidth}x{destHeight}");
+
+                    spriteBatch.Draw(texture, destinationRect, sourceRect, Color.White);
+                }
+                else
+                {
+                    // draw with scaling
+                    float scale = 0.8f;
+
+                    // custom scaling for small like yoyos and grenades are 16x16 and 20x20
+                    if (w <= 20 && h <= 20)
+                    {
+                        scale = 2f;
+                    }
+
+                    spriteBatch.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                }
             }
         }
 
