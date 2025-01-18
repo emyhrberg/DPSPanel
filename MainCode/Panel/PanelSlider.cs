@@ -14,12 +14,14 @@ namespace DPSPanel.MainCode.Panel
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
         private readonly Color fillColor;             // Color for the fill
         private int value;                   // Fill value (0-100)
+        private string text = "";                // Text for the slider
         private UIText textElement;          // Text element for slider label
 
         public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull, string text, Color color, int value)
         {
             this.sliderEmpty = sliderEmpty;
             this.sliderFull = sliderFull;
+            this.text = text;
             this.fillColor = color;
             this.value = (int)MathHelper.Clamp(value, 0, 100); // Clamp value between 0 and 100
 
@@ -69,14 +71,8 @@ namespace DPSPanel.MainCode.Panel
         public void updateSliderValue(int damageDone, int newValue)
         {
             // Update the value and clamp it between 0 and 100
-            textElement.SetText($"{Main.LocalPlayer.name} ({damageDone})");
+            textElement.SetText($"{text} ({damageDone})");
             value = (int)MathHelper.Clamp(newValue, 0, 100);
-        }
-
-        public void updateSliderText(string newText)
-        {
-            // Update the text element
-            
         }
     }
 }

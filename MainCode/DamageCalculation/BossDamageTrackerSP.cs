@@ -2,6 +2,7 @@
 using Terraria;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
+using System.Linq;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -16,14 +17,8 @@ namespace DPSPanel.MainCode.Panel
             public int initialLife;
             public string bossName;
             public int damageTaken;
-            public CustomPlayer player;
-        }
-
-        public class CustomPlayer
-        {
-            public string playerName;
-            public int totalDamage;
             public HashSet<Weapon> weapons = [];
+            public bool isAlive = false;
         }
 
         public class Weapon
@@ -46,15 +41,6 @@ namespace DPSPanel.MainCode.Panel
             Main.NewText("Hello, " + Main.LocalPlayer.name + "! To use the DPS panel, type /dps show in chat or toggle with K (set the keybind in controls).", Color.Yellow);
         }
 
-        public override void OnHitAnything(float x, float y, Entity victim)
-        {
-            // check if golem was hit
-            if (victim is NPC npc && IsValidBoss(npc))
-            {
-                Mod.Logger.Info("Unknown NPC. Hopefully Golem? was hit!");
-            }
-        }
-
         public override void PreUpdate()
         {
             // Iterate all NPCs every 1 second (idk how computationally heavy this is)
@@ -63,7 +49,7 @@ namespace DPSPanel.MainCode.Panel
                 for (int i = 0; i < Main.npc.Length; i++)
                 {
                     NPC npc = Main.npc[i];
-                    if (IsValidBoss(npc))
+                    if (IsValidBoss(npc) && (fight == null || !fight.isAlive) && npc.life > 0)
                     {
                         CreateNewBossFight(npc);
                     }
@@ -96,29 +82,57 @@ namespace DPSPanel.MainCode.Panel
                     initialLife = npc.lifeMax,
                     bossName = npc.FullName,
                     damageTaken = 0,
-                    player = new CustomPlayer
-                    {
-                        playerName = Main.LocalPlayer.name,
-                        totalDamage = 0
-                    }
+                    weapons = [],
+                    isAlive = true
                 };
+                Mod.Logger.Info("New boss fight created: " + fight.bossName);
+                PrintBossFight();
                 var panelSystem = ModContent.GetInstance<PanelSystem>();
                 panelSystem.state.panel.AddBossTitle(npc.FullName);
-                panelSystem.state.panel.CreateSlider();
+
             }
         }
+
+        private void UpdateWeapon(string weaponName, int damageDone)
+        {
+            var panelSystem = ModContent.GetInstance<PanelSystem>();
+
+            // Check if the weapon already exists
+            var weapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
+            if (weapon != null)
+            {
+                // Update existing weapon's damage
+                weapon.damage += damageDone;
+            }
+            else
+            {
+                // Add new weapon to the fight
+                weapon = new Weapon { weaponName = weaponName, damage = damageDone };
+                fight.weapons.Add(weapon);
+
+                // Create a new slider for this weapon
+                panelSystem.state.panel.CreateSlider(weaponName);
+            }
+
+            // Update the slider for this weapon
+            int damageProgress = (int)(((float)fight.damageTaken / (float)fight.initialLife) * 100f);
+            panelSystem.state.panel.UpdateSlider(weaponName, weapon.damage, damageProgress);
+        }
+
 
         private void TrackBossDamage(string weaponName, int damageDone, NPC npc)
         {
             // Check if NPC is a boss
-            if (IsValidBoss(npc) && !IsNPCDead(npc))
+            if (IsValidBoss(npc) && !IsNPCDead(npc, weaponName))
             {
-                // Add to existing fight
+                // Add weapon to player's weapon list
+                UpdateWeapon(weaponName, damageDone);
+
+                // Add damage to existing fight
                 fight.damageTaken += damageDone;
-                fight.player.totalDamage += damageDone;
 
                 // Send boss fight data to show in UI
-                SendBossFightToPanel();
+                SendBossFightToPanel(weaponName);
                 PrintBossFight();
             }
         }
@@ -126,16 +140,21 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         // Send to panel
         // --------------------------------------------------------------------------------
-        private void SendBossFightToPanel()
+        private void SendBossFightToPanel(string weaponName)
         {
             var panelSystem = ModContent.GetInstance<PanelSystem>();
 
-            // Use float to do division with percentages
-            int damageProgress = (int)(((float)fight.damageTaken / (float)fight.initialLife) * 100f);
-            int damageDone = fight.player.totalDamage;
-
-            // Update slider with the new progress value.
-            panelSystem.state.panel.UpdateSlider(damageDone, damageProgress);
+            // Check which weapon it is
+            foreach (var weapon in fight.weapons)
+            {
+                if (weapon.weaponName == weaponName)
+                {
+                    int damageProgress = (int)(((float)fight.damageTaken / (float)fight.initialLife) * 100f);
+                    panelSystem.state.panel.UpdateSlider(weaponName, weapon.damage, damageProgress);
+                    //Mod.Logger.Info("Weapon: " + weapon.weaponName + " | Damage: " + weapon.damage);
+                    return;
+                }
+            }
         }
 
         // --------------------------------------------------------------------------------
@@ -143,15 +162,17 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         private void PrintBossFight()
         {
-            Mod.Logger.Info($"Name: {fight.bossName} | ID: {fight.bossId} | Player: {fight.player.playerName} | Damage: {fight.player.totalDamage}");
+            string weaponsDamages = string.Join(", ", fight.weapons.Select(w => w.weaponName + ": " + w.damage));
+            Mod.Logger.Info($"Name: {fight.bossName} | ID: {fight.bossId} | WeaponsDamages: {weaponsDamages} | DamageTaken: {fight.damageTaken} | InitialLife: {fight.initialLife}");
         }
 
-        private bool IsNPCDead(NPC npc)
+        private bool IsNPCDead(NPC npc, string weaponName)
         {
             if (npc.life <= 0)
             {
-                FixFinalBlowDiscrepancy();
-                SendBossFightToPanel();
+                fight.isAlive = false;
+                FixFinalBlowDiscrepancy(weaponName);
+                SendBossFightToPanel(weaponName);
                 fightId++;
                 fight = null;
                 return true;
@@ -159,14 +180,21 @@ namespace DPSPanel.MainCode.Panel
             return false;
         }
 
-        private void FixFinalBlowDiscrepancy()
+        private void FixFinalBlowDiscrepancy(string weaponName)
         {
             // Check if the final blow was not accounted for
             if (fight.damageTaken < fight.initialLife)
             {
-                fight.damageTaken = fight.initialLife;
-                fight.player.totalDamage = fight.initialLife;
-                PrintBossFight();
+                foreach (var weapon in fight.weapons)
+                {
+                    if (weapon.weaponName == weaponName)
+                    {
+                        int discrepancy = fight.initialLife - fight.damageTaken;
+                        weapon.damage += discrepancy;
+                        fight.damageTaken = fight.initialLife;
+                        PrintBossFight();
+                    }
+                }
             }
         }
 

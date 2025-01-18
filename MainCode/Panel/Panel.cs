@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using log4net.Repository.Hierarchy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
@@ -30,7 +31,7 @@ namespace DPSPanel.MainCode.Panel
         private const float ItemHeight = 40f;
 
         // Slider items
-        private PanelSlider slider;
+        private Dictionary<string, PanelSlider> sliders = new();
         private readonly Asset<Texture2D> sliderEmpty;
         private readonly Asset<Texture2D> sliderFull;
 
@@ -71,21 +72,11 @@ namespace DPSPanel.MainCode.Panel
          * -------------------------------------------------------------
          */
 
-        public void AddDefaultPanelHeader(string text="Damage dealt")
-        {
-            // Header text
-            UIText header = new(text, 1.0f);
-            header.HAlign = 0.5f; // center horizontal align
-            Append(header);
-            currentYOffset = headerHeight + padding*2; // add padding on both sides to the height
-            ResizePanelHeight();
-        }
-
         public void AddBossTitle(string bossName="UnnamedBoss")
         {
             // Clear the entire panel
             RemoveAllChildren();
-            slider = null;
+            sliders = []; // reset sliders
 
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
@@ -94,37 +85,13 @@ namespace DPSPanel.MainCode.Panel
             ResizePanelHeight();
         }
 
-        public void CreateSlider()
+        public void CreateSlider(string sliderName="Name")
         {
-            // Check if slider exists
-            if (slider == null)
+            // Check if the slider already exists
+            if (!sliders.ContainsKey(sliderName))
             {
-                // Select unused color
-                // More likely to select first color
-                // Very likely to select second or third
-                // Percentages: 1. 80%, 2/3. 10%, 4/5. 5%
-                Random rnd = new Random();
-                if (rnd.Next(1, 101) <= 80)
-                {
-                    colorIndex = 0;
-                }
-                else if (rnd.Next(1, 101) <= 10)
-                {
-                    colorIndex = 1;
-                }
-                else if (rnd.Next(1, 101) <= 5)
-                {
-                    colorIndex = 2;
-                }
-                else
-                {
-                    colorIndex = rnd.Next(3, colorsToUse.Length);
-                }
-
-
-                Color color = colorsToUse[colorIndex++ % colorsToUse.Length];
-                // Create a slider
-                slider = new(sliderEmpty, sliderFull, Main.LocalPlayer.name, color, 0)
+                // Create a new slider
+                PanelSlider slider = new(sliderEmpty, sliderFull, sliderName, SelectSliderColor(), 0)
                 {
                     Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
                     Height = new StyleDimension(ItemHeight, 0f), // Set height
@@ -134,18 +101,55 @@ namespace DPSPanel.MainCode.Panel
                 Append(slider);
                 currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
                 ResizePanelHeight();
+
+                // Add to the dictionary
+                sliders[sliderName] = slider;
             }
         }
 
-        public void UpdateSlider(int damageDone, int percentageValue)
+        public void UpdateSlider(string weaponName, int damageDone, int percentageValue)
         {
-            // Ensure slider exists
-            if (slider != null)
+            // Check if the slider exists
+
+            if (!sliders.TryGetValue(weaponName, out var slider))
             {
-                // Update the slider value
-                slider.updateSliderValue(damageDone, percentageValue);
-                Recalculate();
+                // If not, create a new slider
+                CreateSlider(weaponName);
+                slider = sliders[weaponName];
             }
+
+            // Update the slider's values
+            slider.updateSliderValue(damageDone, percentageValue);
+            Recalculate();
+        }
+
+        /* -------------------------------------------------------------
+         * Panel helpers
+         * -------------------------------------------------------------
+         */
+        private Color SelectSliderColor()
+        {
+            // More likely to select first color
+            // Very likely to select second or third
+            // Percentages: 1. 80%, 2/3. 10%, 4/5. 5%
+            Random rnd = new Random();
+            if (rnd.Next(1, 101) <= 80)
+            {
+                colorIndex = 0;
+            }
+            else if (rnd.Next(1, 101) <= 10)
+            {
+                colorIndex = 1;
+            }
+            else if (rnd.Next(1, 101) <= 5)
+            {
+                colorIndex = 2;
+            }
+            else
+            {
+                colorIndex = rnd.Next(3, colorsToUse.Length);
+            }
+            return colorsToUse[colorIndex];
         }
 
         private void ResizePanelHeight()

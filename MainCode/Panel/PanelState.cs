@@ -38,7 +38,7 @@ namespace DPSPanel.MainCode.Panel
         {
             base.OnInitialize();
             panel = CreatePanel();
-            panel.AddBossTitle("Boss Name Here");
+            panel.AddBossTitle("Boss Name");
             //InitializeButtons(panel);
         }
 
