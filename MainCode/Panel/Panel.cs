@@ -75,7 +75,6 @@ namespace DPSPanel.MainCode.Panel
          */
         public void AddBossTitle(string bossName="UnnamedBoss")
         {
-            ClearPanelAndAllItems();
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
@@ -130,12 +129,10 @@ namespace DPSPanel.MainCode.Panel
             ResizePanelHeight();
         }
 
-
         public void ClearPanelAndAllItems()
         {
             RemoveAllChildren();
             sliders = []; // reset sliders
-            currentYOffset = headerHeight + padding * 2;
         }
 
         private void ResizePanelHeight()

@@ -8,6 +8,7 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System.Collections.Generic;
+using System;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -82,9 +83,9 @@ namespace DPSPanel.MainCode.Panel
             Texture2D texture = TextureAssets.Item[ItemID.Zenith].Value;
 
             // Scale and position
-            float scale = 0.75f;
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X, dims.Y);
+            Rectangle rectangleSize = new(0, 0, 48, 48); 
 
             // Check Item or Projectile
             if (itemType == "Item")
@@ -96,27 +97,32 @@ namespace DPSPanel.MainCode.Panel
                 texture = TextureAssets.Projectile[itemId].Value;
             }
 
-            // Check size of texture
-            // get WxH
-            int w = texture.Width;
-            int h = texture.Height;
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH: {w}x{h}");
-
+            // fix a few hardcoded projectiles to items.
             texture = ResizeWeirdTextures(texture);
+
+            // debug item info
+            float w = texture.Width;
+            float h = texture.Height;
+
+            // if the texture is too big, scale it down until its at least 48 width or height
+            float w2 = 0f;
+            float h2 = 0f;
+            if (w > 48 || h > 48)
+            {
+                float scale = 48 / Math.Max(w, h);
+                w2 = w*scale;
+                h2 = w*scale;
+                rectangleSize = new Rectangle(0, 0, (int)w2, (int)h2);
+
+            }
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH Before: {w}x{h} WxH After: {w2}x{h2}");
 
             // Draw texture
             if (texture != null)
             {
-                spriteBatch.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                spriteBatch.Draw(texture, pos, rectangleSize, Color.White);
             }
         }
-
-        private static readonly Dictionary<int, int> projectileToItemMap = new()
-        {
-            // Map projectile ID 933 (e.g., Zenith projectile) to item ID 4956 (Zenith item)
-            {933, 4956}, // zenith
-            {409, 2622} // typhoon
-        };
 
         private Texture2D ResizeWeirdTextures(Texture2D originalTexture)
         {
@@ -128,6 +134,14 @@ namespace DPSPanel.MainCode.Panel
             }
             return originalTexture;
         }
+
+        private static readonly Dictionary<int, int> projectileToItemMap = new()
+        {
+            // Map projectile ID 933 (e.g., Zenith projectile) to item ID 4956 (Zenith item)
+            {933, 4956}, // zenith
+            {409, 2622}, // typhoon
+            {981,278}, // silver bullet
+        };
 
     }
 }

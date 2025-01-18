@@ -35,17 +35,10 @@ namespace DPSPanel.MainCode.Commands
             {
                 uiSystem.state.ShowDPSPanel();
             }
-            else if (target == "a")
+            else if (target == "clear")
             {
-                //uiSystem.state.panel.AddPanelItem($"Item {i}");
-                string text = $"Item {i}";
-                // rand value between 0 and 10
-                Random rnd = new Random();
-                int sliderValue = 95-i* rnd.Next(1, 10);
-                int damageDone = 1000 + i * 1000 + rnd.Next(1,10);
-                //uiSystem.state.panel.CreateSlider("weapon");
-                //uiSystem.state.panel.UpdateSlider("weapon", damageDone, sliderValue);
-                i++;
+                uiSystem.state.panel.ClearPanelAndAllItems();
+                uiSystem.state.panel.AddBossTitle("Boss Name");
             }
             else
             {
