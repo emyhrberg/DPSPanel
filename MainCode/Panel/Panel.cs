@@ -29,6 +29,7 @@ namespace DPSPanel.MainCode.Panel
         private const float ItemHeight = 40f;
 
         // Slider items
+        private PanelSlider slider;
         private Asset<Texture2D> sliderEmpty;
         private Asset<Texture2D> sliderFull;
 
@@ -69,79 +70,60 @@ namespace DPSPanel.MainCode.Panel
          * -------------------------------------------------------------
          */
 
-        public void AddPanelHeader()
+        public void AddDefaultPanelHeader(string text="Damage dealt")
         {
             // Header text
-            UIText header = new("Damage dealt", 1.0f);
-            header.HAlign = 0.5f;
+            UIText header = new(text, 1.0f);
+            header.HAlign = 0.5f; // center horizontal align
             Append(header);
-            currentYOffset += headerHeight + padding*2;
+            currentYOffset = headerHeight + padding*2; // add padding on both sides to the height
             ResizePanelHeight();
         }
 
-        public void AddSlider(string text, int value)
+        public void AddBossTitle(string bossName="UnnamedBoss")
         {
-            // Select unused color
-            Color color = colorsToUse[colorIndex++ % colorsToUse.Length];
+            // Clear the entire panel
+            RemoveAllChildren();
+            slider = null;
 
-            // Create a slider
-            PanelSlider slider = new(sliderEmpty, sliderFull, text, color, value)
-            {
-                Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
-                Height = new StyleDimension(ItemHeight, 0f), // Set height
-                Top = new StyleDimension(currentYOffset, 0f),
-                HAlign = 0.5f, // Center horizontally
-            };
-
-            Append(slider);
-
-            currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
+            UIText bossTitle = new(bossName, 1.0f);
+            bossTitle.HAlign = 0.5f;
+            Append(bossTitle);
+            currentYOffset = headerHeight + padding * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
         }
 
+        public void CreateSlider()
+        {
+            // Check if slider exists
+            if (slider == null)
+            {
+                // Select unused color
+                Color color = colorsToUse[colorIndex++ % colorsToUse.Length];
+                // Create a slider
+                slider = new(sliderEmpty, sliderFull, Main.LocalPlayer.name, color, 0)
+                {
+                    Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
+                    Height = new StyleDimension(ItemHeight, 0f), // Set height
+                    Top = new StyleDimension(currentYOffset, 0f),
+                    HAlign = 0.5f, // Center horizontally
+                };
+                Append(slider);
+                currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
+                ResizePanelHeight();
+            }
+        }
 
-        //public void AddPanelItem(string itemName)
-        //{
-        //    // Cycle through colors
-        //    Color selectedColor = colorsToUse[colorIndex++ % colorsToUse.Length];
-
-        //    // Create uitextpanel
-        //    UITextPanel<string> text = new(itemName, 1.0f, large: false)
-        //    {
-        //        Width = new StyleDimension(0, 1.0f),
-        //        Height = new StyleDimension(ItemHeight, 0f),
-        //        Top = new StyleDimension(currentYOffset, 0f),
-        //        HAlign = 1.0f, // Horizontal align to left of panel
-        //        BackgroundColor = selectedColor
-        //    };
-
-        //    Append(text);
-        //    currentYOffset += ItemHeight + padding;
-        //    ResizePanelHeight();
-        //}
-
-        //public void AddPanelItem(string itemName, float fillPercentage = 1.0f)
-        //{
-        //    // Cycle through colors
-        //    Color selectedColor = colorsToUse[colorIndex++ % colorsToUse.Length];
-
-        //    // Create a custom UITextPanel
-        //    CustomUITextPanel<string> text = new(itemName, 1.0f, large: false)
-        //    {
-        //        Width = new StyleDimension(0, 1.0f),
-        //        Height = new StyleDimension(ItemHeight, 0f),
-        //        Top = new StyleDimension(currentYOffset, 0f),
-        //        HAlign = 0.0f, // Align to the left of the panel
-        //        FillPercentage = fillPercentage, // Set the fill percentage
-        //        FillColor = selectedColor, // Set the fill color
-        //        BackgroundColor = Color.Gray // Set the base background color
-        //    };
-
-        //    Append(text);
-        //    currentYOffset += ItemHeight + padding;
-        //    ResizePanelHeight();
-        //}
-
+        public void UpdateSlider(int damageDone, int percentageValue)
+        {
+            // Ensure slider exists
+            if (slider != null)
+            {
+                // Update the slider value
+                slider.updateSliderValue(damageDone, percentageValue);
+                Recalculate();
+            }
+        }
 
         private void ResizePanelHeight()
         {

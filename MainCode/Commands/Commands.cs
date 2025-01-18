@@ -1,4 +1,5 @@
-﻿using DPSPanel.MainCode.Panel;
+﻿using System;
+using DPSPanel.MainCode.Panel;
 using log4net.Repository.Hierarchy;
 using Terraria.ModLoader;
 
@@ -38,7 +39,12 @@ namespace DPSPanel.MainCode.Commands
             {
                 //uiSystem.state.panel.AddPanelItem($"Item {i}");
                 string text = $"Item {i}";
-                uiSystem.state.panel.AddSlider(text, 95-i*10);
+                // rand value between 0 and 10
+                Random rnd = new Random();
+                int sliderValue = 95-i* rnd.Next(1, 10);
+                int damageDone = 1000 + i * 1000 + rnd.Next(1,10);
+                uiSystem.state.panel.CreateSlider();
+                uiSystem.state.panel.UpdateSlider(damageDone, sliderValue);
                 i++;
             }
             else

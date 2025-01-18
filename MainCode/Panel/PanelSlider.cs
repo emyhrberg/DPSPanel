@@ -13,8 +13,8 @@ namespace DPSPanel.MainCode.Panel
         private readonly Asset<Texture2D> sliderEmpty; // Background slider texture
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
         private readonly Color fillColor;             // Color for the fill
-        private readonly int value;                   // Fill value (0-100)
-        private readonly UIText textElement;          // Text element for slider label
+        private int value;                   // Fill value (0-100)
+        private UIText textElement;          // Text element for slider label
 
         public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull, string text, Color color, int value)
         {
@@ -64,6 +64,19 @@ namespace DPSPanel.MainCode.Panel
                     fillColor // Tint for the full slider
                 );
             }
+        }
+
+        public void updateSliderValue(int damageDone, int newValue)
+        {
+            // Update the value and clamp it between 0 and 100
+            textElement.SetText($"{Main.LocalPlayer.name} ({damageDone})");
+            value = (int)MathHelper.Clamp(newValue, 0, 100);
+        }
+
+        public void updateSliderText(string newText)
+        {
+            // Update the text element
+            
         }
     }
 }

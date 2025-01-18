@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
-using System.Linq;
-using System;
-using log4net.Core;
-using log4net;
+using Microsoft.Xna.Framework;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -44,6 +41,11 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         // Hooks
         // --------------------------------------------------------------------------------
+        public override void OnEnterWorld()
+        {
+            Main.NewText("Hello, " + Main.LocalPlayer.name + "! To use the DPS panel, type /dps show in chat or toggle with K (set the keybind in controls).", Color.Yellow);
+        }
+
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
             TrackBossDamage(item.Name, damageDone, target);
@@ -78,6 +80,9 @@ namespace DPSPanel.MainCode.Panel
                             totalDamage = damageDone
                         }
                     };
+                    var panelSystem = ModContent.GetInstance<PanelSystem>();
+                    panelSystem.state.panel.AddBossTitle(npc.FullName);
+                    panelSystem.state.panel.CreateSlider();
                 }
                 else
                 {
@@ -86,7 +91,23 @@ namespace DPSPanel.MainCode.Panel
                     fight.player.totalDamage += damageDone;
                 }
                 PrintBossFight();
+                SendBossFightToPanel();
             }
+        }
+
+        // --------------------------------------------------------------------------------
+        // Send to panel
+        // --------------------------------------------------------------------------------
+        private void SendBossFightToPanel()
+        {
+            var panelSystem = ModContent.GetInstance<PanelSystem>();
+
+            // Use float to do division with percentages
+            int damageProgress = (int)(((float)fight.damageTaken / (float)fight.initialLife) * 100f);
+            int damageDone = fight.player.totalDamage;
+
+            // Update slider with the new progress value.
+            panelSystem.state.panel.UpdateSlider(damageDone, damageProgress);
         }
 
         // --------------------------------------------------------------------------------
@@ -94,8 +115,7 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         private void PrintBossFight()
         {
-            ILog log = ModContent.GetInstance<DPSPanel>().Logger;
-            log.Info($"Name: {fight.bossName} | ID: {fight.bossId} | Player: {fight.player.playerName} | Damage: {fight.player.totalDamage}");
+            Mod.Logger.Info($"Name: {fight.bossName} | ID: {fight.bossId} | Player: {fight.player.playerName} | Damage: {fight.player.totalDamage}");
         }
 
         private bool IsNPCDead(NPC npc)
@@ -103,6 +123,7 @@ namespace DPSPanel.MainCode.Panel
             if (npc.life <= 0)
             {
                 FixFinalBlowDiscrepancy();
+                SendBossFightToPanel();
                 fightId++;
                 fight = null;
                 return true;
