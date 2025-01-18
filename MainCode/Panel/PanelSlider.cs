@@ -7,6 +7,7 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
+using System.Collections.Generic;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -23,6 +24,7 @@ namespace DPSPanel.MainCode.Panel
         // Weapon icon
         private int itemId;
         private string itemType;
+        private string weaponName;           // Weapon name
 
         public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull)
         {
@@ -39,13 +41,14 @@ namespace DPSPanel.MainCode.Panel
             Append(textElement);
         }
 
-        public void UpdateSlider(int highestDamage, string weaponName, int weaponDamage, Color newColor, int _itemId, string _itemType)
+        public void UpdateSlider(int highestDamage, string _weaponName, int weaponDamage, Color newColor, int _itemId, string _itemType)
         {
             percentage = (int)((weaponDamage / (float)highestDamage) * 100);
             fillColor = newColor;
-            textElement.SetText($"{weaponName} ({weaponDamage})");
+            textElement.SetText($"{_weaponName} ({weaponDamage})");
             itemId = _itemId;
             itemType = _itemType;
+            weaponName = _weaponName;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -75,23 +78,31 @@ namespace DPSPanel.MainCode.Panel
 
         private void DrawIcon(SpriteBatch spriteBatch)
         {
-            CalculatedStyle dims = GetDimensions();
             // Load texture (by default, zenith)
             Texture2D texture = TextureAssets.Item[ItemID.Zenith].Value;
+
+            // Scale and position
             float scale = 0.75f;
+            CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X, dims.Y);
 
             // Check Item or Projectile
             if (itemType == "Item")
             {
-                ModContent.GetInstance<DPSPanel>().Logger.Info("Item ID: " + itemId);
                 texture = TextureAssets.Item[itemId].Value;
             }
             else if (itemType == "Projectile")
             {
-                ModContent.GetInstance<DPSPanel>().Logger.Info("Projectile ID: " + itemId);
                 texture = TextureAssets.Projectile[itemId].Value;
             }
+
+            // Check size of texture
+            // get WxH
+            int w = texture.Width;
+            int h = texture.Height;
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH: {w}x{h}");
+
+            texture = ResizeWeirdTextures(texture);
 
             // Draw texture
             if (texture != null)
@@ -99,5 +110,24 @@ namespace DPSPanel.MainCode.Panel
                 spriteBatch.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             }
         }
+
+        private static readonly Dictionary<int, int> projectileToItemMap = new()
+        {
+            // Map projectile ID 933 (e.g., Zenith projectile) to item ID 4956 (Zenith item)
+            {933, 4956}, // zenith
+            {409, 2622} // typhoon
+        };
+
+        private Texture2D ResizeWeirdTextures(Texture2D originalTexture)
+        {
+            // If the source is a projectile and there is a mapping,
+            // return the texture of the corresponding item.
+            if (itemType == "Projectile" && projectileToItemMap.TryGetValue(itemId, out int mappedItemId))
+            {
+                return TextureAssets.Item[mappedItemId].Value;
+            }
+            return originalTexture;
+        }
+
     }
 }

@@ -88,28 +88,13 @@ namespace DPSPanel.MainCode.Panel
                     isAlive = true
                 };
                 Mod.Logger.Info("New boss fight created: " + fight.bossName);
-                PrintBossFight();
                 var panelSystem = ModContent.GetInstance<PanelSystem>();
                 panelSystem.state.panel.AddBossTitle(npc.FullName);
-
             }
         }
 
         private void UpdateWeapon(string _itemType, int itemID, string weaponName, int damageDone)
         {
-            if (fight == null || fight.weapons == null)
-            {
-                Mod.Logger.Warn("UpdateWeapon called with uninitialized fight or weapons list.");
-                return; // Exit early
-            }
-
-            var panelSystem = ModContent.GetInstance<PanelSystem>();
-            if (panelSystem == null || panelSystem.state?.panel == null)
-            {
-                Mod.Logger.Warn("PanelSystem or panel is not initialized. Skipping slider update.");
-                return; // Exit early
-            }
-
             // Check if the weapon already exists
             var weapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
             if (weapon == null)
@@ -119,21 +104,15 @@ namespace DPSPanel.MainCode.Panel
                 fight.weapons.Add(weapon);
                 fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
 
-                // Find this weapon's index
-                int index = fight.weapons.FindIndex(w => w.weaponName == weaponName);
-
                 // Create a new slider for this weapon
-                panelSystem.state.panel.CreateSlider(weaponName);
+                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                sys.state.panel.CreateSlider(weaponName);
             }
             else
             {
                 // Update existing weapon's damage
                 weapon.damage += damageDone;
             }
-
-            // Sort weapons by damage and update sliders
-            fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
-            panelSystem.state.panel.UpdateSliders(fight.weapons);
         }
 
         private void TrackBossDamage(string _itemType, int itemID, string weaponName, int damageDone, NPC npc)
@@ -141,26 +120,18 @@ namespace DPSPanel.MainCode.Panel
             // Check if NPC is a boss
             if (IsValidBoss(npc) && !HandleBossDeath(npc, weaponName))
             {
-                // Add weapon to player's weapon list
-                UpdateWeapon(_itemType, itemID, weaponName, damageDone);
-
-                // Add damage to existing fight
-                fight.damageTaken += damageDone;
-
-                // Send boss fight data to show in UI
-                SendBossFightToPanel();
-                PrintBossFight();
+                UpdateWeapon(_itemType, itemID, weaponName, damageDone); // Add weapon to player's weapon list
+                fight.damageTaken += damageDone; // Add damage to existing fight
+                SendBossFightToPanel(); // Send boss fight data to show in UI
             }
         }
 
-        // --------------------------------------------------------------------------------
-        // Send to panel
-        // --------------------------------------------------------------------------------
         private void SendBossFightToPanel()
         {
-            if (fight == null || fight.weapons.Count == 0) return;
+            // Sort weapons by descending damage
             fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
-            int highestDamage = fight.weapons.First().damage;
+
+            // Update the sliders
             var panelSystem = ModContent.GetInstance<PanelSystem>();
             panelSystem.state.panel.UpdateSliders(fight.weapons);
         }
@@ -200,7 +171,6 @@ namespace DPSPanel.MainCode.Panel
                         int discrepancy = fight.initialLife - fight.damageTaken;
                         weapon.damage += discrepancy;
                         fight.damageTaken = fight.initialLife;
-                        PrintBossFight();
                     }
                 }
             }
