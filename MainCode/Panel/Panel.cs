@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
+using static DPSPanel.MainCode.Panel.BossDamageTrackerSP;
 
 namespace DPSPanel.MainCode.Panel
 {
@@ -31,7 +32,7 @@ namespace DPSPanel.MainCode.Panel
         private const float ItemHeight = 40f;
 
         // Slider items
-        private Dictionary<string, PanelSlider> sliders = new();
+        private Dictionary<string, PanelSlider> sliders = [];
         private readonly Asset<Texture2D> sliderEmpty;
         private readonly Asset<Texture2D> sliderFull;
 
@@ -74,9 +75,7 @@ namespace DPSPanel.MainCode.Panel
 
         public void AddBossTitle(string bossName="UnnamedBoss")
         {
-            // Clear the entire panel
-            RemoveAllChildren();
-            sliders = []; // reset sliders
+            clearPanelAndAllItems();
 
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
@@ -107,20 +106,43 @@ namespace DPSPanel.MainCode.Panel
             }
         }
 
-        public void UpdateSlider(string weaponName, int damageDone, int percentageValue)
+        public void UpdateSliders(List<Weapon> weapons)
         {
-            // Check if the slider exists
+            // Sort weapons by damage
+            weapons = weapons.OrderByDescending(w => w.damage).ToList();
 
-            if (!sliders.TryGetValue(weaponName, out var slider))
+            int highestDamage = weapons.FirstOrDefault()?.damage ?? 1; // Avoid division by zero
+
+            foreach (var weapon in weapons)
             {
-                // If not, create a new slider
-                CreateSlider(weaponName);
-                slider = sliders[weaponName];
-            }
+                if (!sliders.TryGetValue(weapon.weaponName, out var slider))
+                {
+                    // Slider does not exist, create it
+                    slider = new PanelSlider(sliderEmpty, sliderFull, weapon.weaponName, SelectSliderColor(), 0)
+                    {
+                        Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
+                        Height = new StyleDimension(ItemHeight, 0f), // Set height
+                        Top = new StyleDimension(currentYOffset, 0f),
+                        HAlign = 0.5f, // Center horizontally
+                    };
 
-            // Update the slider's values
-            slider.updateSliderValue(damageDone, percentageValue);
-            Recalculate();
+                    Append(slider);
+                    sliders[weapon.weaponName] = slider;
+
+                    currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
+                    ResizePanelHeight();
+                }
+
+                // Update slider value based on weapon damage and highest damage
+                int damageProgress = (int)(((float)weapon.damage / highestDamage) * 100);
+                slider.updateSliderValue(weapon.damage, damageProgress);
+            }
+        }
+
+        public void clearPanelAndAllItems()
+        {
+            RemoveAllChildren();
+            sliders = []; // reset sliders
         }
 
         /* -------------------------------------------------------------

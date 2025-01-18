@@ -43,8 +43,8 @@ namespace DPSPanel.MainCode.Commands
                 Random rnd = new Random();
                 int sliderValue = 95-i* rnd.Next(1, 10);
                 int damageDone = 1000 + i * 1000 + rnd.Next(1,10);
-                uiSystem.state.panel.CreateSlider("weapon");
-                uiSystem.state.panel.UpdateSlider("weapon", damageDone, sliderValue);
+                //uiSystem.state.panel.CreateSlider("weapon");
+                //uiSystem.state.panel.UpdateSlider("weapon", damageDone, sliderValue);
                 i++;
             }
             else

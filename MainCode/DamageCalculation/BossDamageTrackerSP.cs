@@ -17,7 +17,7 @@ namespace DPSPanel.MainCode.Panel
             public int initialLife;
             public string bossName;
             public int damageTaken;
-            public HashSet<Weapon> weapons = [];
+            public List<Weapon> weapons = [];
             public bool isAlive = false;
         }
 
@@ -32,6 +32,7 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         private BossFight fight;
         private int fightId = 0;
+        private int highestDamage = 0; // weapon with highest damage
 
         // --------------------------------------------------------------------------------
         // Hooks
@@ -99,12 +100,7 @@ namespace DPSPanel.MainCode.Panel
 
             // Check if the weapon already exists
             var weapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
-            if (weapon != null)
-            {
-                // Update existing weapon's damage
-                weapon.damage += damageDone;
-            }
-            else
+            if (weapon == null)
             {
                 // Add new weapon to the fight
                 weapon = new Weapon { weaponName = weaponName, damage = damageDone };
@@ -113,10 +109,14 @@ namespace DPSPanel.MainCode.Panel
                 // Create a new slider for this weapon
                 panelSystem.state.panel.CreateSlider(weaponName);
             }
+            else
+            {
+                // Update existing weapon's damage
+                weapon.damage += damageDone;
+            }
 
-            // Update the slider for this weapon
-            int damageProgress = (int)(((float)fight.damageTaken / (float)fight.initialLife) * 100f);
-            panelSystem.state.panel.UpdateSlider(weaponName, weapon.damage, damageProgress);
+            // Update all sliders
+            panelSystem.state.panel.UpdateSliders(fight.weapons);
         }
 
 
@@ -132,7 +132,7 @@ namespace DPSPanel.MainCode.Panel
                 fight.damageTaken += damageDone;
 
                 // Send boss fight data to show in UI
-                SendBossFightToPanel(weaponName);
+                SendBossFightToPanel();
                 PrintBossFight();
             }
         }
@@ -140,20 +140,20 @@ namespace DPSPanel.MainCode.Panel
         // --------------------------------------------------------------------------------
         // Send to panel
         // --------------------------------------------------------------------------------
-        private void SendBossFightToPanel(string weaponName)
+        private void SendBossFightToPanel()
         {
-            var panelSystem = ModContent.GetInstance<PanelSystem>();
+            if (fight == null || fight.weapons.Count == 0) return;
 
-            // Check which weapon it is
+            // Sort weapons by damage
+            fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
+
+            // Update sliders for each weapon
+            int highestDamage = fight.weapons.First().damage;
             foreach (var weapon in fight.weapons)
             {
-                if (weapon.weaponName == weaponName)
-                {
-                    int damageProgress = (int)(((float)fight.damageTaken / (float)fight.initialLife) * 100f);
-                    panelSystem.state.panel.UpdateSlider(weaponName, weapon.damage, damageProgress);
-                    //Mod.Logger.Info("Weapon: " + weapon.weaponName + " | Damage: " + weapon.damage);
-                    return;
-                }
+                int damageProgress = (int)(((float)weapon.damage / (float)highestDamage) * 100);
+                var panelSystem = ModContent.GetInstance<PanelSystem>();
+                panelSystem.state.panel.UpdateSliders(fight.weapons);
             }
         }
 
@@ -172,7 +172,7 @@ namespace DPSPanel.MainCode.Panel
             {
                 fight.isAlive = false;
                 FixFinalBlowDiscrepancy(weaponName);
-                SendBossFightToPanel(weaponName);
+                SendBossFightToPanel();
                 fightId++;
                 fight = null;
                 return true;
