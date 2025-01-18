@@ -6,7 +6,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using static DPSPanel.MainCode.Panel.BossDamageTrackerSP;
@@ -116,24 +118,15 @@ namespace DPSPanel.MainCode.Panel
             {
                 var wpn = weapons[i];
                 Color color = colorsToUse[i % colorsToUse.Length];
-                //PanelSlider slider;
+                //Texture2D icon = TextureAssets.Item[here].Value;
+                Texture2D icon = null;
 
-                //if (!sliders.TryGetValue(wpn.weaponName, out slider))
-                //{
-                //    // Create a new slider if it doesn't exist.
-                //    slider = new PanelSlider(sliderEmpty, sliderFull)
-                //    {
-                //        Width = new StyleDimension(0, 1f),
-                //        Height = new StyleDimension(ItemHeight, 0f),
-                //        HAlign = 0.5f,
-                //    };
-                //    sliders[wpn.weaponName] = slider;
-                //    Append(slider);
-                //}
+                // Get the slider for this weapon.
                 PanelSlider slider = sliders[wpn.weaponName];
+                
 
                 // Update the slider with the current data.
-                slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color);
+                slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color, icon);
                 slider.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + padding * 2;
             }

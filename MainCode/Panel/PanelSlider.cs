@@ -12,6 +12,8 @@ namespace DPSPanel.MainCode.Panel
         private readonly Asset<Texture2D> sliderEmpty; // Background slider texture
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
         private readonly UIText textElement;          // Text element for slider label
+
+        private Texture2D weaponIcon;          // Icon for the weapon
         private Color fillColor;             // Color for the fill
         private int percentage;              // Progress percentage (0-100)
 
@@ -30,17 +32,23 @@ namespace DPSPanel.MainCode.Panel
             Append(textElement);
         }
 
-        public void UpdateSlider(int highestDamage, string weaponName, int weaponDamage, Color newColor)
+        public void UpdateSlider(int highestDamage, string weaponName, int weaponDamage, Color newColor, Texture2D icon)
         {
             percentage = (int)((weaponDamage / (float)highestDamage) * 100);
             fillColor = newColor;
             textElement.SetText($"{weaponName} ({weaponDamage})");
+            weaponIcon = icon;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
+            DrawSlider(spriteBatch);
+            DrawIcon(spriteBatch);
+        }
 
+        private void DrawSlider(SpriteBatch spriteBatch)
+        {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new Vector2(dims.X, dims.Y);
             Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
@@ -55,6 +63,14 @@ namespace DPSPanel.MainCode.Panel
                 Rectangle sourceRect = new Rectangle(0, 0, (int)(sliderFull.Width() * (percentage / 100f)), sliderFull.Height());
                 spriteBatch.Draw(sliderFull.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
             }
+        }
+
+        private void DrawIcon(SpriteBatch spriteBatch)
+        {
+            CalculatedStyle dims = GetDimensions();
+            Vector2 pos = new Vector2(dims.X, dims.Y);
+            Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
+            //spriteBatch.Draw(weaponIcon, new Rectangle((int)pos.X, (int)pos.Y, 20, 20), Color.White);
         }
     }
 }
