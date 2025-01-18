@@ -17,12 +17,14 @@ namespace DPSPanel.MainCode.Panel
         private readonly bool IS_DRAGGABLE = false; // Debug option: Set to true to enable dragging
 
         // Panel items
+        private readonly float padding;
         private float currentYOffset = 0;
         private const float ItemHeight = 16f;
 
-        public Panel()
+        public Panel(float padding)
         {
-            // Empty constructor for no reason
+            this.padding = padding;
+            SetPadding(padding);
         }
 
         // Define predefined colors for each row
@@ -52,11 +54,9 @@ namespace DPSPanel.MainCode.Panel
         public void AddPanelHeader()
         {
             // Header text
-            UIText headerText = new("Damage dealt", 1.0f);
-            headerText.Top.Set(currentYOffset, 0f); // = 0
-            headerText.Left.Set(0, 0f);
-            headerText.SetPadding(0);
-            Append(headerText);
+            UIText header = new("Damage dealt", 1.0f);
+            header.HAlign = 1.0f;
+            Append(header);
             ResizePanelHeight();
         }
 
@@ -64,15 +64,14 @@ namespace DPSPanel.MainCode.Panel
         {
             UIText text = new(itemName, 1.0f);
             text.Top.Set(currentYOffset, 0f);
+            text.HAlign = 1.0f;
             Append(text);
-
-            // Adjust offset for the next item
             ResizePanelHeight();
         }
 
         private void ResizePanelHeight()
         {
-            currentYOffset += ItemHeight;
+            currentYOffset += ItemHeight + padding*2;
             Height.Set(currentYOffset, 0f);
             Recalculate();
         }

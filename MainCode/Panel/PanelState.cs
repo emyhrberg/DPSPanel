@@ -24,11 +24,11 @@ namespace DPSPanel.MainCode.Panel
         private bool isVisible = true;
 
         // Panel settings
+        private readonly float padding = 5f;
         private readonly float w = 200f; // PANEL WIDTH
-        private readonly float h = 35f; // PANEL HEIGHT
+        private readonly float h = 300f; // PANEL HEIGHT. is reset later anyways
         private readonly float leftOffset = 15f; // place under inventory for now
         private readonly float topOffset = 260f; // place under inventory for now
-        private readonly float padding = 0f;
         private readonly Color panelColor = new(56, 58, 134); // Light blue, same as inventory panel
 
         // Button settings
@@ -39,8 +39,6 @@ namespace DPSPanel.MainCode.Panel
             base.OnInitialize();
             panel = CreatePanel();
             panel.AddPanelHeader();
-            panel.AddPanelItem("Item 1");
-            panel.AddPanelItem("Item 2");
             //InitializeButtons(panel);
         }
 
@@ -51,7 +49,7 @@ namespace DPSPanel.MainCode.Panel
 
         private Panel CreatePanel()
         {
-            panel = new Panel();
+            panel = new Panel(padding);
 
             // Size of panel
             panel.Width.Set(w, 0f);
@@ -60,9 +58,6 @@ namespace DPSPanel.MainCode.Panel
             // Position of panel
             panel.Left.Set(leftOffset, 0f); // distance from the left edge
             panel.Top.Set(topOffset, 0f); // distance from the top edge
-
-            // Padding of panel
-            panel.SetPadding(padding);
 
             // Background color of panel
             panel.BackgroundColor = panelColor; // Light blue background
