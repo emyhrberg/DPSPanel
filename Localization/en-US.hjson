@@ -56,6 +56,11 @@ Mods: {
 					Label: Position
 					Tooltip: Changes the position of the icon. You can also hold right click and drag the icon.
 				}
+
+				BossIconSide: {
+					Label: Boss Icon Side
+					Tooltip: Changes the position of the boss icon.
+				}
 			}
 
 			CommonConfig: {

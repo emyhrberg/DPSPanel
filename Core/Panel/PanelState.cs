@@ -1,52 +1,28 @@
-﻿using System.Linq;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Terraria.ModLoader;
-using Terraria.UI;
-using System;
-using Terraria;
-using Terraria.Audio;
+﻿using Terraria;
 using Terraria.ID;
-using Microsoft.Xna.Framework;
-using System.Collections.Generic;
-using DPSPanel.Core.Configs;
-using Terraria.GameContent;
-using ReLogic.Graphics;
-using DPSPanel.Core.Panel;
-using DPSPanel.Core.Helpers;
-using Terraria.Social.WeGame;
+using Terraria.UI;
 
 namespace DPSPanel.Core.Panel
 {
     public class PanelState : UIState
     {
-        public Panel panel;
-        public bool isVisible = true;
 
-        public override void OnInitialize()
+        public BossPanelContainer container;
+
+        // state variables
+        // public NPC currentBoss;
+
+        public PanelState()
         {
-            base.OnInitialize();
-
-            // LOAD all resources from LoadResources.cs
-            LoadResources.PreloadResources();
-
-            // add panel
-            panel = new Panel();
-            Append(panel);
-            panel.AddBossTitle("Fight a boss to show stats!");
-
-            //ToggleDPSPanel(); // disable by default
+            container = new BossPanelContainer();
+            Append(container);
         }
 
-        public void ToggleDPSPanel()
+        public void UpdateBoss(NPC boss)
         {
-            isVisible = !isVisible;
-            if (isVisible)
-            {
-                Append(panel);
-            }
-            else
-                panel.Remove();
+            // currentBoss = boss;
+            container.panel.SetBossTitle(boss.FullName, boss);
+            container.bossIcon.UpdateBossIcon(boss);
         }
     }
 }

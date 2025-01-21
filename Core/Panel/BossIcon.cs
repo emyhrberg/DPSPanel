@@ -6,17 +6,21 @@ using Terraria.UI;
 using Terraria.GameContent;
 using Terraria;
 using DPSPanel.Core.Configs;
+using Terraria.ModLoader.UI;
 
 namespace DPSPanel.Core.Panel
 {
     public class BossIconElement : UIElement
     {
-
-        NPC currentBoss; 
+        public NPC currentBoss; 
 
         public BossIconElement()
         {
-
+            Width.Set(30f, 0f);
+            Height.Set(30f, 0f);
+            Top.Set(0, 0f);
+            Left.Set(0, 0f);
+            currentBoss = null;
         }
 
         public void UpdateBossIcon(NPC boss)
@@ -28,7 +32,7 @@ namespace DPSPanel.Core.Panel
         {
             // Toggle panel
             PanelSystem s = ModContent.GetInstance<PanelSystem>();
-            s?.state?.ToggleDPSPanel();
+            s?.state?.container?.TogglePanel();
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -38,15 +42,23 @@ namespace DPSPanel.Core.Panel
             if (!c.EnableButton)
                 return;
 
+            if (IsMouseHovering)
+            {
+                UICommon.TooltipMouseText("Toggle DPS Panel");
+                // Main.hoverItemName = "Toggle DPS Panel 2";
+            }
+
             if (currentBoss == null)
-                DrawBossIcon(spriteBatch, 7);
+                DrawBossIconAtIndex(spriteBatch, 7);
+            else
+                DrawBossIconAtIndex(spriteBatch, currentBoss.type);
         }
 
-        private void DrawBossIcon(SpriteBatch sb, int i)
+        private void DrawBossIconAtIndex(SpriteBatch sb, int i)
         {
             Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[i]?.Value;
-            CalculatedStyle dims = GetInnerDimensions();
-            Vector2 pos = new Vector2(dims.X, dims.Y);
+            CalculatedStyle dims = GetDimensions();
+            Vector2 pos = new(dims.X, dims.Y);
             sb.Draw(bossHeadTexture, pos, Color.White);
         }
     }

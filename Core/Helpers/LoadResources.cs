@@ -11,11 +11,11 @@ namespace DPSPanel.Core.Helpers
     internal class LoadResources
     {
 
-        public static Asset<Texture2D> SliderEmpty;
-        public static Asset<Texture2D> SliderFull;
+        public static Asset<Texture2D> BarFancyEmpty;
+        public static Asset<Texture2D> BarFancyFull;
 
-        public static Asset<Texture2D> SliderGenericEmpty;
-        public static Asset<Texture2D> SliderGenericFull;
+        public static Asset<Texture2D> BarGenericEmpty;
+        public static Asset<Texture2D> BarGenericFull;
 
         public static Asset<Texture2D> RequestResource(string path, bool immediate = false) => ModContent.Request<Texture2D>("DPSPanel/Core/Resources/" + path, immediate ? AssetRequestMode.ImmediateLoad : AssetRequestMode.AsyncLoad);
         private static Asset<Texture2D> PreloadResource(string path) => RequestResource(path, true);
@@ -23,11 +23,11 @@ namespace DPSPanel.Core.Helpers
         public static void PreloadResources()
         {
 
-            SliderEmpty = PreloadResource("SliderEmpty");
-            SliderFull = PreloadResource("SliderFull");
+            BarFancyEmpty = PreloadResource("BarFancyEmpty");
+            BarFancyFull = PreloadResource("BarFancyFull");
 
-            SliderGenericEmpty = PreloadResource("SliderGenericEmpty");
-            SliderGenericFull = PreloadResource("SliderGenericFull");
+            BarGenericEmpty = PreloadResource("BarGenericEmpty");
+            BarGenericFull = PreloadResource("BarGenericFull");
         }
     }
 }

@@ -24,12 +24,12 @@ namespace DPSPanel.Core.Panel
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
 
-        // Boss icon button
-        private BossIconElement bossIconButton;
+        // Add event handlers for child changes
+        public event Action OnSizeChanged;
 
-        // Slider items
-        private Dictionary<string, PanelSlider> sliders = [];
-        private NPC currentBoss;
+        // bar items
+        private Dictionary<string, DamageBarElement> damageBars = [];
+        // private NPC currentBoss;
         private const float headerHeight = 16f;
 
         public Panel()
@@ -40,21 +40,14 @@ namespace DPSPanel.Core.Panel
             VAlign = 0.07f; // 7% from the top
             HAlign = 0.5f; // Center horizontally
             SetPadding(padding);
-
-            // Add boss icon button with a default texture
-            bossIconButton = new BossIconElement();
-            Append(bossIconButton);
         }
 
-        public void AddBossTitle(string bossName = "Boss Name", NPC npc = null)
+        public void SetBossTitle(string bossName = "Boss Name", NPC npc = null)
         {
-            currentBoss = npc;
+            // currentBoss = npc;
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
-
-            // add boss icon
-            bossIconButton.UpdateBossIcon(npc);
 
             currentYOffset = headerHeight + padding * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
@@ -63,36 +56,24 @@ namespace DPSPanel.Core.Panel
         public override void Draw(SpriteBatch sb)
         {
             base.Draw(sb);
-            DrawBossIconDuringFight(sb); 
-        }
-        private void DrawBossIconDuringFight(SpriteBatch sb)
-        {
-            if (currentBoss != null)
-            {
-                int i = currentBoss.GetBossHeadTextureIndex();
-                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[i]?.Value;
-                CalculatedStyle dims = GetInnerDimensions();
-                Vector2 pos = new(dims.X, dims.Y);
-                sb.Draw(bossHeadTexture, pos, Color.White);
-            }
         }
 
-        public void CreateSlider(string sliderName = "Name")
+        public void CreateDamageBar(string barName = "Name")
         {
-            // Check if the slider already exists
-            if (!sliders.ContainsKey(sliderName))
+            // Check if the bar already exists
+            if (!damageBars.ContainsKey(barName))
             {
-                // Create a new slider
-                PanelSlider slider = new(currentYOffset);
-                Append(slider);
-                sliders[sliderName] = slider;
+                // Create a new bar
+                DamageBarElement bar = new(currentYOffset);
+                Append(bar);
+                damageBars[barName] = bar;
 
                 currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
                 ResizePanelHeight();
             }
         }
 
-        public void UpdateSliders(List<Weapon> weapons)
+        public void UpdateDamageBars(List<Weapon> weapons)
         {
             // Reset vertical offset. needed?
             currentYOffset = headerHeight + padding * 2;
@@ -106,12 +87,12 @@ namespace DPSPanel.Core.Panel
                 var wpn = weapons[i];
                 Color color = PanelColors.colors[i % PanelColors.colors.Length];
 
-                // Get the slider for this weapon.
-                PanelSlider slider = sliders[wpn.weaponName];
+                // Get for this weapon.
+                DamageBarElement bar = damageBars[wpn.weaponName];
 
-                // Update the slider with the current data.
-                slider.UpdateSlider(highest, wpn.weaponName, wpn.damage, color, wpn.itemID, wpn.itemType);
-                slider.Top.Set(currentYOffset, 0f);
+                // Update  with the current data.
+                bar.UpdateDamageBar(highest, wpn.weaponName, wpn.damage, color, wpn.itemID, wpn.itemType);
+                bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + padding * 2;
             }
             ResizePanelHeight();
@@ -120,13 +101,14 @@ namespace DPSPanel.Core.Panel
         public void ClearPanelAndAllItems()
         {
             RemoveAllChildren();
-            sliders = []; // reset sliders
+            damageBars = []; // reset
         }
 
         private void ResizePanelHeight()
         {
             Height.Set(currentYOffset + padding, 0f);
             Recalculate();
+            OnSizeChanged?.Invoke();
         }
     }
 }

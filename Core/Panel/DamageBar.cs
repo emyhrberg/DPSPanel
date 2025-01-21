@@ -14,11 +14,11 @@ using DPSPanel.Core.Configs;
 
 namespace DPSPanel.Core.Panel
 {
-    public class PanelSlider : UIElement
+    public class DamageBarElement : UIElement
     {
-        private readonly Asset<Texture2D> sliderEmpty; // Background slider texture
-        private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
-        private readonly UIText textElement;          // Text element for slider label
+        private readonly Asset<Texture2D> emptyBar; // Background 
+        private readonly Asset<Texture2D> fullBar;  // Foreground fill texture
+        private readonly UIText textElement;          // Text element for 
         private const float ItemHeight = 40f;
 
         private Color fillColor;             // Color for the fill
@@ -27,26 +27,21 @@ namespace DPSPanel.Core.Panel
         // Weapon icon
         private int itemId;
         private string itemType;
-        private string weaponName;           // Weapon name
+        // private string weaponName;           // Weapon name
 
-        public PanelSlider(float currentYOffset)
+        public DamageBarElement(float currentYOffset)
         {
             // check config settings for theme
             Config c = ModContent.GetInstance<Config>();
             if (c.Theme == "Generic")
             {
-                sliderEmpty = LoadResources.SliderGenericEmpty;
-                sliderFull = LoadResources.SliderGenericFull;
+                emptyBar = LoadResources.BarGenericEmpty;
+                fullBar = LoadResources.BarGenericFull;
             }
             else
             {
-                sliderEmpty = LoadResources.SliderEmpty;
-                sliderFull = LoadResources.SliderFull;
-            }
-
-            if (sliderEmpty == null || sliderFull == null)
-            {
-                ModContent.GetInstance<DPSPanel>().Logger.Error("Slider textures are not loaded correctly!");
+                emptyBar = LoadResources.BarFancyEmpty;
+                fullBar = LoadResources.BarFancyFull;
             }
 
             Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
@@ -54,7 +49,7 @@ namespace DPSPanel.Core.Panel
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f; // Center horizontally
 
-            // Create the text element centered on the slider.
+            // Create the text element centered on the bar.
             textElement = new UIText("", 0.8f)
             {
                 HAlign = 0.5f,
@@ -63,38 +58,38 @@ namespace DPSPanel.Core.Panel
             Append(textElement);
         }
 
-        public void UpdateSlider(int highestDamage, string _weaponName, int weaponDamage, Color newColor, int _itemId, string _itemType)
+        public void UpdateDamageBar(int highestDamage, string _weaponName, int weaponDamage, Color newColor, int _itemId, string _itemType)
         {
-            percentage = (int)((weaponDamage / (float)highestDamage) * 100);
+            percentage = (int)(weaponDamage / (float)highestDamage * 100);
             fillColor = newColor;
             textElement.SetText($"{_weaponName} ({weaponDamage})");
             itemId = _itemId;
             itemType = _itemType;
-            weaponName = _weaponName;
+            // weaponName = _weaponName;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
-            DrawSlider(spriteBatch);
+            DrawDamageBar(spriteBatch);
             DrawIcon(spriteBatch);
         }
 
-        private void DrawSlider(SpriteBatch spriteBatch)
+        private void DrawDamageBar(SpriteBatch spriteBatch)
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new Vector2(dims.X, dims.Y);
             Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
 
             // Draw background.
-            spriteBatch.Draw(sliderEmpty.Value, rect, Color.DarkGray);
+            spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
 
             // Draw filled portion based on percentage.
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
-                Rectangle sourceRect = new Rectangle(0, 0, (int)(sliderFull.Width() * (percentage / 100f)), sliderFull.Height());
-                spriteBatch.Draw(sliderFull.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
+                Rectangle sourceRect = new Rectangle(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
+                spriteBatch.Draw(fullBar.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
             }
         }
 

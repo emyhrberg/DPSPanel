@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DPSPanel.Core.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
 using System.Reflection.Metadata.Ecma335;
@@ -15,6 +16,13 @@ namespace DPSPanel.Core.Panel
         private readonly UserInterface ui = new();
         internal PanelState state = new();
         
+        public override void Load()
+        {
+            // Load resources
+            if (!Main.dedServ) // Only load on client
+                LoadResources.PreloadResources();
+        }
+
         public override void PostSetupContent()
         {
             // This is called after everything in the game has been loaded

@@ -31,6 +31,14 @@ namespace DPSPanel.Core.Configs
         [DefaultValue("Generic")]
         public string Theme { get; set; }
 
+        [Label("Boss Icon Side")]
+        [Tooltip("Changes the position of the boss icon.")]
+        [BackgroundColor(255, 99, 71)]
+        [DrawTicks]
+        [OptionStrings(["Left", "Right"])]
+        [DefaultValue("Left")]
+        public string BossIconSide { get; set; }
+
         [Label("Position")]
         [Tooltip("Changes the position of the icon. You can also hold right click and drag the icon.")]
         [BackgroundColor(250, 235, 215)]

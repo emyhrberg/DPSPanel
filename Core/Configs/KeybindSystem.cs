@@ -25,10 +25,10 @@ namespace DPSPanel.Core.Configs
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
                 PanelSystem uiSystem = ModContent.GetInstance<PanelSystem>();
-                bool vis = uiSystem.state.isVisible;
+                bool vis = uiSystem.state.container.panelVisible;
                 string onOff = vis ? "ON" : "OFF";
                 Main.NewText($"Damage Panel: [{onOff}]. Press K to toggle.", Color.Yellow);
-                uiSystem.state.ToggleDPSPanel();
+                uiSystem.state.container.TogglePanel();
             }
         }
     }

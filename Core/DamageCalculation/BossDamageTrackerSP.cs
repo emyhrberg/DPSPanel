@@ -98,14 +98,8 @@ namespace DPSPanel.Core.Panel
                 };
                 Mod.Logger.Info("New boss fight created: " + fight.bossName);
                 var panelSystem = ModContent.GetInstance<PanelSystem>();
-                panelSystem.state.panel.ClearPanelAndAllItems();
-
-                // check config
-                //Config c = ModContent.GetInstance<Config>();
-                //if (c.ShowBossName)
-                //{
-                    panelSystem.state.panel.AddBossTitle(npc.FullName, npc);
-                //}
+                panelSystem.state.container.panel.ClearPanelAndAllItems();
+                panelSystem.state.container.panel.SetBossTitle(npc.FullName, npc);
             }
         }
 
@@ -120,9 +114,9 @@ namespace DPSPanel.Core.Panel
                 fight.weapons.Add(weapon);
                 fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
 
-                // Create a new slider for this weapon
+                // Create a new bar for this weapon
                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.panel.CreateSlider(weaponName);
+                sys.state.container.panel.CreateDamageBar(weaponName);
             }
             else
             {
@@ -147,9 +141,9 @@ namespace DPSPanel.Core.Panel
             // Sort weapons by descending damage
             fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
 
-            // Update the sliders
+            // Update the bars
             var panelSystem = ModContent.GetInstance<PanelSystem>();
-            panelSystem.state.panel.UpdateSliders(fight.weapons);
+            panelSystem.state.container.panel.UpdateDamageBars(fight.weapons);
         }
 
         // --------------------------------------------------------------------------------
