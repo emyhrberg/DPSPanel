@@ -18,18 +18,10 @@ using Terraria.Social.WeGame;
 
 namespace DPSPanel.Core.Panel
 {
-    /// <summary>
-    /// Handles the panel, buttons, and logic for the DPS panel.
-    /// Shows the DPS panel when the player presses the toggle keybind.
-    /// </summary>
     public class PanelState : UIState
     {
-        // Panel variables
         public Panel panel;
         public bool isVisible = true;
-
-        //btn
-        public KingSlimeButton ksButton;
 
         public override void OnInitialize()
         {
@@ -43,11 +35,7 @@ namespace DPSPanel.Core.Panel
             Append(panel);
             panel.AddBossTitle("Fight a boss to show stats!");
 
-            // add button ON TOP
-            ksButton = new KingSlimeButton();
-            Append(ksButton);
-
-            ToggleDPSPanel(); // turn off by default
+            //ToggleDPSPanel(); // disable by default
         }
 
         public void ToggleDPSPanel()
@@ -55,14 +43,10 @@ namespace DPSPanel.Core.Panel
             isVisible = !isVisible;
             if (isVisible)
             {
-                // Show
                 Append(panel);
             }
             else
-            {
-                // Hide
                 panel.Remove();
-            }
         }
     }
 }

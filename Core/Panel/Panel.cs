@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Core.Helpers;
-using log4net.Repository.Hierarchy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using ReLogic.Graphics;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
@@ -19,65 +16,36 @@ namespace DPSPanel.Core.Panel
 {
     public class Panel : UIPanel
     {
-        /* -------------------------------------------------------------
-         * Variables
-         * -------------------------------------------------------------
-         */
-
         // Panel
         private readonly float padding = 5f;
-        private readonly float w = 300f; // PANEL WIDTH
-        private readonly float h = 40f; // PANEL HEIGHT. 2is reset later anyways
-        private readonly Color panelColor = new(49, 84, 141); // Light blue, same as inventory panel
-
-        // Panel items
+        private readonly float PANEL_WIDTH = 300f; // 300 width
+        private readonly float PANEL_HEIGHT = 40f; // is reset anyways
+        private readonly Color panelColor = new(49, 84, 141); 
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
 
+        // Boss icon button
+        private BossIconElement bossIconButton;
+
         // Slider items
         private Dictionary<string, PanelSlider> sliders = [];
-
-        // Header
         private NPC currentBoss;
         private const float headerHeight = 16f;
 
-        private readonly Color[] colors =
-        [
-            Color.Red,
-            Color.Green,
-            Color.Blue,
-            Color.Yellow,
-            Color.Purple,
-            Color.Orange,
-            Color.Cyan,
-            Color.Pink,
-            Color.LightGreen,
-            Color.LightBlue,
-            Color.LightCoral,
-            Color.LightGoldenrodYellow,
-
-        ];
-
         public Panel()
         {
+            Width.Set(PANEL_WIDTH, 0f);
+            Height.Set(PANEL_HEIGHT, 0f);
+            BackgroundColor = panelColor;
+            VAlign = 0.07f; // 7% from the top
+            HAlign = 0.5f; // Center horizontally
             SetPadding(padding);
 
-            // Size of panel
-            Width.Set(w, 0f);
-            Height.Set(h, 0f);
-
-            // Center the panel on the screen
-            VAlign = 0.07f; // vertical pos. 
-            HAlign = 0.5f;
-
-            // Background color of panel
-            BackgroundColor = panelColor;
+            // Add boss icon button with a default texture
+            bossIconButton = new BossIconElement();
+            Append(bossIconButton);
         }
 
-        /* -------------------------------------------------------------
-         * Panel content
-         * -------------------------------------------------------------
-         */
         public void AddBossTitle(string bossName = "Boss Name", NPC npc = null)
         {
             currentBoss = npc;
@@ -85,36 +53,27 @@ namespace DPSPanel.Core.Panel
             bossTitle.HAlign = 0.5f;
             Append(bossTitle);
 
+            // add boss icon
+            bossIconButton.UpdateBossIcon(npc);
+
             currentYOffset = headerHeight + padding * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
         }
 
-        public override void Draw(SpriteBatch spriteBatch)
+        public override void Draw(SpriteBatch sb)
         {
-            base.Draw(spriteBatch);
-
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"Curentt boss in panel: {currentBoss}");
-
-            // Draw boss head icon if a boss is active
+            base.Draw(sb);
+            DrawBossIconDuringFight(sb); 
+        }
+        private void DrawBossIconDuringFight(SpriteBatch sb)
+        {
             if (currentBoss != null)
             {
-                int headIndex = currentBoss.GetBossHeadTextureIndex();
-                if (headIndex >= 0 && headIndex < TextureAssets.NpcHeadBoss.Length &&
-                    TextureAssets.NpcHeadBoss[headIndex]?.IsLoaded == true)
-                {
-                    // Get the boss head texture
-                    Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[headIndex].Value;
-
-                    // Calculate the icon's position (top-left aligned within the panel)
-                    CalculatedStyle dims = GetDimensions();
-                    Vector2 iconPosition = new Vector2(
-                        dims.X + 4f,
-                        dims.Y - 2f
-                    );
-
-                    // Draw the boss head icon
-                    spriteBatch.Draw(bossHeadTexture, iconPosition, Color.White);
-                }
+                int i = currentBoss.GetBossHeadTextureIndex();
+                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[i]?.Value;
+                CalculatedStyle dims = GetInnerDimensions();
+                Vector2 pos = new(dims.X, dims.Y);
+                sb.Draw(bossHeadTexture, pos, Color.White);
             }
         }
 
@@ -126,17 +85,16 @@ namespace DPSPanel.Core.Panel
                 // Create a new slider
                 PanelSlider slider = new(currentYOffset);
                 Append(slider);
+                sliders[sliderName] = slider;
+
                 currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
                 ResizePanelHeight();
-
-                // Add to the dictionary
-                sliders[sliderName] = slider;
             }
         }
 
         public void UpdateSliders(List<Weapon> weapons)
         {
-            // Reset vertical offset.
+            // Reset vertical offset. needed?
             currentYOffset = headerHeight + padding * 2;
 
             // Sort weapons by descending damage.
@@ -146,7 +104,7 @@ namespace DPSPanel.Core.Panel
             for (int i = 0; i < weapons.Count; i++)
             {
                 var wpn = weapons[i];
-                Color color = colors[i % colors.Length];
+                Color color = PanelColors.colors[i % PanelColors.colors.Length];
 
                 // Get the slider for this weapon.
                 PanelSlider slider = sliders[wpn.weaponName];

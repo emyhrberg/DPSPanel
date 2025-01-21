@@ -11,9 +11,6 @@ namespace DPSPanel.Core.Helpers
     internal class LoadResources
     {
 
-        public static Asset<Texture2D> KingSlimeButton;
-        public static Asset<Texture2D> KingSlimeButtonHighlight;
-
         public static Asset<Texture2D> SliderEmpty;
         public static Asset<Texture2D> SliderFull;
 
@@ -25,9 +22,6 @@ namespace DPSPanel.Core.Helpers
 
         public static void PreloadResources()
         {
-
-            KingSlimeButton = PreloadResource("KingSlime");
-            KingSlimeButtonHighlight = PreloadResource("KingSlimeHighlight");
 
             SliderEmpty = PreloadResource("SliderEmpty");
             SliderFull = PreloadResource("SliderFull");

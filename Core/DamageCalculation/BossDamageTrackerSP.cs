@@ -101,11 +101,11 @@ namespace DPSPanel.Core.Panel
                 panelSystem.state.panel.ClearPanelAndAllItems();
 
                 // check config
-                Config c = ModContent.GetInstance<Config>();
-                if (c.ShowBossName)
-                {
+                //Config c = ModContent.GetInstance<Config>();
+                //if (c.ShowBossName)
+                //{
                     panelSystem.state.panel.AddBossTitle(npc.FullName, npc);
-                }
+                //}
             }
         }
 

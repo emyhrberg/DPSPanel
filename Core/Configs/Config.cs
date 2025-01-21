@@ -17,11 +17,11 @@ namespace DPSPanel.Core.Configs
         [DefaultValue(true)] // Default value is true.
         public bool EnableButton { get; set; } = false;
 
-        [Label("Show Boss Name And Title")]
-        [BackgroundColor(255, 99, 71)]
-        [DefaultValue(true)] // Default value is true.
-        [Tooltip("Shows the boss name and icon.")]
-        public bool ShowBossName { get; set; } = false;
+        //[Label("Show Boss Name And Title")]
+        //[BackgroundColor(255, 99, 71)]
+        //[DefaultValue(true)] // Default value is true.
+        //[Tooltip("Shows the boss name and icon.")]
+        //public bool ShowBossName { get; set; } = false;
 
         [Label("Theme")]
         [Tooltip("Changes the theme of the boss damage bar.")]

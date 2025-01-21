@@ -17,7 +17,6 @@ namespace DPSPanel.Core.Configs
 
         public override void Unload()
         {
-            // Null out the keybind to avoid issues during unloading
             toggleDPSPanelKeybind = null;
         }
 
@@ -25,22 +24,7 @@ namespace DPSPanel.Core.Configs
         {
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
-                // Get the PanelSystem instance
                 PanelSystem uiSystem = ModContent.GetInstance<PanelSystem>();
-
-                // Ensure PanelSystem and its state exist
-                if (uiSystem == null)
-                {
-                    Mod.Logger.Warn("PanelSystem instance is null. Make sure it is initialized.");
-                    return;
-                }
-
-                if (uiSystem.state == null)
-                {
-                    Mod.Logger.Warn("PanelSystem state is null. Cannot toggle DPS panel.");
-                    return;
-                }
-
                 bool vis = uiSystem.state.isVisible;
                 string onOff = vis ? "ON" : "OFF";
                 Main.NewText($"Damage Panel: [{onOff}]. Press K to toggle.", Color.Yellow);

@@ -12,31 +12,24 @@ namespace DPSPanel.Core.Panel
     public class PanelSystem : ModSystem
     {
         // Variables
-        private UserInterface ui = new();
+        private readonly UserInterface ui = new();
         internal PanelState state = new();
-
-        // This is called after everything in the game has been loaded
+        
         public override void PostSetupContent()
         {
+            // This is called after everything in the game has been loaded
             state.Activate();
             ui.SetState(state);
             ModContent.GetInstance<DPSPanel>().Logger.Info("PanelSystem initialized!");
         }
 
-        // This is always called after the world has been loaded
-        // This runs every tick
-        // Always update the UI (everything in the PanelState, Panel, etc.)
         public override void UpdateUI(GameTime gameTime)
         {
-            ui?.Update(gameTime);
+            ui?.Update(gameTime); // Always update the UI (everything in the PanelState, Panel, etc.)
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            // insert the UIContainer into the interface layers and render it
-            // then we insert it before the mouse text layer because we want it to be rendered above the mouse text
-            // also we check if the mouse text layer exists because it might not exist if the player has disabled the UI
-            // Note: Kinda boilerplate code, but it's necessary to ensure the UI is rendered correctly
             int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
             if (mouseTextIndex != -1)
             {
