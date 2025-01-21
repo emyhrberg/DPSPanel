@@ -1,4 +1,5 @@
-﻿using DPSPanel.Core.Panel;
+﻿using DPSPanel.Core.Configs;
+using DPSPanel.Core.Panel;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Core.Commands
@@ -19,7 +20,9 @@ namespace DPSPanel.Core.Commands
 
             string target = args[0].ToLower(); // "dps" or "panel"
             if (target == "toggle")
-                sys?.state.container.TogglePanel();
+            {
+                ModContent.GetInstance<Config>().EnableButton = !ModContent.GetInstance<Config>().EnableButton;
+            }
             else
                 throw new UsageException("Error: Incorrect argument. Valid arguments are: /dps hide, show, clear.");
         }
@@ -32,8 +35,6 @@ namespace DPSPanel.Core.Commands
         public override string Usage => "Use: /dps"; // Usage instructions
         public override string Description => "Usage: /toggle dps"; // Is shown when using "/help"
 
-        private int i = 0;
-
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             if (args.Length < 1)
@@ -42,7 +43,9 @@ namespace DPSPanel.Core.Commands
             string target = args[0].ToLower(); // "dps" or "panel"
 
             if (target == "dps")
-                sys?.state.container.TogglePanel();
+                ModContent.GetInstance<Config>().EnableButton = !ModContent.GetInstance<Config>().EnableButton;
+
+                // sys?.state.container.TogglePanel();
             else
                 throw new UsageException("Error: Incorrect argument. Valid arguments are: /dps hide, show, clear.");
         }

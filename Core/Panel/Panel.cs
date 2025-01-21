@@ -25,12 +25,8 @@ namespace DPSPanel.Core.Panel
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
 
-        // Add event handlers for child changes
-        public event Action OnSizeChanged;
-
         // bar items
         private Dictionary<string, DamageBarElement> damageBars = [];
-        // private NPC currentBoss;
         private const float headerHeight = 16f;
 
         public Panel()
@@ -112,9 +108,14 @@ namespace DPSPanel.Core.Panel
 
         private void ResizePanelHeight()
         {
+            var parentContainer = Parent as BossPanelContainer;
+
+            // set parent container height
+            parentContainer.Height.Set(currentYOffset + padding, 0f);
+            parentContainer.Recalculate();
+
             Height.Set(currentYOffset + padding, 0f);
             Recalculate();
-            OnSizeChanged?.Invoke();
         }
     }
 }

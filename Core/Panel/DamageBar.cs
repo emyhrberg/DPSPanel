@@ -67,33 +67,44 @@ namespace DPSPanel.Core.Panel
             // weaponName = _weaponName;
         }
 
-        protected override void DrawSelf(SpriteBatch spriteBatch)
+        protected override void DrawSelf(SpriteBatch sb)
         {
-            base.DrawSelf(spriteBatch);
-            DrawDamageBar(spriteBatch);
-            DrawIcon(spriteBatch);
+            base.DrawSelf(sb);
+            DrawDamageBarFill(sb);
+            DrawDamageBarOutline(sb);
+            DrawIcon(sb);
         }
 
-        private void DrawDamageBar(SpriteBatch spriteBatch)
+        private void DrawDamageBarFill(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new Vector2(dims.X, dims.Y);
             Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
-
-            // Draw background.
-            spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
 
             // Draw filled portion based on percentage.
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
                 Rectangle sourceRect = new Rectangle(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
-                spriteBatch.Draw(fullBar.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
+                sb.Draw(fullBar.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
             }
         }
 
-        private void DrawIcon(SpriteBatch spriteBatch)
+        private void DrawDamageBarOutline(SpriteBatch sb)
         {
+            CalculatedStyle dims = GetDimensions();
+            Vector2 pos = new Vector2(dims.X, dims.Y);
+            Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
+            sb.Draw(emptyBar.Value, rect, Color.DarkGray);
+        }
+
+        private void DrawIcon(SpriteBatch sb)
+        {
+            // check if enabled
+            Config c = ModContent.GetInstance<Config>();
+            if (!c.ShowWeaponIcon)
+                return;
+
             // Load texture (by default, zenith)
             Texture2D texture = TextureAssets.Item[ItemID.Zenith].Value;
 
@@ -137,7 +148,7 @@ namespace DPSPanel.Core.Panel
 
                     //ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} Cropped h > 70 scaled to: {destWidth}x{destHeight}");
 
-                    spriteBatch.Draw(texture, destinationRect, sourceRect, Color.White);
+                    sb.Draw(texture, destinationRect, sourceRect, Color.White);
                 }
                 else
                 {
@@ -150,7 +161,7 @@ namespace DPSPanel.Core.Panel
                         scale = 2f;
                     }
 
-                    spriteBatch.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                    sb.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                 }
             }
         }

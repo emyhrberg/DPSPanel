@@ -1,6 +1,5 @@
 ﻿using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
-using Microsoft.Xna.Framework;
 using System.ComponentModel;
 
 namespace DPSPanel.Core.Configs
@@ -13,8 +12,20 @@ namespace DPSPanel.Core.Configs
         [Header("DPSPanelConfig")]
 
         [BackgroundColor(255, 99, 71)]
-        [DefaultValue(true)] // Default value is true.dddd
+        [DefaultValue(true)] // Default value is true.
         public bool EnableButton { get; set; } = false;
+
+        [BackgroundColor(255, 99, 71)]
+        [DefaultValue(false)] // Default value is true.
+        public bool ShowWeaponIcon { get; set; } = false;
+
+        [BackgroundColor(255, 99, 71)]
+        [DefaultValue("false")]
+        public bool HighlightBossIcon { get; set; }
+
+        // [BackgroundColor(255, 99, 71)]
+        // [DefaultValue(false)] // Default value is true.
+        // public bool DrawXOnDead { get; set; } = false;
 
         [BackgroundColor(255, 99, 71)]
         [DrawTicks]

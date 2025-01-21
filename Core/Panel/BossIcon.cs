@@ -5,67 +5,78 @@ using Terraria.UI;
 using Terraria.GameContent;
 using Terraria;
 using DPSPanel.Core.Configs;
-using Terraria.ModLoader.UI;
+using DPSPanel.Core.Helpers;
+using ReLogic.Content;
 
 namespace DPSPanel.Core.Panel
 {
     public class BossIconElement : UIElement
     {
-        public NPC currentBoss; 
+        public NPC currentBoss;
+
+        private Texture2D t;
+        private Vector2 clickStartPosition; // Start position of a mouse click
+        private bool isDragging;
 
         public BossIconElement()
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
+            Top.Set(0, 0f);
+            Left.Set(0, 0f);
 
-            // Config c = ModContent.GetInstance<Config>();
-            // if (c.BossIconSide == "Left")
-            // {
-                Top.Set(0, 0f);
-                Left.Set(0, 0f);
-            // }
-            // else // right
-            // {
-                // HAlign = 1f;
-            // }
-            
+            t = LoadResources.CoolDown?.Value;
             currentBoss = null;
         }
 
-        public void UpdateBossIcon(NPC boss)
+        private Texture2D XTexture
         {
-            currentBoss = boss;
+            get
+            {
+                t ??= LoadResources.CoolDown?.Value;
+                return t;
+            }
         }
 
-        public override void LeftClick(UIMouseEvent evt)
+        protected override void DrawSelf(SpriteBatch sb)
         {
-            // Toggle panel
-            PanelSystem s = ModContent.GetInstance<PanelSystem>();
-            s?.state?.container?.TogglePanel();
-        }
-
-        protected override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            base.DrawSelf(spriteBatch);
+            base.DrawSelf(sb);
             Config c = ModContent.GetInstance<Config>();
             if (!c.EnableButton)
                 return;
 
             if (IsMouseHovering)
             {
-                // UICommon.TooltipMouseText("Toggle DPS Panel");
+                // outline
+                // Texture2D outlinedTexture;
+                // if (currentBoss == null)
+                // {
+                //     Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[7]?.Value;
+                //     outlinedTexture = PanelColors.AddYellowOutlineToTexture(Main.graphics.GraphicsDevice, bossHeadTexture, 2);
+                // } else {
+                //     Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[currentBoss.GetBossHeadTextureIndex()]?.Value;
+                //     outlinedTexture = PanelColors.AddYellowOutlineToTexture(Main.graphics.GraphicsDevice, bossHeadTexture, 2);
+                // }
+                // CalculatedStyle dims = GetDimensions();
+                // Vector2 pos = new(dims.X, dims.Y);
+                // sb.Draw(outlinedTexture, pos, Color.Yellow);
+
+                // hover tooltip
                 Main.hoverItemName = "Show Boss Damage";
             }
 
-            if (currentBoss != null) 
-            {
-                int headIndex = currentBoss.GetBossHeadTextureIndex();
-                if (headIndex < 0)
-                    headIndex = 7; // fallback
-                DrawBossIconAtIndex(spriteBatch, headIndex);
-            }
+            if (currentBoss != null)
+                DrawBossIconAtIndex(sb, currentBoss.GetBossHeadTextureIndex());
             else
-                DrawBossIconAtIndex(spriteBatch, 7); // fallback if no boss
+                DrawBossIconAtIndex(sb, 7); // Fallback if no boss
+
+            // if (c.DrawXOnDead)
+                // DrawBossXIfDead(sb);
+        }
+
+        public void UpdateBossIcon(NPC boss)
+        {
+            currentBoss = boss;
         }
 
         private void DrawBossIconAtIndex(SpriteBatch sb, int i)
@@ -75,5 +86,55 @@ namespace DPSPanel.Core.Panel
             Vector2 pos = new(dims.X, dims.Y);
             sb.Draw(bossHeadTexture, pos, Color.White);
         }
+
+        private void DrawBossXIfDead(SpriteBatch sb)
+        {
+            if (currentBoss == null || currentBoss.life > 0)
+                return;
+
+            ModContent.GetInstance<DPSPanel>().Logger.Info("boss index" + currentBoss?.GetBossHeadTextureIndex());
+
+            CalculatedStyle dims = GetDimensions();
+            Vector2 pos = new(dims.X, dims.Y);
+
+            if (t==null)
+            {
+                t = ModContent.Request<Texture2D>("DPSPanel/Core/Resources/CoolDown", AssetRequestMode.ImmediateLoad).Value;
+            }
+
+            if (t != null)
+                sb.Draw(t, pos, Color.White);
+            else
+                ModContent.GetInstance<DPSPanel>().Logger.Info("error index" + currentBoss?.GetBossHeadTextureIndex());
+        }
+
+        #region ClickDragHotFix
+        public override void LeftMouseDown(UIMouseEvent evt)
+        {
+            base.LeftMouseDown(evt);
+
+            // Record the start position when the mouse is pressed
+            clickStartPosition = evt.MousePosition;
+            isDragging = false; // Reset dragging flag
+        }
+
+        public override void LeftMouseUp(UIMouseEvent evt)
+        {
+            base.LeftMouseUp(evt);
+
+            // Check if the mouse moved significantly during the click
+            if (Vector2.Distance(clickStartPosition, evt.MousePosition) > 5f) // Threshold for drag
+            {
+                isDragging = true;
+            }
+
+            // Only toggle the panel if it was not a drag
+            if (!isDragging)
+            {
+                var parentContainer = Parent as BossPanelContainer;
+                parentContainer?.TogglePanel();
+            }
+        }
+        #endregion
     }
 }

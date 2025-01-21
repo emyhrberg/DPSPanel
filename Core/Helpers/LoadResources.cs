@@ -1,14 +1,10 @@
 ﻿using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using System.Collections.Generic;
-using System.Linq;
-using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Core.Helpers
 {
-    internal class LoadResources
+    public static class LoadResources
     {
 
         public static Asset<Texture2D> BarFancyEmpty;

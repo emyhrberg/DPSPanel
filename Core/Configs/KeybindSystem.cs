@@ -24,18 +24,8 @@ namespace DPSPanel.Core.Configs
         {
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
-                Config c = ModContent.GetInstance<Config>();
-                if (!c.EnableButton)
-                {
-                    Main.NewText($"Damage panel is disabled, enable it in configuration.", Color.Yellow);
-                    return;
-                }
-
-                PanelSystem uiSystem = ModContent.GetInstance<PanelSystem>();
-                bool vis = uiSystem.state.container.panelVisible;
-                string onOff = vis ? "ON" : "OFF";
-                Main.NewText($"Damage Panel: [{onOff}]. Press K to toggle.", Color.Yellow);
-                uiSystem.state.container.TogglePanel();
+                // toggle the button
+                ModContent.GetInstance<Config>().EnableButton = !ModContent.GetInstance<Config>().EnableButton;
             }
         }
     }

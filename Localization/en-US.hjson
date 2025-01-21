@@ -1,6 +1,6 @@
 Mods: {
 	DPSPanel: {
-		Keybinds.ToggleDPSPanel.DisplayName: Toggle D P S Panel
+		Keybinds.ToggleDPSPanel.DisplayName: Toggle Boss Panel
 
 		Configs: {
 			Config: {
@@ -9,11 +9,26 @@ Mods: {
 
 				EnableButton: {
 					Label: "[i:560] [c/ffffff:Enable Button]"
-					Tooltip: ""
+					Tooltip: Choose whether to enable the button to see boss damage or not.
 				}
 
 				Theme: {
 					Label: "[i:337] [c/ffffff:Damage Bar Theme]"
+					Tooltip: Change the theme of the boss damage bars that appear. Two options exist; Fancy and Generic.
+				}
+
+				ShowWeaponIcon: {
+					Label: "[i:3520] [c/ffffff:Show Weapon (experimental)]"
+					Tooltip: Choose whether to show the weapons or not in the damage bars that appear.
+				}
+
+				DrawXOnDead: {
+					Label: Draw X On Dead
+					Tooltip: ""
+				}
+
+				HighlightBossIcon: {
+					Label: Highlight Boss Icon
 					Tooltip: ""
 				}
 			}
