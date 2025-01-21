@@ -1,252 +1,117 @@
-﻿using Terraria.ModLoader;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using DPSPanel.Core.Panel;
+using Terraria;
+using Terraria.ModLoader;
 
-namespace DPSPanel.MainCode.Panel
+namespace DPSPanel.Core.DamageCalculation
 {
     public class BossDamageTrackerMP : ModPlayer
     {
-        //        // --------------------------------------------------------------------------------
-        //        // Classes
-        //        // --------------------------------------------------------------------------------
+        public class Fight
+        {
+            public int initialLife;
+            public string bossName;
+            public int damageTaken;
+            public HashSet<CustomPlayer> players = [];
+        }
 
-        //        public class BossFight
-        //        {
-        //            public int bossId;            // Incremental ID (0, 1, 2, ...)
-        //            public int initialLife;
-        //            public string bossName;
-        //            public int damageTaken;
-        //            public HashSet<CustomPlayer> players = new();
-        //        }
+        public class CustomPlayer
+        {
+            public string playerName;
+            public int totalDamage;
+        }
 
-        //        public class CustomPlayer
-        //        {
-        //            public string playerName;
-        //            public int totalDamage;
-        //            public HashSet<Weapon> weapons = new();
-        //        }
+        private Fight fight = null;
 
-        //        public class Weapon
-        //        {
-        //            public string weaponName;
-        //            public int damage;
-        //        }
+        #region Hooks
+        public override void PreUpdate()
+        {
+            // Iterate all NPCs every 1 second (idk how computationally heavy this is)
+            if (Main.time % 60 == 0)
+            {
+                // If there's an active fight and the boss is no longer alive or present, stop tracking
+                if (fight != null && !Main.npc.Any(npc => npc.active && npc.boss && npc.FullName == fight.bossName))
+                {
+                    Mod.Logger.Info($"Boss {fight.bossName} despawned!");
+                    fight = null; // Stop tracking the fight
+                }
 
-        //        // --------------------------------------------------------------------------------
-        //        // Fields
-        //        // --------------------------------------------------------------------------------
-        //        private Dictionary<int, BossFight> fights = new();
-        //        private int fightId = 0;
-        //        private Weapon lastHitWeapon;
+                // Start a fight if a boss spawns
+                foreach (NPC npc in Main.npc)
+                    if (fight == null && npc.active && npc.boss && npc.life > 0)
+                        fight = CreateNewBossFight(npc);
+            }
+        }
 
-        //        // --------------------------------------------------------------------------------
-        //        // Hooks
-        //        // --------------------------------------------------------------------------------
-        //        public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
-        //        {
-        //            TrackBossDamage(item.Name, damageDone, target);
-        //        }
+        public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            // melee damage
+            UpdateFight(item.Name, target, damageDone);
+        }
+        public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
+        {
+            // projectile damage.
+            UpdateFight(proj.Name, target, damageDone);
+        }
+        #endregion
 
-        //        public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
-        //        {
-        //            TrackBossDamage(proj.Name, damageDone, target);
-        //        }
+        #region Main Logic
+        private void UpdateFight(string weaponName, NPC npc, int damageDone)
+        {
+            if (!npc.boss) return;
 
-        //        // --------------------------------------------------------------------------------
-        //        // Main Logic
-        //        // --------------------------------------------------------------------------------
-        //        private void TrackBossDamage(string weaponName, int damageDone, NPC npc)
-        //        {
-        //            if (!IsValidBoss(npc) || (IsNPCDead(npc)))
-        //                return;
+            // create a new fight if there isn't one
+            if (fight == null)
+                fight = CreateNewBossFight(npc);
 
-        //            if (!fights.TryGetValue(fightId, out var fight))
-        //            {
-        //                fight = CreateNewBossFight(npc, damageDone, weaponName);
-        //                fights[fightId] = fight;
-        //            }
-        //            else
-        //            {
-        //                UpdateBossFight(fight, weaponName, damageDone);
-        //            }
+            // create a new player if current player hasnt been added to the fight yet
+            if (!fight.players.Any(p => p.playerName == Main.LocalPlayer.name))
+                fight = AddNewPlayer(Main.LocalPlayer.name);
 
-        //            LogBossFights();
-        //        }
+            // update damage done to the boss
+            foreach (var player in fight.players)
+            {
+                if (player.playerName == Main.LocalPlayer.name)
+                {
+                    player.totalDamage += damageDone;
+                    Mod.Logger.Info("Player: " + player.playerName + " Damage: " + player.totalDamage);
+                }
+            }
+        }
 
-        //        private BossFight CreateNewBossFight(NPC npc, int damageDone, string weaponName)
-        //        {
-        //            return new BossFight
-        //            {
-        //                bossId = fightId,
-        //                bossName = npc.FullName,
-        //                initialLife = npc.lifeMax,
-        //                damageTaken = damageDone,
-        //                players =
-        //                [
-        //                    new CustomPlayer
-        //                    {
-        //                        playerName = Main.LocalPlayer.name,
-        //                        totalDamage = damageDone,
-        //                        weapons =
-        //                        [
-        //                            new Weapon
-        //                            {
-        //                                weaponName = weaponName,
-        //                                damage = damageDone
-        //                            }
-        //                        ]
-        //                    }
-        //                ]
-        //            };
-        //        }
+        private Fight CreateNewBossFight(NPC npc)
+        {
+                fight = new Fight
+                {
+                    initialLife = npc.lifeMax,
+                    bossName = npc.FullName,
+                    damageTaken = 0,
+                    players = []
+                };
+            return fight;
+        }
 
-        //        private void UpdateBossFight(BossFight fight, string weaponName, int damageDone)
-        //        {
-        //            fight.damageTaken += damageDone;
+        private Fight AddNewPlayer(string playerName)
+        {
+            fight.players.Add(new CustomPlayer
+            {
+                playerName = playerName,
+                totalDamage = 0
+            });
+            return fight;
+        }
+        #endregion
 
-        //            // Check if player is already in the fight
-        //            var player = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name);
-        //            if (player == null)
-        //            {
-        //                player = new CustomPlayer
-        //                {
-        //                    playerName = Main.LocalPlayer.name,
-        //                    totalDamage = damageDone,
-        //                    weapons =
-        //                    [
-        //                        new Weapon
-        //                        {
-        //                            weaponName = weaponName,
-        //                            damage = damageDone
-        //                        }
-        //                    ]
-        //                };
-        //                fight.players.Add(player);
-        //            }
-        //            else
-        //            {
-        //                player.totalDamage += damageDone;
-
-        //                // Check if weapon is already in the fight
-        //                var weapon = player.weapons.FirstOrDefault(w => w.weaponName == weaponName);
-        //                if (weapon == null)
-        //                {
-        //                    player.weapons.Add(new Weapon
-        //                    {
-        //                        weaponName = weaponName,
-        //                        damage = damageDone
-        //                    });
-        //                }
-        //                else
-        //                {
-        //                    weapon.damage += damageDone;
-        //                }
-        //            }
-        //            // For final blow fix
-        //            lastHitWeapon = new Weapon { weaponName = weaponName, damage = damageDone };
-        //        }
-
-        //        // --------------------------------------------------------------------------------
-        //        // Utility Methods
-        //        // --------------------------------------------------------------------------------
-        //        private bool IsNPCDead(NPC npc)
-        //        {
-        //            if (npc.life <= 0)
-        //            {
-        //                FixFinalBlowDiscrepancy();
-        //                fightId++;
-        //                return true;
-        //            }
-        //            return false;
-        //        }
-
-        //        private bool IsValidBoss(NPC npc)
-        //        {
-        //            return npc.boss && !npc.friendly;
-        //        }
-
-        //        public void LogBossFights()
-        //        {
-        //            if (fights.Count == 0)
-        //            {
-        //                ModContent.GetInstance<DPSPanel>().Logger.Info("No boss fights have been tracked yet.");
-        //                return;
-        //            }
-
-        //            // Print latest fight
-        //            ILog logger = ModContent.GetInstance<DPSPanel>().Logger;
-
-        //            // Check if fightid exists in the dictionary
-        //            if (!fights.ContainsKey(fightId))
-        //            {
-        //                // Get the latest fight ID
-        //                fightId = fights.Keys.Max();
-        //                logger.Info($"Took the latest fight ID instead: {fightId} ");
-        //            }
-
-        //            var fight = fights[fightId];
-        //            logger.Info($"{fight.bossName} ID {fight.bossId}");
-        //            foreach (var player in fight.players)
-        //            {
-        //                logger.Info($"{player.playerName} ({player.totalDamage})");
-        //            }
-
-        //            //foreach (var fight in fights.Values)
-        //            //{
-        //            //    ModContent.GetInstance<DPSPanel>().Logger.Info($"{fight.bossName} ID {fight.bossId}");
-        //            //    foreach (var player in fight.players)
-        //            //    {
-        //            //        ModContent.GetInstance<DPSPanel>().Logger.Info($"{player.playerName} ({player.totalDamage})");
-        //            //    }
-        //            //}
-
-        //        }
-
-        //        private void FixFinalBlowDiscrepancy()
-        //        {
-        //            if (!fights.TryGetValue(fightId, out var currFight))
-        //                return; // No active fight to fix
-
-        //            int discrepancy = currFight.damageTaken - currFight.initialLife;
-        //            if (discrepancy == 0)
-        //                return; // Damage matches boss life; no fix needed
-
-        //            // Correct the total damage for the boss fight
-        //            currFight.damageTaken -= discrepancy;
-
-        //            // Adjust the last hitter's damage based on weaponName
-        //            if (lastHitWeapon != null)
-        //            {
-        //                // Find the player who used a weapon with the same name as the lastHitWeapon
-        //                var lastHitter = currFight.players.FirstOrDefault(p =>
-        //                    p.weapons.Any(w => w.weaponName == lastHitWeapon.weaponName));
-
-        //                if (lastHitter != null)
-        //                {
-        //                    // Now find that weapon object
-        //                    var weapon = lastHitter.weapons.FirstOrDefault(w => w.weaponName == lastHitWeapon.weaponName);
-        //                    if (weapon != null)
-        //                    {
-        //                        // Adjust weapon damage
-        //                        weapon.damage -= discrepancy;
-        //                        weapon.damage = Math.Max(0, weapon.damage); // Prevent negative values
-
-        //                        // Adjust player's total damage
-        //                        lastHitter.totalDamage -= discrepancy;
-        //                        lastHitter.totalDamage = Math.Max(0, lastHitter.totalDamage); // Prevent negative values
-        //                    }
-        //                }
-        //            }
-
-        //            // Update the dictionary entry for the boss fight
-        //            fights[fightId] = currFight;
-
-        //            // Log the updated damage
-        //            string playersDamageSummary = string.Join(", ", currFight.players
-        //                .Select(p => $"{p.playerName}: {p.weapons.Sum(w => w.damage)}"));
-
-        //            ModContent.GetInstance<DPSPanel>().Logger.Info(
-        //                $"[Boss Fight {fightId} - {currFight.bossName}] " +
-        //                $"Adjusted Damage: {currFight.damageTaken} | Players: {playersDamageSummary}"
-        //            );
-        //        }
+        #region UI
+        private void UpdateDamageBarWithFightInfo(NPC npc)
+        {
+            PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+            sys.state.container.panel.ClearPanelAndAllItems();
+            sys.state.container.panel.SetBossTitle(fight.bossName, null);
+            sys.state.container.bossIcon.UpdateBossIcon(npc);
+        }
+        #endregion 
     }
 }

@@ -11,7 +11,6 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
-using static DPSPanel.Core.Panel.BossDamageTrackerSP;
 
 namespace DPSPanel.Core.Panel
 {
@@ -75,30 +74,30 @@ namespace DPSPanel.Core.Panel
             }
         }
 
-        public void UpdateDamageBars(List<Weapon> weapons)
-        {
-            // Reset vertical offset. needed?
-            currentYOffset = headerHeight + padding * 2;
+        // public void UpdateDamageBars(List<Weapon> weapons)
+        // {
+        //     // Reset vertical offset. needed?
+        //     currentYOffset = headerHeight + padding * 2;
 
-            // Sort weapons by descending damage.
-            weapons = weapons.OrderByDescending(w => w.damage).ToList();
-            int highest = weapons.FirstOrDefault()?.damage ?? 1;
+        //     // Sort weapons by descending damage.
+        //     weapons = weapons.OrderByDescending(w => w.damage).ToList();
+        //     int highest = weapons.FirstOrDefault()?.damage ?? 1;
 
-            for (int i = 0; i < weapons.Count; i++)
-            {
-                var wpn = weapons[i];
-                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+        //     for (int i = 0; i < weapons.Count; i++)
+        //     {
+        //         var wpn = weapons[i];
+        //         Color color = PanelColors.colors[i % PanelColors.colors.Length];
 
-                // Get for this weapon.
-                DamageBarElement bar = damageBars[wpn.weaponName];
+        //         // Get for this weapon.
+        //         DamageBarElement bar = damageBars[wpn.weaponName];
 
-                // Update  with the current data.
-                bar.UpdateDamageBar(highest, wpn.weaponName, wpn.damage, color, wpn.itemID, wpn.itemType);
-                bar.Top.Set(currentYOffset, 0f);
-                currentYOffset += ItemHeight + padding * 2;
-            }
-            ResizePanelHeight();
-        }
+        //         // Update  with the current data.
+        //         bar.UpdateDamageBar(highest, wpn.weaponName, wpn.damage, color, wpn.itemID, wpn.itemType);
+        //         bar.Top.Set(currentYOffset, 0f);
+        //         currentYOffset += ItemHeight + padding * 2;
+        //     }
+        //     ResizePanelHeight();
+        // }
 
         public void ClearPanelAndAllItems()
         {
