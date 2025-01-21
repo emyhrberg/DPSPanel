@@ -1,1 +1,119 @@
-Mods.DPSPanel.Keybinds.ToggleDPSPanel.DisplayName: Toggle DPS Panel
+Mods: {
+	DPSPanel: {
+		Keybinds.ToggleDPSPanel.DisplayName: Toggle DPS Panel
+
+		Configs: {
+			Config: {
+				DisplayName: Config
+
+				Common: {
+					Label: CommonSettings
+					Tooltip: ""
+				}
+
+				BossLogConfiguration: {
+					Label: BossLogCustomization
+					Tooltip: ""
+				}
+
+				Headers: {
+					UI: U I Header
+					BossLogCustomization: Boss Log Customization Header
+					BasicSettings: Basic Settings Header
+				}
+
+				UI: {
+					Label: U I
+					Tooltip: ""
+				}
+
+				Debug: {
+					Label: "[i:560] [c/ffeb6e:Enable Button] [i:3625]"
+					Tooltip: Show the button in the top. Otherwise toggle with hotkey (K) or command (/dps toggle)
+				}
+
+				EnableButton: {
+					Label: "[i:560] [c/ffeb6e:Enable Button] [i:3625]"
+					Tooltip: Show the button in the top. Otherwise toggle with hotkey (K) or command (/dps toggle)
+				}
+
+				ShowBossTitle: {
+					Label: "[i:560] [c/ffeb6e:Show Boss Name]"
+					Tooltip: Show the boss name.
+				}
+
+				ShowBossName: {
+					Label: Show Boss Name And Title]
+					Tooltip: Shows the boss name and icon.
+				}
+
+				Theme: {
+					Label: Theme
+					Tooltip: Changes the theme of the boss damage bar.
+				}
+
+				BossLogPos: {
+					Label: Position
+					Tooltip: Changes the position of the icon. You can also hold right click and drag the icon.
+				}
+			}
+
+			CommonConfig: {
+				Tooltip: ""
+
+				InvalidChange: {
+					Label: InvalidChangeMessage
+					Tooltip: Displayed when an invalid change attempt is made.
+				}
+
+				HostChange: {
+					Label: HostChangeMessage
+					Tooltip: Message displayed when only the host can make changes.
+				}
+
+				BossLogColor: {
+					Label: Boss Damage Color
+					Tooltip: Choose the color of your icon!
+				}
+
+				BossLogPos: {
+					Label: Boss Damage Position
+					Tooltip: Change the position of the icon!
+				}
+			}
+
+			BossLogConfig: {
+				Tooltip: ""
+				Headers.BossLogUI: Boss Log U I Header
+
+				BossLogColor: {
+					Label: BossLogColor
+					Tooltip: Choose the color of your Boss Log!
+				}
+
+				BossLogPos: {
+					Label: OpenBPosition
+					Tooltip:
+						'''
+						Alternatively, hold right-click while hovering over the Boss Log button to move it wherever you'd like with ease!
+						Position is measured from the bottom right corner of the screen.
+						'''
+				}
+
+				ShowInteractionTooltips: {
+					Label: Enable Interactions Tab
+					Tooltip:
+						'''
+						When enabled, a small tab can be hovered over for an explanation on how to use the alternative interactions of the current page.
+						Examples include right-clicking on a Table of Contents entry to manually mark it as defeated.
+						'''
+				}
+
+				Debug: {
+					Label: "[i:3625] [c/ffeb6e:Debug Tools for Mod Developers] [i:3619]"
+					Tooltip: Enable debugging features for mod developers.
+				}
+			}
+		}
+	}
+}

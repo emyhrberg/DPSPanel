@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DPSPanel.Core.Helpers;
 using log4net.Repository.Hierarchy;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -12,9 +13,9 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
-using static DPSPanel.MainCode.Panel.BossDamageTrackerSP;
+using static DPSPanel.Core.Panel.BossDamageTrackerSP;
 
-namespace DPSPanel.MainCode.Panel
+namespace DPSPanel.Core.Panel
 {
     public class Panel : UIPanel
     {
@@ -22,21 +23,19 @@ namespace DPSPanel.MainCode.Panel
          * Variables
          * -------------------------------------------------------------
          */
-        // Variables for dragging the panel
-        private Vector2 offset;
-        private bool dragging;
-        private bool clickStartedInsidePanel;
-        private readonly bool IS_DRAGGABLE = false; // Debug option: Set to true to enable dragging
+
+        // Panel
+        private readonly float padding = 5f;
+        private readonly float w = 300f; // PANEL WIDTH
+        private readonly float h = 40f; // PANEL HEIGHT. 2is reset later anyways
+        private readonly Color panelColor = new(49, 84, 141); // Light blue, same as inventory panel
 
         // Panel items
-        private readonly float padding;
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
 
         // Slider items
         private Dictionary<string, PanelSlider> sliders = [];
-        private readonly Asset<Texture2D> sliderEmpty;
-        private readonly Asset<Texture2D> sliderFull;
 
         // Header
         private NPC currentBoss;
@@ -59,16 +58,20 @@ namespace DPSPanel.MainCode.Panel
 
         ];
 
-        /* -------------------------------------------------------------
-         * Panel Constructor
-         * -------------------------------------------------------------
-         */
-        public Panel(float padding)
+        public Panel()
         {
-            this.padding = padding;
             SetPadding(padding);
-            sliderEmpty = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/SliderEmpty");
-            sliderFull = ModContent.Request<Texture2D>("DPSPanel/MainCode/Assets/SliderFull");
+
+            // Size of panel
+            Width.Set(w, 0f);
+            Height.Set(h, 0f);
+
+            // Center the panel on the screen
+            VAlign = 0.07f; // vertical pos. 
+            HAlign = 0.5f;
+
+            // Background color of panel
+            BackgroundColor = panelColor;
         }
 
         /* -------------------------------------------------------------
@@ -88,10 +91,12 @@ namespace DPSPanel.MainCode.Panel
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            base.Draw(spriteBatch); // Ensure the panel is drawn
+            base.Draw(spriteBatch);
+
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"Curentt boss in panel: {currentBoss}");
 
             // Draw boss head icon if a boss is active
-            if (currentBoss != null && currentBoss.active && currentBoss.boss && currentBoss.life > 0)
+            if (currentBoss != null)
             {
                 int headIndex = currentBoss.GetBossHeadTextureIndex();
                 if (headIndex >= 0 && headIndex < TextureAssets.NpcHeadBoss.Length &&
@@ -113,19 +118,13 @@ namespace DPSPanel.MainCode.Panel
             }
         }
 
-        public void CreateSlider(string sliderName="Name")
+        public void CreateSlider(string sliderName = "Name")
         {
             // Check if the slider already exists
             if (!sliders.ContainsKey(sliderName))
             {
                 // Create a new slider
-                PanelSlider slider = new(sliderEmpty, sliderFull)
-                {
-                    Width = new StyleDimension(0, 1.0f), // Fill the width of the panel
-                    Height = new StyleDimension(ItemHeight, 0f), // Set height
-                    Top = new StyleDimension(currentYOffset, 0f),
-                    HAlign = 0.5f, // Center horizontally
-                };
+                PanelSlider slider = new(currentYOffset);
                 Append(slider);
                 currentYOffset += ItemHeight + padding * 2; // Adjust Y offset for the next element
                 ResizePanelHeight();
@@ -170,92 +169,6 @@ namespace DPSPanel.MainCode.Panel
         {
             Height.Set(currentYOffset + padding, 0f);
             Recalculate();
-        }
-
-        /* -------------------------------------------------------------
-         * Dragging functionality
-         * -------------------------------------------------------------
-         */
-
-        public override void LeftMouseDown(UIMouseEvent evt)
-        {
-
-            if (!IS_DRAGGABLE) return; 
-
-            // When the mouse is pressed, start dragging the panel
-            base.LeftMouseDown(evt);
-            if (evt.Target == this)
-            {
-                DragStart(evt);
-                clickStartedInsidePanel = true;
-
-                // Prevent other UI elements from interacting
-                Main.LocalPlayer.mouseInterface = true;
-            }
-        }
-
-        public override void LeftMouseUp(UIMouseEvent evt)
-        {
-            if (!IS_DRAGGABLE) return;
-
-            // When the mouse is released, stop dragging the panel
-            base.LeftMouseUp(evt);
-            if (clickStartedInsidePanel)
-            {
-                DragEnd(evt);
-            }
-            clickStartedInsidePanel = false; // default to false
-        }
-
-        private void DragStart(UIMouseEvent evt)
-        {
-            if (!IS_DRAGGABLE) return;
-
-            // Start dragging the panel
-            offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
-            dragging = true;
-        }
-
-        private void DragEnd(UIMouseEvent evt)
-        {
-            if (!IS_DRAGGABLE) return;
-
-            // Stop dragging the panel
-            dragging = false;
-            Vector2 endMousePosition = evt.MousePosition;
-            Left.Set(endMousePosition.X - offset.X, 0f);
-            Top.Set(endMousePosition.Y - offset.Y, 0f);
-            Recalculate();
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            base.Update(gameTime);
-
-            if (!IS_DRAGGABLE) return;
-
-            // If the mouse is inside the panel, set the mouse interface to true to prevent other UI elements from interacting
-            if (dragging || clickStartedInsidePanel && ContainsPoint(Main.MouseScreen))
-            {
-                Main.LocalPlayer.mouseInterface = true;
-            }
-
-            // Drag the panel
-            if (dragging)
-            {
-                Left.Set(Main.mouseX - offset.X, 0f);
-                Top.Set(Main.mouseY - offset.Y, 0f);
-                Recalculate();
-            }
-
-            // Keep the panel within bounds
-            var parentSpace = Parent.GetDimensions().ToRectangle();
-            if (!GetDimensions().ToRectangle().Intersects(parentSpace))
-            {
-                Left.Pixels = Utils.Clamp(Left.Pixels, 0, parentSpace.Right - Width.Pixels);
-                Top.Pixels = Utils.Clamp(Top.Pixels, 0, parentSpace.Bottom - Height.Pixels);
-                Recalculate();
-            }
         }
     }
 }

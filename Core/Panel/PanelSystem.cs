@@ -1,10 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace DPSPanel.MainCode.Panel
+namespace DPSPanel.Core.Panel
 {
     public class PanelSystem : ModSystem
     {
@@ -17,6 +20,7 @@ namespace DPSPanel.MainCode.Panel
         {
             state.Activate();
             ui.SetState(state);
+            ModContent.GetInstance<DPSPanel>().Logger.Info("PanelSystem initialized!");
         }
 
         // This is always called after the world has been loaded

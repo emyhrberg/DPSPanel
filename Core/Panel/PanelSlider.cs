@@ -9,14 +9,17 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using System.Collections.Generic;
 using System;
+using DPSPanel.Core.Helpers;
+using DPSPanel.Core.Configs;
 
-namespace DPSPanel.MainCode.Panel
+namespace DPSPanel.Core.Panel
 {
     public class PanelSlider : UIElement
     {
         private readonly Asset<Texture2D> sliderEmpty; // Background slider texture
         private readonly Asset<Texture2D> sliderFull;  // Foreground fill texture
         private readonly UIText textElement;          // Text element for slider label
+        private const float ItemHeight = 40f;
 
         private Color fillColor;             // Color for the fill
         private int percentage;              // Progress percentage (0-100)
@@ -26,11 +29,30 @@ namespace DPSPanel.MainCode.Panel
         private string itemType;
         private string weaponName;           // Weapon name
 
-        public PanelSlider(Asset<Texture2D> sliderEmpty, Asset<Texture2D> sliderFull)
+        public PanelSlider(float currentYOffset)
         {
-            this.sliderEmpty = sliderEmpty;
-            this.sliderFull = sliderFull;
-            this.percentage = 0; // initial progress
+            // check config settings for theme
+            Config c = ModContent.GetInstance<Config>();
+            if (c.Theme == "Generic")
+            {
+                sliderEmpty = LoadResources.SliderGenericEmpty;
+                sliderFull = LoadResources.SliderGenericFull;
+            }
+            else
+            {
+                sliderEmpty = LoadResources.SliderEmpty;
+                sliderFull = LoadResources.SliderFull;
+            }
+
+            if (sliderEmpty == null || sliderFull == null)
+            {
+                ModContent.GetInstance<DPSPanel>().Logger.Error("Slider textures are not loaded correctly!");
+            }
+
+            Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
+            Height = new StyleDimension(ItemHeight, 0f); // Set height
+            Top = new StyleDimension(currentYOffset, 0f);
+            HAlign = 0.5f; // Center horizontally
 
             // Create the text element centered on the slider.
             textElement = new UIText("", 0.8f)
@@ -155,7 +177,7 @@ namespace DPSPanel.MainCode.Panel
             // Map projectile ID 933 (e.g., Zenith projectile) to item ID 4956 (Zenith item)
             {933, 4956}, // zenith
             {409, 2622}, // typhoon
-            {981,278}, // silver bullet
+            {981,278}, // silver bulleta2
         };
 
     }

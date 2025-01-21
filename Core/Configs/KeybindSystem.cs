@@ -1,8 +1,9 @@
 ﻿using Terraria.ModLoader;
 using Terraria;
-using DPSPanel.MainCode.Panel;
+using DPSPanel.Core.Panel;
+using Microsoft.Xna.Framework;
 
-namespace DPSPanel.MainCode.Configs
+namespace DPSPanel.Core.Configs
 {
     public class KeybindSystem : ModSystem
     {
@@ -22,11 +23,10 @@ namespace DPSPanel.MainCode.Configs
 
         public override void PostUpdateInput()
         {
-            // Check if the keybind was pressed
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
                 // Get the PanelSystem instance
-                var uiSystem = ModContent.GetInstance<PanelSystem>();
+                PanelSystem uiSystem = ModContent.GetInstance<PanelSystem>();
 
                 // Ensure PanelSystem and its state exist
                 if (uiSystem == null)
@@ -41,7 +41,9 @@ namespace DPSPanel.MainCode.Configs
                     return;
                 }
 
-                // Toggle the DPS panel
+                bool vis = uiSystem.state.isVisible;
+                string onOff = vis ? "ON" : "OFF";
+                Main.NewText($"Damage Panel: [{onOff}]. Press K to toggle.", Color.Yellow);
                 uiSystem.state.ToggleDPSPanel();
             }
         }
