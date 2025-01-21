@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DPSPanel.Core.Configs;
 using DPSPanel.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +20,7 @@ namespace DPSPanel.Core.Panel
         // Panel
         private readonly float padding = 5f;
         private readonly float PANEL_WIDTH = 300f; // 300 width
-        private readonly float PANEL_HEIGHT = 40f; // is reset anyways
+        private readonly float PANEL_HEIGHT = 40f; // is reset anyways by parent
         private readonly Color panelColor = new(49, 84, 141); 
         private float currentYOffset = 0;
         private const float ItemHeight = 40f;
@@ -37,7 +38,9 @@ namespace DPSPanel.Core.Panel
             Width.Set(PANEL_WIDTH, 0f);
             Height.Set(PANEL_HEIGHT, 0f);
             BackgroundColor = panelColor;
-            VAlign = 0.07f; // 7% from the top
+
+            // set position relative to PARENT container.
+            // VAlign = 0.07f; // 7% from the top
             HAlign = 0.5f; // Center horizontally
             SetPadding(padding);
         }
@@ -55,6 +58,9 @@ namespace DPSPanel.Core.Panel
 
         public override void Draw(SpriteBatch sb)
         {
+            Config c = ModContent.GetInstance<Config>();
+            if (!c.EnableButton)
+                return;
             base.Draw(sb);
         }
 

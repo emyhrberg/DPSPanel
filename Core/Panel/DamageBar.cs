@@ -8,7 +8,6 @@ using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System.Collections.Generic;
-using System;
 using DPSPanel.Core.Helpers;
 using DPSPanel.Core.Configs;
 

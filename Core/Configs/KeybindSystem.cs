@@ -24,6 +24,13 @@ namespace DPSPanel.Core.Configs
         {
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
+                Config c = ModContent.GetInstance<Config>();
+                if (!c.EnableButton)
+                {
+                    Main.NewText($"Damage panel is disabled, enable it in configuration.", Color.Yellow);
+                    return;
+                }
+
                 PanelSystem uiSystem = ModContent.GetInstance<PanelSystem>();
                 bool vis = uiSystem.state.container.panelVisible;
                 string onOff = vis ? "ON" : "OFF";

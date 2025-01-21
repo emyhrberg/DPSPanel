@@ -17,6 +17,8 @@ namespace DPSPanel.Core.Helpers
         public static Asset<Texture2D> BarGenericEmpty;
         public static Asset<Texture2D> BarGenericFull;
 
+        public static Asset<Texture2D> CoolDown;
+
         public static Asset<Texture2D> RequestResource(string path, bool immediate = false) => ModContent.Request<Texture2D>("DPSPanel/Core/Resources/" + path, immediate ? AssetRequestMode.ImmediateLoad : AssetRequestMode.AsyncLoad);
         private static Asset<Texture2D> PreloadResource(string path) => RequestResource(path, true);
 
@@ -28,6 +30,8 @@ namespace DPSPanel.Core.Helpers
 
             BarGenericEmpty = PreloadResource("BarGenericEmpty");
             BarGenericFull = PreloadResource("BarGenericFull");
+
+            CoolDown = PreloadResource("CoolDown");
         }
     }
 }

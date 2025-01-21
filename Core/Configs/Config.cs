@@ -10,42 +10,39 @@ namespace DPSPanel.Core.Configs
         // Determines the scope of the configuration. ClientSide means it only affects the player's local game.
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-        // basic settings
-        [Label("[i:560] [c/ffeb6e:Show Button]")]
-        [Tooltip("Shows the button. You can also toggle with hotkey (K) or command (/dps toggle)")]
+        [Header("DPSPanelConfig")]
+
         [BackgroundColor(255, 99, 71)]
-        [DefaultValue(true)] // Default value is true.
+        [DefaultValue(true)] // Default value is true.dddd
         public bool EnableButton { get; set; } = false;
 
+        [BackgroundColor(255, 99, 71)]
+        [DrawTicks]
+        [OptionStrings(["Fancy", "Generic"])]
+        [DefaultValue("Generic")]
+        public string Theme { get; set; }
+        
         //[Label("Show Boss Name And Title")]
         //[BackgroundColor(255, 99, 71)]
         //[DefaultValue(true)] // Default value is true.
         //[Tooltip("Shows the boss name and icon.")]
         //public bool ShowBossName { get; set; } = false;
 
-        [Label("Theme")]
-        [Tooltip("Changes the theme of the boss damage bar.")]
-        [BackgroundColor(255, 99, 71)]
-        [DrawTicks]
-        [OptionStrings(["Fancy", "Generic"])]
-        [DefaultValue("Generic")]
-        public string Theme { get; set; }
+        // [Label("Boss Icon Side")]
+        // [Tooltip("Changes the position of the boss icon.")]
+        // [BackgroundColor(255, 99, 71)]
+        // [DrawTicks]
+        // [OptionStrings(["Left", "Right"])]
+        // [DefaultValue("Left")]
+        // public string BossIconSide { get; set; }
 
-        [Label("Boss Icon Side")]
-        [Tooltip("Changes the position of the boss icon.")]
-        [BackgroundColor(255, 99, 71)]
-        [DrawTicks]
-        [OptionStrings(["Left", "Right"])]
-        [DefaultValue("Left")]
-        public string BossIconSide { get; set; }
-
-        [Label("Position")]
-        [Tooltip("Changes the position of the icon. You can also hold right click and drag the icon.")]
-        [BackgroundColor(250, 235, 215)]
-        [SliderColor(87, 181, 92)]
-        [DefaultValue(typeof(Vector2), "-270, -50")]
-        [Range(-1920f, 0f)]
-        public Vector2 BossLogPos { get; set; }
+        // [Label("Position")]
+        // [Tooltip("Changes the position of the icon. You can also hold right click and drag the icon.")]
+        // [BackgroundColor(250, 235, 215)]
+        // [SliderColor(87, 181, 92)]
+        // [DefaultValue(typeof(Vector2), "-270, -50")]
+        // [Range(-1920f, 0f)]
+        // public Vector2 BossLogPos { get; set; }
 
         //Todo uncmment this and start implementing config.
 

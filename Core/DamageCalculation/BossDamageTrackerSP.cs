@@ -97,9 +97,10 @@ namespace DPSPanel.Core.Panel
                     isAlive = true
                 };
                 Mod.Logger.Info("New boss fight created: " + fight.bossName);
-                var panelSystem = ModContent.GetInstance<PanelSystem>();
-                panelSystem.state.container.panel.ClearPanelAndAllItems();
-                panelSystem.state.container.panel.SetBossTitle(npc.FullName, npc);
+                var sys = ModContent.GetInstance<PanelSystem>();
+                sys.state.container.panel.ClearPanelAndAllItems();
+                sys.state.container.panel.SetBossTitle(npc.FullName, npc);
+                sys.state.container.bossIcon.UpdateBossIcon(npc);
             }
         }
 

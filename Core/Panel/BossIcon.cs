@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Terraria.GameContent;
@@ -18,8 +17,18 @@ namespace DPSPanel.Core.Panel
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
-            Top.Set(0, 0f);
-            Left.Set(0, 0f);
+
+            // Config c = ModContent.GetInstance<Config>();
+            // if (c.BossIconSide == "Left")
+            // {
+                Top.Set(0, 0f);
+                Left.Set(0, 0f);
+            // }
+            // else // right
+            // {
+                // HAlign = 1f;
+            // }
+            
             currentBoss = null;
         }
 
@@ -44,14 +53,19 @@ namespace DPSPanel.Core.Panel
 
             if (IsMouseHovering)
             {
-                UICommon.TooltipMouseText("Toggle DPS Panel");
-                // Main.hoverItemName = "Toggle DPS Panel 2";
+                // UICommon.TooltipMouseText("Toggle DPS Panel");
+                Main.hoverItemName = "Show Boss Damage";
             }
 
-            if (currentBoss == null)
-                DrawBossIconAtIndex(spriteBatch, 7);
+            if (currentBoss != null) 
+            {
+                int headIndex = currentBoss.GetBossHeadTextureIndex();
+                if (headIndex < 0)
+                    headIndex = 7; // fallback
+                DrawBossIconAtIndex(spriteBatch, headIndex);
+            }
             else
-                DrawBossIconAtIndex(spriteBatch, currentBoss.type);
+                DrawBossIconAtIndex(spriteBatch, 7); // fallback if no boss
         }
 
         private void DrawBossIconAtIndex(SpriteBatch sb, int i)

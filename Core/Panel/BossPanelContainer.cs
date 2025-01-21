@@ -1,13 +1,8 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Linq;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using Terraria;
-using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI;
-using DPSPanel.Core.Helpers;
-using DPSPanel.Core.Configs;
-using System.Linq;
 
 namespace DPSPanel.Core.Panel
 {
@@ -15,115 +10,82 @@ namespace DPSPanel.Core.Panel
     {
         public BossIconElement bossIcon;
         public Panel panel;
-        private NPC currentBoss;
 
         private bool dragging;
         private Vector2 offset;
 
         public bool panelVisible = true;
 
-        private readonly float PANEL_WIDTH = 300f; // 300 width
-        private float currentHeight = 40f; // Dynamic height
+        private const float PANEL_WIDTH = 300f;
 
         public BossPanelContainer()
         {
-            // set the size and position of the panel
+            // Container defaults
             Width.Set(PANEL_WIDTH, 0f);
-            Height.Set(currentHeight, 0f);
-            VAlign = 0.07f;
-            HAlign = 0.5f;
+            Height.Set(0f, 0f); // We'll adjust after measuring the panel
+            VAlign = 0.07f; // 7% down from top
+            HAlign = 0.5f;  // center horizontally
 
-            // 1) add boss panel
+            // 1) Create the panel
             panel = new Panel();
-            // panel.OnSizeChanged += Panel_OnChildChanged;
+            // Put the panel at 0,0 in local space
+            panel.Left.Set(0f, 0f);
+            panel.Top.Set(0f, 0f);
+
+            // Whenever the panel changes size, we measure it
+            panel.OnSizeChanged += OnPanelResized;
             Append(panel);
 
-            // 2) add boss icon with initial king slime
+            // 2) Create the icon
             bossIcon = new BossIconElement();
+            // Also at 0,0, on top of the panel
+            bossIcon.Left.Set(0f, 0f);
+            bossIcon.Top.Set(0f, 0f);
+            // Append it last, so it draws on top
             Append(bossIcon);
 
-            // 3) add boss title
-            panel.SetBossTitle("Fight a boss to display stats!", currentBoss);
+            // Example usage
+            panel.SetBossTitle("Fight a boss to display stats!", null);
+
+            // Ensure we measure the panel right away
+            AdjustSizeToPanel();
         }
 
-        public void TogglePanel()
+        #region Resizing
+        private void OnPanelResized()
         {
-            panelVisible = !panelVisible;
-
-            if (panelVisible)
-            {
-                if (!Children.Contains(panel))
-                    Append(panel);
-                    bossIcon.Remove();
-                    Append(bossIcon);
-                    RecalculateSize();
-            }
-            else
-            {
-                if (Children.Contains(panel))
-                    panel.Remove();
-                    currentHeight = bossIcon.GetDimensions().Height; // Set height to just icon height
-                    Height.Set(currentHeight, 0f);
-                    Recalculate();
-            }
+            AdjustSizeToPanel();
         }
 
-        #region Recalculate Panel
-        private void Panel_OnChildChanged(UIElement parent, UIElement child)
+        /// <summary>
+        /// Adjusts the container size to match the panel's size (ignoring the icon).
+        /// </summary>
+        private void AdjustSizeToPanel()
         {
-            RecalculateSize();
-        }
+            CalculatedStyle containerDims = GetDimensions();
+            CalculatedStyle panelDims = panel.GetDimensions();
 
-        public void RecalculateSize()
-        {
-            if (panel != null)
-            {
-                // Get panel's calculated dimensions
-                CalculatedStyle panelDims = panel.GetDimensions();
-                
-                // Update container height to match panel
-                currentHeight = panelDims.Height;
-                Height.Set(currentHeight, 0f);
-                
-                // Recalculate container and children
-                Recalculate();
+            // Convert panel’s absolute bottom to local coords
+            float localBottom = (panelDims.Y + panelDims.Height) - containerDims.Y;
+            // If you also want to maintain a minimum height (like 40f), do:
+            float finalHeight = MathHelper.Max(localBottom, 40f);
 
-                // Ensure boss icon stays on top
-                if (bossIcon != null && Children.Contains(bossIcon))
-                {
-                    bossIcon.Remove();
-                    Append(bossIcon);
-                }
-            }
-        }
+            // Guarantee container width is at least PANEL_WIDTH
+            Width.Set(PANEL_WIDTH, 0f);
+            // Use the panel’s measured height
+            Height.Set(finalHeight, 0f);
 
-        public override void Recalculate()
-        {
-            base.Recalculate();
-
-            // After recalculating, update children positions if needed
-            if (panel != null && Children.Contains(panel))
-            {
-                panel.Width.Set(PANEL_WIDTH, 0f);
-                panel.Recalculate();
-            }
-
-            if (bossIcon != null && Children.Contains(bossIcon))
-            {
-                // Position boss icon relative to panel
-                CalculatedStyle containerDims = GetDimensions();
-                bossIcon.Left.Set(containerDims.Width - bossIcon.Width.Pixels, 0f);
-                bossIcon.Top.Set(0f, 0f);
-                bossIcon.Recalculate();
-            }
+            Recalculate();
         }
         #endregion
 
-        #region Draggable Container
+        #region Draggable Container (Entire Area)
         public override void LeftMouseDown(UIMouseEvent evt)
         {
             base.LeftMouseDown(evt);
 
+            // If you want to start dragging whenever the user clicks on *any part* 
+            // (including children), check ContainsPoint, not evt.Target == this.
             if (ContainsPoint(evt.MousePosition))
             {
                 dragging = true;
@@ -136,34 +98,67 @@ namespace DPSPanel.Core.Panel
             base.LeftMouseUp(evt);
             dragging = false;
         }
-        
-        // right mouse also
-        public override void RightMouseDown(UIMouseEvent evt)
-        {
-            base.RightMouseDown(evt);
-
-            if (ContainsPoint(evt.MousePosition))
-            {
-                dragging = true;
-                offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
-            }
-        }
-
-        public override void RightMouseUp(UIMouseEvent evt)
-        {
-            base.RightMouseUp(evt);
-            dragging = false;
-        }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
 
+            // If the mouse is over any part of this container, block item usage
+            if (ContainsPoint(Main.MouseScreen))
+            {
+                Main.LocalPlayer.mouseInterface = true;
+            }
+
+            // Dragging logic
             if (dragging)
             {
                 Left.Set(Main.mouseX - offset.X, 0f);
                 Top.Set(Main.mouseY - offset.Y, 0f);
+                ClampToScreen();
                 Recalculate();
+            }
+        }
+
+        /// <summary>
+        /// Clamps the container to the screen so it cannot be dragged off.
+        /// </summary>
+        private void ClampToScreen()
+        {
+            CalculatedStyle dims = GetDimensions();
+
+            float clampedLeft = Utils.Clamp(Left.Pixels, 0f, Main.screenWidth - dims.Width);
+            float clampedTop = Utils.Clamp(Top.Pixels, 0f, Main.screenHeight - dims.Height);
+
+            Left.Set(clampedLeft, 0f);
+            Top.Set(clampedTop, 0f);
+        }
+        #endregion
+
+        #region Show/Hide Panel
+        public void TogglePanel()
+        {
+            panelVisible = !panelVisible;
+
+            if (panelVisible)
+            {
+                if (!Children.Contains(panel))
+                {
+                    Append(panel);
+                    // remove & re-append the icon so it draws on top
+                    bossIcon.Remove();
+                    Append(bossIcon);
+                    AdjustSizeToPanel();
+                }
+            }
+            else
+            {
+                if (Children.Contains(panel))
+                {
+                    panel.Remove();
+                    // If you want the container to shrink to just the icon’s size, do so:
+                    Height.Set(bossIcon.GetDimensions().Height, 0f);
+                    Recalculate();
+                }
             }
         }
         #endregion
