@@ -25,7 +25,7 @@ namespace DPSPanel.Core.Panel
 
         // Weapon icon
         private int weaponItemID;
-        // private string weaponName;           // Weapon name
+        private string weaponName;           // Weapon name
 
         public DamageBarElement(float currentYOffset)
         {
@@ -36,7 +36,7 @@ namespace DPSPanel.Core.Panel
                 emptyBar = LoadResources.BarGenericEmpty;
                 fullBar = LoadResources.BarGenericFull;
             }
-            else
+            else if (c.Theme == "Fancy")
             {
                 emptyBar = LoadResources.BarFancyEmpty;
                 fullBar = LoadResources.BarFancyFull;
@@ -48,7 +48,7 @@ namespace DPSPanel.Core.Panel
             HAlign = 0.5f; // Center horizontally
 
             // Create the text element centered on the bar.
-            textElement = new UIText("", 0.8f)
+            textElement = new UIText("", 0.8f) // 80% size
             {
                 HAlign = 0.5f,
                 VAlign = 0.5f,
@@ -61,6 +61,7 @@ namespace DPSPanel.Core.Panel
             percentage = _percentage;
             weaponItemID = weaponID;
             fillColor = _fillColor;
+            weaponName = _weaponName; // used for debugging only
             textElement.SetText($"{_weaponName} ({weaponDamage})");
         }
 
@@ -69,7 +70,7 @@ namespace DPSPanel.Core.Panel
             base.DrawSelf(sb);
             DrawDamageBarFill(sb);
             DrawDamageBarOutline(sb);
-            DrawIcon(sb);
+            DrawWeaponIcon(sb);
         }
 
         private void DrawDamageBarFill(SpriteBatch sb)
@@ -95,30 +96,24 @@ namespace DPSPanel.Core.Panel
             sb.Draw(emptyBar.Value, rect, Color.DarkGray);
         }
 
-        private void DrawIcon(SpriteBatch sb)
+        private void DrawWeaponIcon(SpriteBatch sb)
         {
             // check if enabled
             Config c = ModContent.GetInstance<Config>();
             if (!c.ShowWeaponIcon)
                 return;
 
-            // Load texture (by default, zenith)
-            Texture2D texture = TextureAssets.Item[weaponItemID].Value;
+            if (weaponItemID < 0 || weaponItemID > TextureAssets.Item.Length) // invalid item id, don't draw any weapon
+                return;
 
-            // Scale and position
+            // Load texture with id
+            Texture2D texture = TextureAssets.Item[weaponItemID].Value;
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X, dims.Y);
-            //Rectangle rectangleSize = new(0, 0, 48, 48); 
-
-            // Check Item or Projectile
-            // texture = TextureAssets.Item[itemId].Value;
 
             // debug item info
             float w = texture.Width;
             float h = texture.Height;
-
-            // ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH: {w}x{h}");
-                    // draw with scaling
             float scale = 0.8f;
 
             // custom scaling for small like yoyos and grenades are 16x16 and 20x20

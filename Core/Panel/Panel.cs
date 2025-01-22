@@ -36,7 +36,6 @@ namespace DPSPanel.Core.Panel
             BackgroundColor = panelColor;
 
             // set position relative to PARENT container.
-            // VAlign = 0.07f; // 7% from the top
             HAlign = 0.5f; // Center horizontally
             SetPadding(padding);
         }
@@ -77,18 +76,16 @@ namespace DPSPanel.Core.Panel
 
         public void UpdateDamageBars(List<Weapon> weapons)
         {
-            // Reset vertical offset. needed?
+            // Reset vertical offset. needed for ensuring that an updated panel does not get added height)
             currentYOffset = headerHeight + padding * 2;
 
             // Sort weapons by descending damage.
-            weapons = weapons.OrderByDescending(w => w.damage).ToList();
+            // weapons = weapons.OrderByDescending(w => w.damage).ToList();
             int highest = weapons.FirstOrDefault()?.damage ?? 1;
 
             for (int i = 0; i < weapons.Count; i++)
             {
                 var wpn = weapons[i];
-
-                // Get for this weapon.
                 DamageBarElement bar = damageBars[wpn.weaponName];
 
                 // Update  with the current data.

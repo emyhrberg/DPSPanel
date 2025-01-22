@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using System.Linq;
 using DPSPanel.Core.Configs;
 using DPSPanel.Core.Helpers;
+using System;
 
 namespace DPSPanel.Core.Panel
 {
@@ -18,7 +19,7 @@ namespace DPSPanel.Core.Panel
             public string bossName;
             public int damageTaken;
             public bool isAlive = false;
-            public List<Weapon> weapons = [];
+            public List<Weapon> weapons = new List<Weapon>(); // Proper initialization
 
             public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
             {
@@ -52,8 +53,28 @@ namespace DPSPanel.Core.Panel
                     var weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
                     if (weapon != null)
                     {
+                        // Add discrepancy to the weapon that landed the final blow
                         int discrepancy = initialLife - damageTaken;
                         weapon.damage += discrepancy;
+                        damageTaken = initialLife;
+                    }
+                    else
+                    {
+                        // Weapon not found, add "Unknown"
+                        int discrepancy = initialLife - damageTaken;
+                        Weapon unknownWeapon = new Weapon
+                        {
+                            weaponName = "Unknown",
+                            weaponItemID = -1, // Invalid ID
+                            damage = discrepancy
+                        };
+                        weapons.Add(unknownWeapon);
+                        weapons = weapons.OrderByDescending(w => w.damage).ToList();
+
+                        // Create damage bar for "Unknown"
+                        PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                        sys.state.container.panel.CreateDamageBar("Unknown");
+
                         damageTaken = initialLife;
                     }
                 }
@@ -68,10 +89,17 @@ namespace DPSPanel.Core.Panel
 
             public void PrintFightData(Mod mod)
             {
+                if (weapons.Count == 0)
+                {
+                    mod.Logger.Info($"Boss: {bossName} | ID: {bossId} | No weapons tracked | DamageTaken: {damageTaken} | InitialLife: {initialLife}");
+                    return;
+                }
+
                 string highestWeapon = weapons[0].weaponName;
                 int highestDamage = weapons[0].damage;
                 string s = $"{highestWeapon} ({highestDamage})";
-                mod.Logger.Info($"Boss: {bossName} | ID: {bossId} | Highest weapon: {s} | DamageTaken: {damageTaken} | InitialLife: {initialLife}");
+                int weaponID = weapons[0].weaponItemID;
+                mod.Logger.Info($"Boss: {bossName} | ID: {bossId} | Highest weapon: {s} ID: {weaponID} | DamageTaken: {damageTaken} | InitialLife: {initialLife}");
             }
         }
 
@@ -109,12 +137,14 @@ namespace DPSPanel.Core.Panel
                 }
 
                 // 2) If no fight, check if a boss is present; start a new fight if so
+                NPC currentBoss = null;
                 for (int i = 0; i < Main.npc.Length; i++)
                 {
-                    NPC npc = Main.npc[i];
-                    if (IsValidBoss(npc) && (fight == null || !fight.isAlive) && npc.life > 0)
+                    currentBoss = Main.npc[i];
+                    if (IsValidBoss(currentBoss) && (fight == null || !fight.isAlive) && currentBoss.life > 0)
                     {
-                        CreateNewBossFight(npc);
+                        CreateNewBossFight(currentBoss);
+                        Mod.Logger.Info($"Boss {fight.bossName} created!");
                     }
                 }
             }
@@ -122,45 +152,25 @@ namespace DPSPanel.Core.Panel
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            TrackBossDamage(damageDone, target);
+            // Pass the actual item type (ID) explicitly for melee
+            int actualItemID = item?.type ?? -1;
+            string actualItemName = item?.Name ?? "unknown";
+            TrackBossDamage(actualItemID, actualItemName, damageDone, target);
         }
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
-            TrackBossDamage(damageDone, target);
+            string weaponName = GetSourceWeaponName();
+            int weaponID = GetSourceWeaponItemID();
+            TrackBossDamage(weaponID, weaponName, damageDone, target);
         }
         #endregion
 
         #region Methods
-        private void CreateNewBossFight(NPC npc)
-        {
-            if (fight == null)
-            {
-                fight = new BossFight
-                {
-                    // bossId = fightId,
-                    initialLife = npc.lifeMax,
-                    bossName = npc.FullName,
-                    damageTaken = 0,
-                    weapons = [],
-                    isAlive = true
-                };
-                Mod.Logger.Info("New boss fight created: " + fight.bossName);
-
-                var sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle(npc.FullName, npc);
-                sys.state.container.bossIcon.UpdateBossIcon(npc);
-            }
-        }
-
-        private void TrackBossDamage(int damageDone, NPC npc)
+        private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
             if (IsValidBoss(npc))
             {
-                string weaponName = GetSourceWeaponName();
-                int weaponID = GetSourceWeaponItemID();
-
                 // If the boss died, handle final blow then end fight
                 if (HandleBossDeath(npc, weaponName)) 
                     return; 
@@ -172,6 +182,28 @@ namespace DPSPanel.Core.Panel
                 // Update UI and log
                 fight.SendBossFightToPanel();
                 fight.PrintFightData(Mod);
+            }
+        }
+
+        private void CreateNewBossFight(NPC npc)
+        {
+            if (fight == null)
+            {
+                fight = new BossFight
+                {
+                    // bossId = fightId,
+                    initialLife = npc.lifeMax,
+                    bossName = npc.FullName,
+                    damageTaken = 0,
+                    weapons = new List<Weapon>(), // Proper initialization
+                    isAlive = true
+                };
+                Mod.Logger.Info("New boss fight created: " + fight.bossName);
+
+                var sys = ModContent.GetInstance<PanelSystem>();
+                sys.state.container.panel.ClearPanelAndAllItems();
+                sys.state.container.panel.SetBossTitle(npc.FullName, npc);
+                sys.state.container.bossIcon.UpdateBossIcon(npc);
             }
         }
 
@@ -209,6 +241,5 @@ namespace DPSPanel.Core.Panel
             return npc.boss && !npc.friendly;
         }
         #endregion
-    
     }
 }
