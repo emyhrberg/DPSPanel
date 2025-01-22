@@ -202,27 +202,34 @@ namespace DPSPanel.Core.Panel
                         }
                         else
                         {
-                            // If "Unknown" doesn't exist, create it
-                            unknownWeapon = new Weapon
-                            {
-                                weaponName = "Unknown",
-                                weaponItemID = -1, // Invalid ID so no icon is drawn
-                                damage = unknownDamage
-                            };
-                            // add damage
-                            fight.damageTaken += unknownDamage;
-                            fight.weapons.Add(unknownWeapon);
-                            fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
+                            if (unknownDamage == 0)
+                                return;
 
-                            // Create damage bar for "Unknown" in the UI
-                            PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                            sys.state.container.panel.CreateDamageBar("Unknown");
+                            // If "Unknown" doesn't exist, create it
+                            bool unknownWeaponExists = fight.weapons.Any(w => w.weaponName == "Unknown");
+                            if (!unknownWeaponExists)
+                            {
+                                unknownWeapon = new Weapon
+                                {
+                                    weaponName = "Unknown",
+                                    weaponItemID = -1, // Invalid ID so no icon is drawn
+                                    damage = unknownDamage
+                                };
+                                fight.damageTaken += unknownDamage;
+                                fight.weapons.Add(unknownWeapon);
+                                fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
+
+                                // Create damage bar for "Unknown" in the UI
+                                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                                sys.state.container.panel.CreateDamageBar("Unknown");
+                            } else {
+                                unknownWeapon.damage = unknownDamage;
+                            }
                         }
 
                         // Update the UI with the latest damage data
                         fight.SendBossFightToPanel();
                         fight.PrintFightData(Mod);
-
                     }
                     else
                     {
@@ -258,11 +265,6 @@ namespace DPSPanel.Core.Panel
                 // If the boss died, handle final blow then end fight
                 Weapon currentWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
 
-                if (currentWeapon == null)
-                {
-                    Mod.Logger.Info($"currentweapon null");
-                }
-
                 if (HandleBossDeath(npc, currentWeapon)) 
                     return; 
 
@@ -288,7 +290,7 @@ namespace DPSPanel.Core.Panel
                     initialLife = npc.lifeMax,
                     bossName = npc.FullName,
                     damageTaken = 0,
-                    weapons = new List<Weapon>(), // Proper initialization
+                    weapons = [],
                     isAlive = true
                 };
                 Mod.Logger.Info("New boss fight created: " + fight.bossName);
