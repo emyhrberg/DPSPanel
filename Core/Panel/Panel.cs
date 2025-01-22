@@ -87,13 +87,15 @@ namespace DPSPanel.Core.Panel
             for (int i = 0; i < weapons.Count; i++)
             {
                 var wpn = weapons[i];
-                Color color = PanelColors.colors[i % PanelColors.colors.Length];
 
                 // Get for this weapon.
                 DamageBarElement bar = damageBars[wpn.weaponName];
 
                 // Update  with the current data.
-                bar.UpdateDamageBar(highest, wpn.weaponName, wpn.damage, color, wpn.itemID, wpn.itemType);
+                int percentageToFill = (int)(wpn.damage / (float)highest * 100);
+                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+
+                bar.UpdateDamageBar(percentageToFill, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
                 bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + padding * 2;
             }

@@ -12,7 +12,7 @@ namespace DPSPanel.Core.Helpers
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
             if (source is IEntitySource_WithStatsFromItem withStats)
-                sourceWeapon = withStats.Item;
+                sourceWeapon = withStats.Item; // sourceWeapon is of type: Item
         }
     }
 }

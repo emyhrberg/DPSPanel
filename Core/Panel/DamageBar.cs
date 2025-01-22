@@ -24,8 +24,7 @@ namespace DPSPanel.Core.Panel
         private int percentage;              // Progress percentage (0-100)
 
         // Weapon icon
-        private int itemId;
-        private string itemType;
+        private int weaponItemID;
         // private string weaponName;           // Weapon name
 
         public DamageBarElement(float currentYOffset)
@@ -57,14 +56,12 @@ namespace DPSPanel.Core.Panel
             Append(textElement);
         }
 
-        public void UpdateDamageBar(int highestDamage, string _weaponName, int weaponDamage, Color newColor, int _itemId, string _itemType)
+        public void UpdateDamageBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
         {
-            percentage = (int)(weaponDamage / (float)highestDamage * 100);
-            fillColor = newColor;
+            percentage = _percentage;
+            weaponItemID = weaponID;
+            fillColor = _fillColor;
             textElement.SetText($"{_weaponName} ({weaponDamage})");
-            itemId = _itemId;
-            itemType = _itemType;
-            // weaponName = _weaponName;
         }
 
         protected override void DrawSelf(SpriteBatch sb)
@@ -79,7 +76,7 @@ namespace DPSPanel.Core.Panel
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new Vector2(dims.X, dims.Y);
-            Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
+            // Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
 
             // Draw filled portion based on percentage.
             int fillWidth = (int)(dims.Width * (percentage / 100f));
@@ -106,7 +103,7 @@ namespace DPSPanel.Core.Panel
                 return;
 
             // Load texture (by default, zenith)
-            Texture2D texture = TextureAssets.Item[ItemID.Zenith].Value;
+            Texture2D texture = TextureAssets.Item[weaponItemID].Value;
 
             // Scale and position
             CalculatedStyle dims = GetDimensions();
@@ -114,76 +111,23 @@ namespace DPSPanel.Core.Panel
             //Rectangle rectangleSize = new(0, 0, 48, 48); 
 
             // Check Item or Projectile
-            if (itemType == "Item")
-            {
-                texture = TextureAssets.Item[itemId].Value;
-            }
-            else if (itemType == "Projectile")
-            {
-                texture = TextureAssets.Projectile[itemId].Value;
-            }
-
-            // fix a few hardcoded projectiles to items.
-            texture = ResizeWeirdTextures(texture);
+            // texture = TextureAssets.Item[itemId].Value;
 
             // debug item info
             float w = texture.Width;
             float h = texture.Height;
 
-            //ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH: {w}x{h}");
-
-            // Draw texture
-            if (texture != null)
-            {
-                // if height is more than 70, its too damn big. try to crop it to only show top 70 pixels
-                if (h > 70)
-                {
-                    Rectangle sourceRect = new Rectangle(0, 0, 70, 70); // crop area
-                    float scaleFactor = 0.6f;
-                    int destWidth = (int)(sourceRect.Width * scaleFactor);
-                    int destHeight = (int)(sourceRect.Height * scaleFactor);
-                    CalculatedStyle dims2 = GetDimensions();
-                    Vector2 pos2 = new Vector2(dims2.X, dims2.Y);
-                    Rectangle destinationRect = new Rectangle((int)pos.X, (int)pos.Y, destWidth, destHeight);
-
-                    //ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} Cropped h > 70 scaled to: {destWidth}x{destHeight}");
-
-                    sb.Draw(texture, destinationRect, sourceRect, Color.White);
-                }
-                else
-                {
+            // ModContent.GetInstance<DPSPanel>().Logger.Info($"[{weaponName}] {itemType} ID: {itemId} WxH: {w}x{h}");
                     // draw with scaling
-                    float scale = 0.8f;
+            float scale = 0.8f;
 
-                    // custom scaling for small like yoyos and grenades are 16x16 and 20x20
-                    if (w <= 20 && h <= 20)
-                    {
-                        scale = 2f;
-                    }
-
-                    sb.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-                }
-            }
-        }
-
-        private Texture2D ResizeWeirdTextures(Texture2D originalTexture)
-        {
-            // If the source is a projectile and there is a mapping,
-            // return the texture of the corresponding item.
-            if (itemType == "Projectile" && projectileToItemMap.TryGetValue(itemId, out int mappedItemId))
+            // custom scaling for small like yoyos and grenades are 16x16 and 20x20
+            if (w <= 20 && h <= 20)
             {
-                return TextureAssets.Item[mappedItemId].Value;
+                scale = 2f;
             }
-            return originalTexture;
+
+            sb.Draw(texture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
         }
-
-        private static readonly Dictionary<int, int> projectileToItemMap = new()
-        {
-            // Map projectile ID 933 (e.g., Zenith projectile) to item ID 4956 (Zenith item)
-            {933, 4956}, // zenith
-            {409, 2622}, // typhoon
-            {981,278}, // silver bulleta2
-        };
-
     }
 }
