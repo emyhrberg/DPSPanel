@@ -62,7 +62,11 @@ namespace DPSPanel.Core.Panel
                 // sb.Draw(outlinedTexture, pos, Color.Yellow);
 
                 // hover tooltip
-                Main.hoverItemName = "Show Boss Damage";
+                var parentContainer = Parent as BossPanelContainer;
+                if (parentContainer.panelVisible)
+                    Main.hoverItemName = "Hide Boss Damage";
+                else
+                    Main.hoverItemName = "Show Boss Damage";
             }
 
             if (currentBoss != null)
@@ -110,7 +114,7 @@ namespace DPSPanel.Core.Panel
 
         #region ClickDragHotFix
         public override void LeftMouseDown(UIMouseEvent evt)
-        {
+        { 
             base.LeftMouseDown(evt);
 
             // Record the start position when the mouse is pressed

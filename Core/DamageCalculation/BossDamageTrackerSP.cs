@@ -165,6 +165,8 @@ namespace DPSPanel.Core.Panel
                         NPC npc = Main.npc[i];
                         if (IsValidBoss(npc) && npc.life > 0)
                         {
+                            if (IgnoreGolem(npc))
+                                continue;
                             detectedBoss = npc;
                             break; // Found a valid boss, no need to check further
                         }
@@ -243,6 +245,9 @@ namespace DPSPanel.Core.Panel
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if (IgnoreGolem(target))
+                return;
+
             // Pass the actual item type (ID) explicitly for melee
             int actualItemID = item?.type ?? -1;
             string actualItemName = item?.Name ?? "unknownitem";
@@ -251,6 +256,9 @@ namespace DPSPanel.Core.Panel
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if (IgnoreGolem(target))
+                return;
+
             string weaponName = GetSourceWeaponName();
             int weaponID = GetSourceWeaponItemID();
             TrackBossDamage(weaponID, weaponName, damageDone, target);
@@ -324,6 +332,10 @@ namespace DPSPanel.Core.Panel
                 fight.FixFinalBlowDiscrepancy(weapon); // ensure total damage == boss max HP
                 fight.SendBossFightToPanel();
 
+                // set height to 10
+                // PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                // sys.state.container.panel.Height.Set(10, 0f);
+
                 // fightId++;
                 fight = null;
                 return true;
@@ -336,5 +348,10 @@ namespace DPSPanel.Core.Panel
             return npc.boss && !npc.friendly;
         }
         #endregion
+
+        private bool IgnoreGolem(NPC npc)
+        {
+            return npc.type == NPCID.Golem || npc.type == NPCID.GolemFistLeft || npc.type == NPCID.GolemFistRight;
+        }
     }
 }

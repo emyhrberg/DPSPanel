@@ -126,5 +126,11 @@ namespace DPSPanel.Core.Panel
             }
         }
         #endregion
+
+        public void SetContainerHeight(float height)
+        {
+            Height.Set(height, 0f);
+            Recalculate();
+        }
     }
 }

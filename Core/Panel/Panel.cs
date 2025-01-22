@@ -121,6 +121,8 @@ namespace DPSPanel.Core.Panel
         {
             // set parent container height
             var parentContainer = Parent as BossPanelContainer;
+            if (parentContainer == null)
+                return; // Exit if parentContainer is not set
             parentContainer.Height.Set(currentYOffset + ITEM_PADDING, 0f);
             parentContainer.Recalculate();
 
