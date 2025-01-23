@@ -6,6 +6,7 @@ using System.Linq;
 using DPSPanel.Core.Helpers;
 using Terraria.ID;
 using DPSPanel.Core.Panel;
+using static DPSPanel.DPSPanel;
 
 namespace DPSPanel.Core.DamageCalculation
 {
@@ -134,7 +135,7 @@ namespace DPSPanel.Core.DamageCalculation
         }
         #endregion
 
-        #region Methods
+        #region Damage Tracking
         private void UpdateOnHitNPC(int weaponID, string weaponName, int damageDone, NPC npc)
         {
             if (IsValidBoss(npc))
@@ -156,6 +157,7 @@ namespace DPSPanel.Core.DamageCalculation
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
                     fight.SendBossFightToPanel();
                     fight.PrintFightData(Mod);
+                    SendPlayerDamagePacket();
                 }
             }
         }
@@ -182,7 +184,24 @@ namespace DPSPanel.Core.DamageCalculation
                 sys.state.container.bossIcon.UpdateBossIcon(npc);
             }
         }
+        #endregion
 
+        #region Networking
+        private void SendPlayerDamagePacket()
+        {
+            // get variables to send
+            int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
+
+            // create the packet to send
+            ModPacket packet = Mod.GetPacket();
+            packet.Write((byte)ModMessageType.PlayerDamage);
+            packet.Write(Main.LocalPlayer.name);
+            packet.Write(damageDone);
+            packet.Send();
+        }
+        #endregion
+
+        #region Helpers
         private string GetSourceWeaponName()
         {
             string sourceWeapon = GlobalProj.sourceWeapon?.Name;
@@ -201,11 +220,11 @@ namespace DPSPanel.Core.DamageCalculation
         {
             return npc.boss && !npc.friendly;
         }
-        #endregion
 
         private bool IgnoreGolem(NPC npc)
         {
             return npc.type == NPCID.Golem || npc.type == NPCID.GolemFistLeft || npc.type == NPCID.GolemFistRight;
         }
+        #endregion
     }
 }
