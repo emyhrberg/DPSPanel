@@ -28,6 +28,32 @@ namespace DPSPanel.Core.Commands
         }
     }
 
+    public class SpawnCommand : ModCommand
+    {
+        public override CommandType Type => CommandType.Chat; // Makes the command available in chat
+        public override string Command => "a"; // main action (/a)
+        public override string Description => "use /spawn item"; // Is shown when using "/help"
+
+        int i = 0;
+
+        public override void Action(CommandCaller caller, string input, string[] args)
+        {
+            // /s will add an item to the panel
+            if (args[0] == "item")
+            {
+                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                sys.state.container.panel.CreateDamageBar($"PlayerName {i}");
+                i++;
+            }
+            else if (args[0] == "clear")
+            {
+                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                sys.state.container.panel.ClearPanelAndAllItems();
+                sys.state.container.panel.SetBossTitle("Reset");
+            }
+        }
+    }
+
     public class ReverseCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat; // Makes the command available in chat
@@ -45,7 +71,7 @@ namespace DPSPanel.Core.Commands
             if (target == "dps")
                 ModContent.GetInstance<Config>().EnableButton = !ModContent.GetInstance<Config>().EnableButton;
 
-                // sys?.state.container.TogglePanel();
+            // sys?.state.container.TogglePanel();
             else
                 throw new UsageException("Error: Incorrect argument. Valid arguments are: /dps hide, show, clear.");
         }

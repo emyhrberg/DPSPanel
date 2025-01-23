@@ -27,8 +27,7 @@ namespace DPSPanel.Core.Panel
 
         // bar items
         private Dictionary<string, DamageBarElement> damageBars = [];
-        private const float headerHeight = 20f;
-        private const float firstItemOffset = 3f;
+        private const float headerHeight = 28f;
 
         public Panel()
         {
@@ -46,6 +45,7 @@ namespace DPSPanel.Core.Panel
             // currentBoss = npc;
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
+            bossTitle.Top.Set(6f, 0f);
             Append(bossTitle);
             currentYOffset = headerHeight;
             ResizePanelHeight();
@@ -61,17 +61,6 @@ namespace DPSPanel.Core.Panel
 
         public void CreateDamageBar(string playerName = "PlayerName")
         {
-            if (damageBars.Count == 0)
-            {
-                // var parentContainer = Parent as BossPanelContainer;
-                // parentContainer.Height.Set(currentYOffset + firstItemOffset, 0f);
-                // parentContainer.Recalculate();
-
-                // Height.Set(currentYOffset + firstItemOffset, 0f);
-                // Recalculate();
-            }
-
-
             // Check if the bar already exists
             if (!damageBars.ContainsKey(playerName))
             {
@@ -89,8 +78,6 @@ namespace DPSPanel.Core.Panel
 
         public void UpdateDamageBars(List<PlayerFightData> players)
         {
-            currentYOffset = headerHeight + ITEM_PADDING * 2;
-
             int highest = players.FirstOrDefault()?.playerDamage ?? 1;
 
             foreach (var player in players)
@@ -104,11 +91,7 @@ namespace DPSPanel.Core.Panel
                 int percentageToFill = (int)(player.playerDamage / (float)highest * 100);
 
                 bar.UpdateDamageBar(percentageToFill, player.playerName, player.playerDamage, Color.White);
-                bar.Top.Set(currentYOffset, 0f);
-                currentYOffset += ItemHeight + ITEM_PADDING * 2;
             }
-
-            ResizePanelHeight();
         }
 
         public void ClearPanelAndAllItems()
