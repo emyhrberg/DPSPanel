@@ -7,7 +7,6 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using System.Collections.Generic;
 using DPSPanel.Core.Helpers;
 using DPSPanel.Core.Configs;
 
@@ -56,21 +55,39 @@ namespace DPSPanel.Core.Panel
             Append(textElement);
         }
 
-        public void UpdateDamageBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
+        // public void UpdateDamageBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
+        // {
+        //     percentage = _percentage;
+        //     // weaponItemID = weaponID;
+        //     fillColor = _fillColor;
+        //     // weaponName = _weaponName; // used for debugging only
+        //     textElement.SetText($"{_weaponName} ({weaponDamage})");
+        // }
+
+        public void UpdateDamageBar(int percentage, string playerName, int playerDamage, Color fillColor)
         {
-            percentage = _percentage;
-            weaponItemID = weaponID;
-            fillColor = _fillColor;
-            weaponName = _weaponName; // used for debugging only
-            textElement.SetText($"{_weaponName} ({weaponDamage})");
+            this.percentage = percentage;
+            this.fillColor = fillColor;
+            textElement.SetText($"{playerName} ({playerDamage})");
         }
+
 
         protected override void DrawSelf(SpriteBatch sb)
         {
             base.DrawSelf(sb);
             DrawDamageBarFill(sb);
             DrawDamageBarOutline(sb);
-            DrawWeaponIcon(sb);
+
+            // check if singleplayer or multiplayer
+            if (Main.netMode == NetmodeID.MultiplayerClient)
+            {
+
+            }
+            else if (Main.netMode == NetmodeID.SinglePlayer)
+            {
+                DrawWeaponIcon(sb);
+            }
+
         }
 
         private void DrawDamageBarFill(SpriteBatch sb)

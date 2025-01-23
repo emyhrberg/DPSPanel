@@ -59,7 +59,7 @@ namespace DPSPanel.Core.Panel
             base.Draw(sb);
         }
 
-        public void CreateDamageBar(string barName = "Name")
+        public void CreateDamageBar(string playerName = "PlayerName")
         {
             if (damageBars.Count == 0)
             {
@@ -73,40 +73,41 @@ namespace DPSPanel.Core.Panel
 
 
             // Check if the bar already exists
-            if (!damageBars.ContainsKey(barName))
+            if (!damageBars.ContainsKey(playerName))
             {
                 // Create a new bar
                 DamageBarElement bar = new(currentYOffset);
                 Append(bar);
-                damageBars[barName] = bar;
+                damageBars[playerName] = bar;
+
+                ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating damage bar for {playerName}");
 
                 currentYOffset += ItemHeight + ITEM_PADDING * 2; // Adjust Y offset for the next element
                 ResizePanelHeight();
             }
         }
 
-        public void UpdateDamageBars(List<Weapon> weapons)
+        public void UpdateDamageBars(List<PlayerFightData> players)
         {
-            // Reset vertical offset. needed for ensuring that an updated panel does not get added height)
             currentYOffset = headerHeight + ITEM_PADDING * 2;
 
-            // Sort weapons by descending damage.
-            // weapons = weapons.OrderByDescending(w => w.damage).ToList();
-            int highest = weapons.FirstOrDefault()?.damage ?? 1;
+            int highest = players.FirstOrDefault()?.playerDamage ?? 1;
 
-            for (int i = 0; i < weapons.Count; i++)
+            foreach (var player in players)
             {
-                var wpn = weapons[i];
-                DamageBarElement bar = damageBars[wpn.weaponName];
+                if (!damageBars.ContainsKey(player.playerName))
+                {
+                    CreateDamageBar(player.playerName);
+                }
 
-                // Update  with the current data.
-                int percentageToFill = (int)(wpn.damage / (float)highest * 100);
-                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+                DamageBarElement bar = damageBars[player.playerName];
+                int percentageToFill = (int)(player.playerDamage / (float)highest * 100);
 
-                bar.UpdateDamageBar(percentageToFill, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
+                bar.UpdateDamageBar(percentageToFill, player.playerName, player.playerDamage, Color.White);
                 bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + ITEM_PADDING * 2;
             }
+
             ResizePanelHeight();
         }
 
