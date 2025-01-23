@@ -10,22 +10,24 @@ using Terraria.UI;
 
 namespace DPSPanel.Core.Panel
 {
+    [Autoload(Side = ModSide.Client)]
     public class PanelSystem : ModSystem
     {
         // Variables
-        private readonly UserInterface ui = new();
-        internal PanelState state = new();
-        
+        private UserInterface ui;
+        internal PanelState state;
+
         public override void Load()
         {
-            // Load resources
-            if (!Main.dedServ) // Only load on client
-                LoadResources.PreloadResources();
+            LoadResources.PreloadResources();
         }
 
         public override void PostSetupContent()
         {
             // This is called after everything in the game has been loaded
+            state = new PanelState();
+            ui = new UserInterface();
+
             state.Activate();
             ui.SetState(state);
             ModContent.GetInstance<DPSPanel>().Logger.Info("PanelSystem initialized!");

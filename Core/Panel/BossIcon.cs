@@ -75,7 +75,7 @@ namespace DPSPanel.Core.Panel
                 DrawBossIconAtIndex(sb, 7); // Fallback if no boss
 
             // if (c.DrawXOnDead)
-                // DrawBossXIfDead(sb);
+            // DrawBossXIfDead(sb);
         }
 
         public void UpdateBossIcon(NPC boss)
@@ -85,6 +85,12 @@ namespace DPSPanel.Core.Panel
 
         private void DrawBossIconAtIndex(SpriteBatch sb, int i)
         {
+            // ensure index is valid!
+            if (i < 0 || i >= TextureAssets.NpcHeadBoss.Length)
+            {
+                ModContent.GetInstance<DPSPanel>().Logger.Info($"Invalid boss index {i}");
+                return;
+            }
             Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[i]?.Value;
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X, dims.Y);
@@ -101,7 +107,7 @@ namespace DPSPanel.Core.Panel
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X, dims.Y);
 
-            if (t==null)
+            if (t == null)
             {
                 t = ModContent.Request<Texture2D>("DPSPanel/Core/Resources/CoolDown", AssetRequestMode.ImmediateLoad).Value;
             }
@@ -114,7 +120,7 @@ namespace DPSPanel.Core.Panel
 
         #region ClickDragHotFix
         public override void LeftMouseDown(UIMouseEvent evt)
-        { 
+        {
             base.LeftMouseDown(evt);
 
             // Record the start position when the mouse is pressed

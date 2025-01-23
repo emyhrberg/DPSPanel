@@ -11,7 +11,6 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
-using static DPSPanel.Core.Panel.BossDamageTrackerSP;
 
 namespace DPSPanel.Core.Panel
 {
@@ -22,7 +21,7 @@ namespace DPSPanel.Core.Panel
         private readonly float ITEM_PADDING = 10f;
         private readonly float PANEL_WIDTH = 300f; // 300 width
         private readonly float PANEL_HEIGHT = 40f; // is reset anyways by parent
-        private readonly Color panelColor = new(49, 84, 141); 
+        private readonly Color panelColor = new(49, 84, 141);
         private float currentYOffset = 0;
         private const float ItemHeight = 16f; // size of each item
 
@@ -71,7 +70,7 @@ namespace DPSPanel.Core.Panel
                 // Height.Set(currentYOffset + firstItemOffset, 0f);
                 // Recalculate();
             }
-                
+
 
             // Check if the bar already exists
             if (!damageBars.ContainsKey(barName))

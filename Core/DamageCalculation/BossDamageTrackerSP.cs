@@ -10,16 +10,18 @@ using Terraria.GameContent;
 using Terraria.ID;
 using log4net.Repository.Hierarchy;
 using log4net;
+using DPSPanel.Core.Panel;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.Core.DamageCalculation
 {
+    [Autoload(Side = ModSide.Client)]
     public class BossDamageTrackerSP : ModPlayer
     {
         #region Classes
         public class BossFight
         {
             public int currentLife;
-            public int bossId;            
+            public int bossId;
             public int initialLife;
             public string bossName;
             public int damageTaken;
@@ -33,7 +35,7 @@ namespace DPSPanel.Core.Panel
                 if (weapon == null)
                 {
                     // Add a new weapon to the fight
-                    weapon = new Weapon 
+                    weapon = new Weapon
                     {
                         weaponItemID = weaponID,
                         weaponName = weaponName,
@@ -63,7 +65,7 @@ namespace DPSPanel.Core.Panel
                     ILog logger = ModContent.GetInstance<DPSPanel>().Logger;
                     logger.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} weapon: {weapon.weaponName} | damage: {weapon.damage}");
                     // add to damage if weapon exists
-                    
+
                     Weapon finalWeapon = weapons.FirstOrDefault(w => w.weaponName == weapon.weaponName);
                     if (finalWeapon != null)
                         finalWeapon.damage += unknownDamage;
@@ -121,13 +123,6 @@ namespace DPSPanel.Core.Panel
                 // mod.Logger.Info($"Boss: {bossName} | ID: {bossId} | Highest weapon: {s} ID: {weaponID} | DamageTaken: {damageTaken} | InitialLife: {initialLife}");
             }
         }
-
-        public class Weapon
-        {
-            internal int weaponItemID; // the internal item ID, can be (0-5000+...) used for drawing.
-            internal string weaponName;
-            internal int damage;
-        }
         #endregion
 
         private BossFight fight;
@@ -137,8 +132,8 @@ namespace DPSPanel.Core.Panel
         public override void OnEnterWorld()
         {
             Main.NewText(
-                "Hello, " + Main.LocalPlayer.name + 
-                "! To use the DPS panel, type /dps toggle in chat or toggle with K (set the keybind in controls).", 
+                "Hello, " + Main.LocalPlayer.name +
+                "! To use the DPS panel, type /dps toggle in chat or toggle with K (set the keybind in controls).",
                 Color.Yellow
             );
         }
@@ -224,7 +219,9 @@ namespace DPSPanel.Core.Panel
                                 // Create damage bar for "Unknown" in the UI
                                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
                                 sys.state.container.panel.CreateDamageBar("Unknown");
-                            } else {
+                            }
+                            else
+                            {
                                 unknownWeapon.damage = unknownDamage;
                             }
                         }
@@ -273,8 +270,8 @@ namespace DPSPanel.Core.Panel
                 // If the boss died, handle final blow then end fight
                 Weapon currentWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
 
-                if (HandleBossDeath(npc, currentWeapon)) 
-                    return; 
+                if (HandleBossDeath(npc, currentWeapon))
+                    return;
 
                 // Otherwise update the fight info
                 fight.UpdateWeapon(weaponID, weaponName, damageDone);
