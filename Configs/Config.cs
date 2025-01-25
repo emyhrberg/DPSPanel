@@ -24,16 +24,16 @@ namespace DPSPanel.Configs
 
         [Header("AdvancedSettings")]
 
-        [Label("[i:560] [c/9bfff0:Do nothing for now]")]
-        [BackgroundColor(255, 182, 193)] // LightPink
-        [Tooltip("IDK")]
-        [DefaultValue(true)]
-        public bool DoNothing1 { get; set; } = true;
+        [Label("Disable Valid Hover Highlight")]
+        [BackgroundColor(35, 132, 250)] // CornflowerBlue
+        [Tooltip("If enabled, disables the valid hover highlight during certain mouse interactions.")]
+        [DefaultValue(false)]
+        public bool DisableValidHoverHighlight { get; set; } = false;
 
-        [Label("[g:25][g:0][g:1][g:2][g:3][g:4][g:5] [c/000000:Do nothing for now]")]
-        [BackgroundColor(255, 182, 193)] // LightPink
-        [Tooltip("IDK")]
-        [DefaultValue(true)]
-        public bool DoNothing2 { get; set; } = true;
+        [Label("Show Clear Button (currently disabled)")]
+        [BackgroundColor(35, 132, 250)] // CornflowerBlue
+        [Tooltip("If enabled, shows the clear button.")]
+        [DefaultValue(false)]
+        public bool ShowClearButton { get; set; } = false;
     }
 }

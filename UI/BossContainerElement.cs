@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using DPSPanel.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -46,7 +47,7 @@ namespace DPSPanel.UI
             Append(toggleButton);
 
             // 3) Add custom buttons
-            AddCustomButtons();
+            // AddCustomButtons();
 
             int invalidBossIdTemp = -1;
             panel.SetBossTitle("Boss Damage System", invalidBossIdTemp);
@@ -55,6 +56,10 @@ namespace DPSPanel.UI
         #region Custom Buttons
         private void AddCustomButtons()
         {
+            Config c = ModContent.GetInstance<Config>();
+            if (!c.ShowClearButton)
+                return;
+
             // Clear Button
             clearButton = new CustomButtonElement("Clear", "Clear all damage data", () =>
             {
@@ -138,7 +143,7 @@ namespace DPSPanel.UI
             // Main.LocalPlayer.mouseInterface = true;
 
             // log state of clickstartinsidepanel
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
+            // ModContent.GetInstance<DPSPanel>().Logger.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
 
             if (dragging)
             {
@@ -174,13 +179,15 @@ namespace DPSPanel.UI
                 if (!Children.Contains(panel))
                 {
                     // SHOW PANEL
-
                     Append(panel);
 
                     // remove & re-append the icon so it draws on top
                     toggleButton.Remove();
                     Append(toggleButton);
-                    Append(clearButton);
+
+                    Config c = ModContent.GetInstance<Config>();
+                    if (c.ShowClearButton && clearButton != null)
+                        Append(clearButton);
                 }
             }
             else
@@ -188,7 +195,7 @@ namespace DPSPanel.UI
                 if (Children.Contains(panel))
                 {
                     panel.Remove();
-                    clearButton.Remove();
+                    clearButton?.Remove();
                     Main.NewText("Panel hidden. Note that you can use /a item or /a clear or /dps toggle", Color.SteelBlue);
                 }
             }

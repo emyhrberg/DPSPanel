@@ -88,6 +88,16 @@ Mods: {
 					Label: "[i:560] [c/9bfff0:Do nothing for now]"
 					Tooltip: IDK
 				}
+
+				DisableValidHoverHighlight: {
+					Label: Disable Valid Hover Highlight
+					Tooltip: If enabled, disables the valid hover highlight during certain mouse interactions.
+				}
+
+				ShowClearButton: {
+					Label: Show Clear Button
+					Tooltip: If enabled, shows the clear button.
+				}
 			}
 		}
 

@@ -8,7 +8,7 @@ namespace DPSPanel.Configs
     {
         public override CommandType Type => CommandType.Chat; // Makes the command available in chat
         public override string Command => "dps"; // The main command is "/dps"
-        public override string Description => "Usage: /dps <createPlayer> <clear> <toggle>"; // Is shown when using "/help"
+        public override string Description => "Usage: /dps <add> <clear> <toggle>"; // Is shown when using "/help"
 
         // create list of example players using real funny russian names. only 4 players for now
         private string[] players = ["Vladimir", "Ivan", "Dmitri", "Sergei"];
@@ -26,7 +26,7 @@ namespace DPSPanel.Configs
 
             string target = args[0];
 
-            if (target == "createPlayer")
+            if (target == "add")
             {
                 // damage = random number between 100 and 2000
                 int damage = Main.rand.Next(100, 2000);

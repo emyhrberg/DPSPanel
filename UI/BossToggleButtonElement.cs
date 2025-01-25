@@ -30,21 +30,25 @@ namespace DPSPanel.UI
         protected override void DrawSelf(SpriteBatch sb)
         {
             Config c = ModContent.GetInstance<Config>();
-            // if inventory is closed and button is not set to always show, don't draw the button
             if (!Main.playerInventory && !c.AlwaysShowButton)
                 return;
 
             base.DrawSelf(sb);
 
-            // get the dimensions of the element
-            const float scale = 0.65f; // Scale factor. Try to make as big as the player head icons.
+            // Get the dimensions of the element
+            const float scale = 0.65f; // Scale factor
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X + (dims.Width - ninjaTexture.Width * scale) / 2f,
-                            dims.Y + (dims.Height - ninjaTexture.Height * scale) / 2f);
+                              dims.Y + (dims.Height - ninjaTexture.Height * scale) / 2f);
 
             var parentContainer = Parent as BossContainerElement;
 
-            if (IsMouseHovering && !(Main.mouseLeft && !parentContainer.clickStartInsidePanel))
+            // Check hover behavior based on config
+            bool isHoverValid = c.DisableValidHoverHighlight
+                ? IsMouseHovering
+                : IsMouseHovering && (!Main.mouseLeft || parentContainer.clickStartInsidePanel);
+
+            if (isHoverValid)
             {
                 sb.Draw(ninjaHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                 if (parentContainer.panelVisible)
@@ -82,7 +86,15 @@ namespace DPSPanel.UI
             if (!isDragging)
             {
                 var parentContainer = Parent as BossContainerElement;
-                parentContainer?.TogglePanel();
+
+                // Ensure the parent container is not null before accessing it
+                if (parentContainer == null)
+                {
+                    ModContent.GetInstance<DPSPanel>().Logger.Warn("Parent container is null. TogglePanel() cannot be called.");
+                    return;
+                }
+
+                parentContainer.TogglePanel();
             }
         }
         #endregion

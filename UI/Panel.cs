@@ -103,10 +103,7 @@ namespace DPSPanel.UI
         public void UpdateDamageBars(string playerName, int playerDamage, int playerWhoAmI)
         {
             if (!players.ContainsKey(playerName))
-            {
                 CreateDamageBar(playerName, playerWhoAmI);
-                return;
-            }
 
             // Update the player's damage in the DamageBarElement
             var bar = players[playerName];
