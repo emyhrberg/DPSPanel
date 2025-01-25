@@ -41,14 +41,15 @@ namespace DPSPanel.Configs
             if (args[0] == "item")
             {
                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.container.panel.CreateDamageBar($"PlayerName {i}");
+                sys.state.container.panel.UpdateDamageBars($"PlayerName {i}", 300);
                 i++;
             }
             else if (args[0] == "clear")
             {
                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
                 sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle($"Reset{i}");
+                sys.state.container.panel.SetBossTitle($"Reset{i}", i);
+                i++;
             }
         }
     }

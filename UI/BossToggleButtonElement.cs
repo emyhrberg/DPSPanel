@@ -19,8 +19,8 @@ namespace DPSPanel.UI
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
-            Top.Set(0, 0f);
-            Left.Set(0, 0f);
+            Top.Set(5f, 0f);
+            Left.Set(5f, 0f);
 
             ninjaTexture = LoadResources.NinjaTexture.Value;
             ninjaHighlightedTexture = LoadResources.NinjaHighlightedTexture.Value;

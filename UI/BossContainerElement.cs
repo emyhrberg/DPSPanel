@@ -39,7 +39,7 @@ namespace DPSPanel.UI
             // Append it last, so it draws on top
             Append(bossIcon);
 
-            panel.SetBossTitle("Fight a boss to display stats!");
+            panel.SetBossTitle("Fight a boss to display stats!", -1);
         }
 
         #region Dragging

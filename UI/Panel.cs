@@ -23,7 +23,12 @@ namespace DPSPanel.UI
 
         // damageBars: Key = each individual playerName, Value = DamageBarElement
         private Dictionary<string, DamageBarElement> players = [];
-        private const float headerHeight = 28f;
+
+        // bossTitle: Title of the boss
+        public int CurrentBossID;
+        public string CurrentBossName;
+        private const float bossHeaderHeight = 28f;
+
 
         public Panel()
         {
@@ -36,13 +41,20 @@ namespace DPSPanel.UI
             SetPadding(PANEL_PADDING);
         }
 
-        public void SetBossTitle(string bossName)
+        public void SetBossTitle(string bossName, int bossID)
         {
+            // Set the boss name and ID
+            CurrentBossID = bossID;
+            CurrentBossName = bossName;
+
+            // Add the element to the panel
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             bossTitle.Top.Set(6f, 0f);
             Append(bossTitle);
-            currentYOffset = headerHeight;
+
+            // Resize panel height
+            currentYOffset = bossHeaderHeight;
             ResizePanelHeight();
         }
 
@@ -87,7 +99,7 @@ namespace DPSPanel.UI
                 .ToList();
 
             // Reset Y offset for re-sorting
-            currentYOffset = headerHeight;
+            currentYOffset = bossHeaderHeight;
 
             // Calculate the highest damage once
             int highestDamage = sortedPlayers.First().Value.PlayerDamage;
@@ -118,12 +130,11 @@ namespace DPSPanel.UI
             ResizePanelHeight();
         }
 
-
         public void ClearPanelAndAllItems()
         {
             RemoveAllChildren();
             players.Clear(); // Clear the players dictionary
-            currentYOffset = headerHeight; // Reset the Y offset
+            currentYOffset = bossHeaderHeight; // Reset the Y offset
             ResizePanelHeight();
         }
 

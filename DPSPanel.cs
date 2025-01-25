@@ -44,14 +44,17 @@ namespace DPSPanel
                         // Client updates its UI with the received data
                         Logger.Info($"[Client] Updating UI for {playerName}: {damageDone} damage to {bossName} (ID {bossId})");
 
-                        var panel = ModContent.GetInstance<PanelSystem>()?.state?.container?.panel;
-                        if (panel == null)
+                        PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                        Panel panel = sys.state.container.panel;
+
+                        if (panel.CurrentBossID != bossId)
                         {
-                            Logger.Warn("[Client] Panel is null! Ensure the UI is properly initialized.");
-                            return;
+                            // new boss fight, clear panel and set title
+                            Logger.Info($"[Client] New boss fight detected: {bossName} (ID {bossId})");
+                            panel.ClearPanelAndAllItems();
+                            panel.SetBossTitle(bossName, bossId);
                         }
 
-                        panel.SetBossTitle(bossName);
                         panel.UpdateDamageBars(playerName, damageDone);
                     }
                     break;
