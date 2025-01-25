@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Core.Configs;
+using DPSPanel.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;
@@ -82,21 +83,35 @@ namespace DPSPanel.Core.Panel
             // Update the player's damage in the dictionary
             players[playerName] = playerDamage;
 
-            // Find the highest damage to scale the bars
-            int highest = players.Values.Max();
+            // Sort players by damage in descending order
+            var sortedPlayers = players.OrderByDescending(p => p.Value).ToList();
 
-            // Update each player's damage bar
-            foreach (var player in players)
+            // Reset Y offset for sorting
+            currentYOffset = headerHeight;
+
+            for (int i = 0; i < sortedPlayers.Count; i++)
             {
-                string currentPlayerName = player.Key;
-                int currentPlayerDamage = player.Value;
+                string currentPlayerName = sortedPlayers[i].Key;
+                int currentPlayerDamage = sortedPlayers[i].Value;
 
                 DamageBarElement bar = damageBars[currentPlayerName];
+
+                // Update bar position to match the sorted order
+                bar.Top.Set(currentYOffset, 0f);
+                currentYOffset += ItemHeight + ITEM_PADDING * 2;
+
+                // Calculate fill percentage based on the highest damage
+                int highest = sortedPlayers.First().Value;
                 int percentageToFill = (int)(currentPlayerDamage / (float)highest * 100);
 
+                // Assign a color based on the position in the sorted list
+                Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
+
                 // Update the bar for the current player
-                bar.UpdateDamageBar(percentageToFill, currentPlayerName, currentPlayerDamage, Color.White);
+                bar.UpdateDamageBar(percentageToFill, currentPlayerName, currentPlayerDamage, barColor);
             }
+
+            ResizePanelHeight();
         }
 
         public void ClearPanelAndAllItems()

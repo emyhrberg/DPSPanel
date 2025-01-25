@@ -62,7 +62,6 @@ namespace DPSPanel.Core.Panel
             textElement.SetText($"{playerName} ({playerDamage})");
         }
 
-
         protected override void DrawSelf(SpriteBatch sb)
         {
             base.DrawSelf(sb);

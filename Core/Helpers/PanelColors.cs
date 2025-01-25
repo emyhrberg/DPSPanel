@@ -7,7 +7,10 @@ namespace DPSPanel.Core.Helpers
     {
         public static readonly Color[] colors =
         [
-            Color.Red,Color.Green,Color.Blue,Color.Yellow,
+            Color.Red,
+            Color.Green,
+            Color.Blue,
+            Color.Yellow,
             Color.Purple,
             Color.Orange,
             Color.Cyan,
