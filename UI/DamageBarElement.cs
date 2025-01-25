@@ -75,6 +75,9 @@ namespace DPSPanel.UI
             PlayerName = playerName;
             PlayerDamage = playerDamage;
 
+            // update fill color? config option?
+            // playerHeadElement.FillColor = fillColor;
+
             textElement.SetText($"{playerName} ({playerDamage})");
         }
 

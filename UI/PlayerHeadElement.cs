@@ -12,9 +12,15 @@ namespace DPSPanel.UI
     {
         private readonly Player player;
 
+        // make a get set for fillcolor
+        public Color FillColor { get; set; }
+
         public PlayerHeadElement(Player player)
         {
             this.player = player;
+
+            // default fill color white
+            FillColor = Color.White;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -33,13 +39,18 @@ namespace DPSPanel.UI
             int yOffset = 16;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
+            if (player.dead)
+            {
+                // you can do something here, but when dead the player disappears and is undrawable so you have to make a clone before death or something
+            }
+
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
                 player,
                 drawPosition,
                 1f, // alpha/transparency
                 1.1f, // scale
-                Color.White // border color
+                FillColor // border color
             );
         }
     }
