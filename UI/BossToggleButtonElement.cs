@@ -42,10 +42,11 @@ namespace DPSPanel.UI
             Vector2 pos = new(dims.X + (dims.Width - ninjaTexture.Width * scale) / 2f,
                             dims.Y + (dims.Height - ninjaTexture.Height * scale) / 2f);
 
-            if (IsMouseHovering)
+            var parentContainer = Parent as BossContainerElement;
+
+            if (IsMouseHovering && !(Main.mouseLeft && !parentContainer.clickStartInsidePanel))
             {
                 sb.Draw(ninjaHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-                var parentContainer = Parent as BossContainerElement;
                 if (parentContainer.panelVisible)
                     Main.instance.MouseText("Click to hide panel");
                 else

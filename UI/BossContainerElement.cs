@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace DPSPanel.UI
@@ -15,12 +16,13 @@ namespace DPSPanel.UI
     {
         // dragging
         public bool dragging;
-        private bool clickStartInsidePanel;
+        public bool clickStartInsidePanel;
         private Vector2 offset;
 
         // elements
         public ToggleButtonElement toggleButton;
         public Panel panel;
+        public CustomButtonElement clearButton;
         public bool panelVisible = true;
 
         private const float MIN_WIDTH = 300f;  // Minimum container width
@@ -43,8 +45,39 @@ namespace DPSPanel.UI
             // Append it last, so it draws on top
             Append(toggleButton);
 
-            panel.SetBossTitle("Boss Damage System", -1);
+            // 3) Add custom buttons
+            AddCustomButtons();
+
+            int invalidBossIdTemp = -1;
+            panel.SetBossTitle("Boss Damage System", invalidBossIdTemp);
         }
+
+        #region Custom Buttons
+        private void AddCustomButtons()
+        {
+            // Clear Button
+            clearButton = new CustomButtonElement("Clear", "Clear all damage data", () =>
+            {
+                panel.ClearPanelAndAllItems();
+                panel.SetBossTitle("Boss Damage System", -1);
+                Main.NewText("Damage data cleared.", Color.Green);
+            });
+            clearButton.HAlign = 1.0f; // Right-aligned
+            clearButton.Top.Set(0f, 0f); // Top-aligned
+            clearButton.Width.Set(10f, 0f); // Set width
+            Append(clearButton);
+
+            // // Lock Draggable Button
+            // // var lockButton = new CustomButtonElement("Lock", "Toggle dragging", () =>
+            // {
+            //     isDraggable = !isDraggable;
+            //     Main.NewText($"Dragging {(isDraggable ? "enabled" : "disabled")}.", isDraggable ? Color.Green : Color.Red);
+            // });
+            // lockButton.Left.Set(115f, 0f); // Positioned next to Clear Button
+            // lockButton.Top.Set(5f, 0f);
+            // Append(lockButton);
+        }
+        #endregion
 
         #region Dragging
         public override void LeftMouseDown(UIMouseEvent evt)
@@ -104,6 +137,9 @@ namespace DPSPanel.UI
             // if (ContainsPoint(Main.MouseScreen))
             // Main.LocalPlayer.mouseInterface = true;
 
+            // log state of clickstartinsidepanel
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
+
             if (dragging)
             {
                 Left.Set(Main.mouseX - offset.X, 0f);
@@ -137,10 +173,14 @@ namespace DPSPanel.UI
             {
                 if (!Children.Contains(panel))
                 {
+                    // SHOW PANEL
+
                     Append(panel);
+
                     // remove & re-append the icon so it draws on top
                     toggleButton.Remove();
                     Append(toggleButton);
+                    Append(clearButton);
                 }
             }
             else
@@ -148,6 +188,7 @@ namespace DPSPanel.UI
                 if (Children.Contains(panel))
                 {
                     panel.Remove();
+                    clearButton.Remove();
                     Main.NewText("Panel hidden. Note that you can use /a item or /a clear or /dps toggle", Color.SteelBlue);
                 }
             }

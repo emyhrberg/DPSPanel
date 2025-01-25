@@ -103,7 +103,10 @@ namespace DPSPanel.UI
         public void UpdateDamageBars(string playerName, int playerDamage, int playerWhoAmI)
         {
             if (!players.ContainsKey(playerName))
+            {
                 CreateDamageBar(playerName, playerWhoAmI);
+                return;
+            }
 
             // Update the player's damage in the DamageBarElement
             var bar = players[playerName];
@@ -163,6 +166,9 @@ namespace DPSPanel.UI
             parentContainer.Height.Set(currentYOffset + ITEM_PADDING, 0f);
             parentContainer.Recalculate();
 
+            // debug to logger the current height
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"Panel.cs: Setting Panel height: {currentYOffset + ITEM_PADDING}");
+
             Height.Set(currentYOffset + ITEM_PADDING, 0f);
             Recalculate();
         }
@@ -170,34 +176,48 @@ namespace DPSPanel.UI
         #region Singleplayer
         public void CreateWeaponDamageBar(string barName)
         {
-            // Check if the bar already exists
             if (!damageBars.ContainsKey(barName))
             {
-                // Create a new bar
                 WeaponBarElement bar = new(currentYOffset);
                 Append(bar);
                 damageBars[barName] = bar;
 
-                currentYOffset += ItemHeight + ITEM_PADDING * 2; // Adjust Y offset for the next element
-                ResizePanelHeight();
+                ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating weapon bar for {barName}");
+
+                // Removed the following lines to prevent double resizing and Y-offset changes
+                // currentYOffset += ItemHeight + ITEM_PADDING * 2;
+                // ResizePanelHeight();
             }
         }
 
         public void UpdateWeaponDamageBars(List<Weapon> weapons)
         {
-            // Reset vertical offset. needed for ensuring that an updated panel does not get added height)
-            currentYOffset = 40f + ITEM_PADDING * 2;
+            // Set currentYOffset to after all player damage bars
+            currentYOffset = bossHeaderHeight + (players.Count * (ItemHeight + ITEM_PADDING * 2));
+
+            if (weapons == null || weapons.Count == 0)
+            {
+                ResizePanelHeight();
+                return;
+            }
 
             // Sort weapons by descending damage.
-            // weapons = weapons.OrderByDescending(w => w.damage).ToList();
             int highest = weapons.FirstOrDefault()?.damage ?? 1;
 
             for (int i = 0; i < weapons.Count; i++)
             {
                 var wpn = weapons[i];
+
+                // Check if the bar already exists
+                if (!damageBars.ContainsKey(wpn.weaponName))
+                {
+                    CreateWeaponDamageBar(wpn.weaponName);
+                    // Removed: return;
+                }
+
                 WeaponBarElement bar = damageBars[wpn.weaponName];
 
-                // Update  with the current data.
+                // Update with the current data.
                 int percentageToFill = (int)(wpn.damage / (float)highest * 100);
                 Color color = PanelColors.colors[i % PanelColors.colors.Length];
 
@@ -205,6 +225,8 @@ namespace DPSPanel.UI
                 bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + ITEM_PADDING * 2;
             }
+
+            // Call ResizePanelHeight once after all updates
             ResizePanelHeight();
         }
         #endregion
