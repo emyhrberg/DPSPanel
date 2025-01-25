@@ -5,14 +5,22 @@ using Terraria.UI;
 
 namespace DPSPanel.UI
 {
+    // the entire container for the boss damage system:
+    // 1) Panel
+    // 2) Toggle button
+    // 3) Damage bars
+    // 4) Weapon bars
+    // So this is the entirety of what we drag around the screen.
     public class BossContainerElement : UIElement
     {
-        public ToggleButtonElement toggleButton;
-        public Panel panel;
-
+        // dragging
         public bool dragging;
+        private bool clickStartInsidePanel;
         private Vector2 offset;
 
+        // elements
+        public ToggleButtonElement toggleButton;
+        public Panel panel;
         public bool panelVisible = true;
 
         private const float MIN_WIDTH = 300f;  // Minimum container width
@@ -43,22 +51,36 @@ namespace DPSPanel.UI
         {
             base.LeftMouseDown(evt);
             if (ContainsPoint(evt.MousePosition))
+            {
+                clickStartInsidePanel = true;
+                dragging = true;
+                Main.LocalPlayer.mouseInterface = true; // Prevents other UI elements from being used
                 DragStart(evt);
+            }
+            else
+            {
+                clickStartInsidePanel = false;
+            }
         }
 
         public override void LeftMouseUp(UIMouseEvent evt)
         {
             base.LeftMouseUp(evt);
             if (dragging)
+            {
                 DragEnd(evt);
+                dragging = false;
+                clickStartInsidePanel = false;
+            }
         }
 
         private void DragStart(UIMouseEvent evt)
         {
-            // Save an offset from the top-left corner of this container
-            // var dims = GetDimensions().ToRectangle();
             offset = new Vector2(evt.MousePosition.X - Left.Pixels, evt.MousePosition.Y - Top.Pixels);
+            // offset = evt.MousePosition - new Vector2(Left.Pixels, Top.Pixels);
             dragging = true;
+            clickStartInsidePanel = true;
+            Main.LocalPlayer.mouseInterface = true; // Prevents other UI elements from being used
         }
 
         private void DragEnd(UIMouseEvent evt)
@@ -69,6 +91,8 @@ namespace DPSPanel.UI
             Left.Set(endMousePosition.X - offset.X, 0f);
             Top.Set(endMousePosition.Y - offset.Y, 0f);
 
+            Main.LocalPlayer.mouseInterface = false; // Allow other UI elements to be used
+
             Recalculate();
         }
 
@@ -77,8 +101,8 @@ namespace DPSPanel.UI
             base.Update(gameTime);
 
             // This ensures we do not use other items while dragging
-            if (ContainsPoint(Main.MouseScreen))
-                Main.LocalPlayer.mouseInterface = true;
+            // if (ContainsPoint(Main.MouseScreen))
+            // Main.LocalPlayer.mouseInterface = true;
 
             if (dragging)
             {
@@ -95,6 +119,11 @@ namespace DPSPanel.UI
                 Top.Pixels = Utils.Clamp(Top.Pixels, 0, parentSpace.Bottom - Height.Pixels);
                 // Recalculate forces the UI system to do the positioning math again.
                 Recalculate();
+            }
+
+            if (dragging)
+            {
+                Main.LocalPlayer.mouseInterface = true;
             }
         }
         #endregion

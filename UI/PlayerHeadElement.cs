@@ -1,3 +1,4 @@
+using DPSPanel.Configs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -18,6 +19,10 @@ namespace DPSPanel.UI
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
+            Config c = ModContent.GetInstance<Config>();
+            if (!c.ShowPlayerIcon)
+                return;
+
             base.DrawSelf(spriteBatch);
 
             if (player == null || !player.active)

@@ -150,6 +150,7 @@ namespace DPSPanel.UI
         {
             RemoveAllChildren();
             players.Clear(); // Clear the players dictionary
+            damageBars.Clear(); // Clear the weapon bars dictionary
             currentYOffset = bossHeaderHeight; // Reset the Y offset
             ResizePanelHeight();
         }
