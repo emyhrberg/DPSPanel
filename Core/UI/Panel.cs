@@ -58,6 +58,10 @@ namespace DPSPanel.Core.Panel
 
         public void CreateDamageBar(string playerName = "PlayerName")
         {
+            // Check if the bar already exists
+            if (damageBars.ContainsKey(playerName))
+                return;
+
             // Create a new bar
             DamageBarElement bar = new(currentYOffset);
             Append(bar);
@@ -71,19 +75,27 @@ namespace DPSPanel.Core.Panel
 
         public void UpdateDamageBars(string playerName, int playerDamage)
         {
+            // If the player doesn't already have a bar, create one
             if (!damageBars.ContainsKey(playerName))
                 CreateDamageBar(playerName);
 
-            // Update the player's damage
+            // Update the player's damage in the dictionary
             players[playerName] = playerDamage;
+
+            // Find the highest damage to scale the bars
             int highest = players.Values.Max();
 
+            // Update each player's damage bar
             foreach (var player in players)
             {
-                DamageBarElement bar = damageBars[player.Key];
-                int percentageToFill = (int)(playerDamage / (float)highest * 100);
+                string currentPlayerName = player.Key;
+                int currentPlayerDamage = player.Value;
 
-                bar.UpdateDamageBar(percentageToFill, playerName, playerDamage, Color.White);
+                DamageBarElement bar = damageBars[currentPlayerName];
+                int percentageToFill = (int)(currentPlayerDamage / (float)highest * 100);
+
+                // Update the bar for the current player
+                bar.UpdateDamageBar(percentageToFill, currentPlayerName, currentPlayerDamage, Color.White);
             }
         }
 
