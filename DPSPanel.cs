@@ -17,6 +17,9 @@ namespace DPSPanel
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                return;
+
             ModMessageType msgType = (ModMessageType)reader.ReadByte();
             switch (msgType)
             {

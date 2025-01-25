@@ -178,6 +178,9 @@ namespace DPSPanel.DamageCalculation
         #region Networking
         private void SendPlayerDamagePacket()
         {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                return;
+
             // Get variables to send
             string player = Main.LocalPlayer.name;
             int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;

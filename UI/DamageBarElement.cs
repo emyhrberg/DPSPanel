@@ -56,14 +56,15 @@ namespace DPSPanel.UI
 
             // Add player head if the player is active
             Config c = ModContent.GetInstance<Config>();
-            if (c.AlwaysShowButton)
-
+            if (c.ShowPlayerIcon)
+            {
                 if (playerWhoAmI >= 0 && playerWhoAmI < Main.player.Length && Main.player[playerWhoAmI].active)
                 {
                     Player player = Main.player[playerWhoAmI];
                     playerHeadElement = new PlayerHeadElement(player);
                     Append(playerHeadElement);
                 }
+            }
         }
 
         public void UpdateDamageBar(int percentage, string playerName, int playerDamage, Color fillColor)
