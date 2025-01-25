@@ -55,15 +55,6 @@ namespace DPSPanel.Core.Panel
             Append(textElement);
         }
 
-        // public void UpdateDamageBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
-        // {
-        //     percentage = _percentage;
-        //     // weaponItemID = weaponID;
-        //     fillColor = _fillColor;
-        //     // weaponName = _weaponName; // used for debugging only
-        //     textElement.SetText($"{_weaponName} ({weaponDamage})");
-        // }
-
         public void UpdateDamageBar(int percentage, string playerName, int playerDamage, Color fillColor)
         {
             this.percentage = percentage;

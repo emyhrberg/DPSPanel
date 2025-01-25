@@ -40,7 +40,7 @@ namespace DPSPanel.Core.Panel
             // Append it last, so it draws on top
             Append(bossIcon);
 
-            panel.SetBossTitle("Fight a boss to display stats!", null);
+            panel.SetBossTitle("Fight a boss to display stats!");
         }
 
         #region Dragging
@@ -66,15 +66,16 @@ namespace DPSPanel.Core.Panel
             dragging = true;
         }
 
-        private void DragEnd(UIMouseEvent evt) {
-			Vector2 endMousePosition = evt.MousePosition;
-			dragging = false;
+        private void DragEnd(UIMouseEvent evt)
+        {
+            Vector2 endMousePosition = evt.MousePosition;
+            dragging = false;
 
-			Left.Set(endMousePosition.X - offset.X, 0f);
-			Top.Set(endMousePosition.Y - offset.Y, 0f);
+            Left.Set(endMousePosition.X - offset.X, 0f);
+            Top.Set(endMousePosition.Y - offset.Y, 0f);
 
-			Recalculate();
-		}
+            Recalculate();
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -93,12 +94,13 @@ namespace DPSPanel.Core.Panel
 
             // Check if the container is out of bounds
             var parentSpace = Parent.GetDimensions().ToRectangle();
-            if (!GetDimensions().ToRectangle().Intersects(parentSpace)) {
-				Left.Pixels = Utils.Clamp(Left.Pixels, 0, parentSpace.Right - Width.Pixels);
-				Top.Pixels = Utils.Clamp(Top.Pixels, 0, parentSpace.Bottom - Height.Pixels);
-				// Recalculate forces the UI system to do the positioning math again.
-				Recalculate();
-			}
+            if (!GetDimensions().ToRectangle().Intersects(parentSpace))
+            {
+                Left.Pixels = Utils.Clamp(Left.Pixels, 0, parentSpace.Right - Width.Pixels);
+                Top.Pixels = Utils.Clamp(Top.Pixels, 0, parentSpace.Bottom - Height.Pixels);
+                // Recalculate forces the UI system to do the positioning math again.
+                Recalculate();
+            }
         }
         #endregion
 
@@ -126,11 +128,5 @@ namespace DPSPanel.Core.Panel
             }
         }
         #endregion
-
-        public void SetContainerHeight(float height)
-        {
-            Height.Set(height, 0f);
-            Recalculate();
-        }
     }
 }

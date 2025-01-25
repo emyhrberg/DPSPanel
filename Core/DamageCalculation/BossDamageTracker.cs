@@ -43,20 +43,13 @@ namespace DPSPanel.Core.DamageCalculation
                 }
             }
 
-            public void SendBossFightToPanel()
-            {
-                players = players.OrderByDescending(p => p.playerDamage).ToList();
-                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.container.panel.UpdateDamageBars(players);
-            }
-
             public void PrintFightData(Mod mod)
             {
                 if (players.Count == 0)
                     return;
 
                 string playersDamages = string.Join(", ", players.Select(p => $"{p.playerName} ({p.playerDamage})"));
-                mod.Logger.Info($"Boss: {bossName} | Life: {currentLife}/{initialLife} | Damage Taken: {damageTaken} | Players: {playersDamages}");
+                // mod.Logger.Info($"Boss: {bossName} | Life: {currentLife}/{initialLife} | Damage Taken: {damageTaken} | Players: {playersDamages}");
             }
         }
         #endregion
@@ -83,7 +76,7 @@ namespace DPSPanel.Core.DamageCalculation
                 // 1) If there's an active fight and the boss is no longer alive or present, stop tracking
                 if (fight != null && !Main.npc.Any(npc => npc.active && npc.boss && npc.FullName == fight.bossName))
                 {
-                    Mod.Logger.Info($"Boss {fight.bossName} was killed or despawned!");
+                    // Mod.Logger.Info($"Boss {fight.bossName} was killed or despawned!");
                     fight = null; // stop tracking
                 }
 
@@ -143,20 +136,18 @@ namespace DPSPanel.Core.DamageCalculation
                 if (fight != null && npc.life <= 0)
                 {
                     fight.isAlive = false;
-                    fight.SendBossFightToPanel();
+                    SendPlayerDamagePacket();
                     fight = null;
                     return;
                 }
 
-                Mod.Logger.Info($"whoAmI: {npc.whoAmI} | fight BOSS ID: {fight.bossId}");
+                // Mod.Logger.Info($"whoAmI: {npc.whoAmI} | fight BOSS ID: {fight.bossId}");
 
                 if (fight != null && fight.bossId == npc.whoAmI)
                 {
                     fight.damageTaken += damageDone;
                     fight.currentLife = npc.life;
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
-                    fight.SendBossFightToPanel();
-                    fight.PrintFightData(Mod);
                     SendPlayerDamagePacket();
                 }
             }
@@ -176,12 +167,9 @@ namespace DPSPanel.Core.DamageCalculation
                     players = [],
                     isAlive = true
                 };
-                Mod.Logger.Info("New boss fight created: " + fight.bossName);
+                // Mod.Logger.Info("New boss fight created: " + fight.bossName);
 
-                var sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle(npc.FullName, npc);
-                sys.state.container.bossIcon.UpdateBossIcon(npc);
+                SendPlayerDamagePacket();
             }
         }
         #endregion
@@ -189,15 +177,19 @@ namespace DPSPanel.Core.DamageCalculation
         #region Networking
         private void SendPlayerDamagePacket()
         {
-            // get variables to send
+            // // get variables to send
+            string player = Main.LocalPlayer.name;
             int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
 
             // create the packet to send
             ModPacket packet = Mod.GetPacket();
-            packet.Write((byte)ModMessageType.PlayerDamage);
-            packet.Write(Main.LocalPlayer.name);
+            packet.Write((byte)ModMessageType.FightPacket);
+            packet.Write(player);
             packet.Write(damageDone);
-            packet.Send();
+            packet.Write(fight.bossId);
+            packet.Write(fight.bossName);
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"Sent: {player} | {damageDone} | {fight.bossId} | {fight.bossName}");
+            packet.Send(); // send the packet to the server
         }
         #endregion
 

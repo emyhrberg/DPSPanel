@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Core.Configs;
-using DPSPanel.Core.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
-using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.UI;
 
 namespace DPSPanel.Core.Panel
 {
@@ -29,6 +23,9 @@ namespace DPSPanel.Core.Panel
         private Dictionary<string, DamageBarElement> damageBars = [];
         private const float headerHeight = 28f;
 
+        // list of players
+        private Dictionary<string, int> players = [];
+
         public Panel()
         {
             Width.Set(PANEL_WIDTH, 0f);
@@ -40,7 +37,7 @@ namespace DPSPanel.Core.Panel
             SetPadding(PANEL_PADDING);
         }
 
-        public void SetBossTitle(string bossName = "Boss Name", NPC npc = null)
+        public void SetBossTitle(string bossName = "Boss Name")
         {
             // currentBoss = npc;
             UIText bossTitle = new(bossName, 1.0f);
@@ -61,36 +58,32 @@ namespace DPSPanel.Core.Panel
 
         public void CreateDamageBar(string playerName = "PlayerName")
         {
-            // Check if the bar already exists
-            if (!damageBars.ContainsKey(playerName))
-            {
-                // Create a new bar
-                DamageBarElement bar = new(currentYOffset);
-                Append(bar);
-                damageBars[playerName] = bar;
+            // Create a new bar
+            DamageBarElement bar = new(currentYOffset);
+            Append(bar);
+            damageBars[playerName] = bar;
 
-                ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating damage bar for {playerName}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating damage bar for {playerName}");
 
-                currentYOffset += ItemHeight + ITEM_PADDING * 2; // Adjust Y offset for the next element
-                ResizePanelHeight();
-            }
+            currentYOffset += ItemHeight + ITEM_PADDING * 2; // Adjust Y offset for the next element
+            ResizePanelHeight();
         }
 
-        public void UpdateDamageBars(List<PlayerFightData> players)
+        public void UpdateDamageBars(string playerName, int playerDamage)
         {
-            int highest = players.FirstOrDefault()?.playerDamage ?? 1;
+            if (!damageBars.ContainsKey(playerName))
+                CreateDamageBar(playerName);
+
+            // Update the player's damage
+            players[playerName] = playerDamage;
+            int highest = players.Values.Max();
 
             foreach (var player in players)
             {
-                if (!damageBars.ContainsKey(player.playerName))
-                {
-                    CreateDamageBar(player.playerName);
-                }
+                DamageBarElement bar = damageBars[player.Key];
+                int percentageToFill = (int)(playerDamage / (float)highest * 100);
 
-                DamageBarElement bar = damageBars[player.playerName];
-                int percentageToFill = (int)(player.playerDamage / (float)highest * 100);
-
-                bar.UpdateDamageBar(percentageToFill, player.playerName, player.playerDamage, Color.White);
+                bar.UpdateDamageBar(percentageToFill, playerName, playerDamage, Color.White);
             }
         }
 

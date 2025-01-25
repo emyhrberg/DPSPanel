@@ -49,7 +49,7 @@ namespace DPSPanel.Core.Commands
             {
                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
                 sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle("Reset");
+                sys.state.container.panel.SetBossTitle("Reset2");
             }
         }
     }
