@@ -6,11 +6,12 @@ using System.Linq;
 using Terraria.ID;
 using static DPSPanel.DPSPanel;
 using DPSPanel.Helpers;
+using DPSPanel.UI;
 
 namespace DPSPanel.DamageCalculation
 {
     [Autoload(Side = ModSide.Client)]
-    public class BossDamageTracker : ModPlayer
+    public class BossDamageTrackerMP : ModPlayer
     {
         #region Classes
         public class BossFight
@@ -60,9 +61,9 @@ namespace DPSPanel.DamageCalculation
         public override void OnEnterWorld()
         {
             Main.NewText(
-                "Hello, " + Main.LocalPlayer.name +
-                "! To use the DPS panel, type /dps toggle in chat or toggle with K (set the keybind in controls).",
-                Color.Yellow
+                "[DPSPanel] Hello, " + Main.LocalPlayer.name +
+                "! To use DPSPanel, type /dps toggle in chat or toggle with K (set the keybind in Settings -> Controls).",
+                Color.SkyBlue
             );
         }
 
@@ -114,7 +115,7 @@ namespace DPSPanel.DamageCalculation
             // Pass the actual item type (ID) explicitly for melee
             int actualItemID = item?.type ?? -1;
             string actualItemName = item?.Name ?? "unknownitem";
-            UpdateOnHitNPC(actualItemID, actualItemName, damageDone, target);
+            TrackBossDamage(actualItemID, actualItemName, damageDone, target);
         }
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
@@ -124,12 +125,12 @@ namespace DPSPanel.DamageCalculation
 
             string weaponName = GetSourceWeaponName();
             int weaponID = GetSourceWeaponItemID();
-            UpdateOnHitNPC(weaponID, weaponName, damageDone, target);
+            TrackBossDamage(weaponID, weaponName, damageDone, target);
         }
         #endregion
 
         #region Damage Tracking
-        private void UpdateOnHitNPC(int weaponID, string weaponName, int damageDone, NPC npc)
+        private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
             if (IsValidBoss(npc))
             {
@@ -145,6 +146,7 @@ namespace DPSPanel.DamageCalculation
 
                 if (fight != null && fight.whoAmI == npc.whoAmI)
                 {
+                    // Update the fight data
                     fight.damageTaken += damageDone;
                     fight.currentLife = npc.life;
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);

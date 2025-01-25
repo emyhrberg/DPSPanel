@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Configs;
+using DPSPanel.DamageCalculation;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -25,11 +26,13 @@ namespace DPSPanel.UI
         // damageBars: Key = each individual playerName, Value = DamageBarElement
         private Dictionary<string, DamageBarElement> players = [];
 
+        // singleplayer: weaponBars: Key = each individual weaponName, Value = WeaponBarElement
+        private Dictionary<string, WeaponBarElement> damageBars = [];
+
         // bossTitle: Title of the boss
         public int CurrentBossID;
         public string CurrentBossName;
         private const float bossHeaderHeight = 28f;
-
 
         public Panel()
         {
@@ -162,5 +165,47 @@ namespace DPSPanel.UI
             Height.Set(currentYOffset + ITEM_PADDING, 0f);
             Recalculate();
         }
+
+        #region Singleplayer
+        public void CreateWeaponDamageBar(string barName)
+        {
+            // Check if the bar already exists
+            if (!damageBars.ContainsKey(barName))
+            {
+                // Create a new bar
+                WeaponBarElement bar = new(currentYOffset);
+                Append(bar);
+                damageBars[barName] = bar;
+
+                currentYOffset += ItemHeight + ITEM_PADDING * 2; // Adjust Y offset for the next element
+                ResizePanelHeight();
+            }
+        }
+
+        public void UpdateWeaponDamageBars(List<Weapon> weapons)
+        {
+            // Reset vertical offset. needed for ensuring that an updated panel does not get added height)
+            currentYOffset = 40f + ITEM_PADDING * 2;
+
+            // Sort weapons by descending damage.
+            // weapons = weapons.OrderByDescending(w => w.damage).ToList();
+            int highest = weapons.FirstOrDefault()?.damage ?? 1;
+
+            for (int i = 0; i < weapons.Count; i++)
+            {
+                var wpn = weapons[i];
+                WeaponBarElement bar = damageBars[wpn.weaponName];
+
+                // Update  with the current data.
+                int percentageToFill = (int)(wpn.damage / (float)highest * 100);
+                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+
+                bar.UpdateDamageBar(percentageToFill, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
+                bar.Top.Set(currentYOffset, 0f);
+                currentYOffset += ItemHeight + ITEM_PADDING * 2;
+            }
+            ResizePanelHeight();
+        }
+        #endregion
     }
 }

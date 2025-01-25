@@ -83,6 +83,11 @@ Mods: {
 					Label: "[a:EYE_ON_YOU] [c/000000:Eye on You]"
 					Tooltip: Achievement: Defeat the Eye of Cthulhu.
 				}
+
+				DoNothing1: {
+					Label: "[i:560] [c/9bfff0:Do nothing for now]"
+					Tooltip: IDK
+				}
 			}
 		}
 

@@ -1,10 +1,8 @@
-using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using System.IO;
 using DPSPanel.UI;
-using DPSPanel.Configs;
 
 namespace DPSPanel
 {

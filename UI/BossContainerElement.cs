@@ -119,7 +119,7 @@ namespace DPSPanel.UI
                 if (Children.Contains(panel))
                 {
                     panel.Remove();
-                    Main.NewText("Panel removed. Note that you can use /a item or /a clear or /dps toggle", Color.SteelBlue);
+                    Main.NewText("Panel hidden. Note that you can use /a item or /a clear or /dps toggle", Color.SteelBlue);
                 }
             }
         }
