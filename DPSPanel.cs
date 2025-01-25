@@ -1,11 +1,9 @@
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ID;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using System.IO;
-using DPSPanel.Core.Panel;
-using System.Collections.Generic;
+using DPSPanel.UI;
 
 namespace DPSPanel
 {
@@ -53,6 +51,7 @@ namespace DPSPanel
                             return;
                         }
 
+                        panel.SetBossTitle(bossName);
                         panel.UpdateDamageBars(playerName, damageDone);
                     }
                     break;

@@ -7,10 +7,10 @@ using Terraria;
 using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using DPSPanel.Core.Helpers;
-using DPSPanel.Core.Configs;
+using DPSPanel.Helpers;
+using DPSPanel.Configs;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.UI
 {
     public class DamageBarElement : UIElement
     {
@@ -26,25 +26,22 @@ namespace DPSPanel.Core.Panel
         private int weaponItemID;
         private string weaponName;           // Weapon name
 
-        public DamageBarElement(float currentYOffset)
+        // Properties
+        public string PlayerName { get; set; }
+        public int PlayerDamage { get; set; }
+
+        public DamageBarElement(float currentYOffset, string playerName)
         {
-            // check config settings for theme
-            Config c = ModContent.GetInstance<Config>();
-            if (c.Theme == "Generic")
-            {
-                emptyBar = LoadResources.BarGenericEmpty;
-                fullBar = LoadResources.BarGenericFull;
-            }
-            else if (c.Theme == "Fancy")
-            {
-                emptyBar = LoadResources.BarFancyEmpty;
-                fullBar = LoadResources.BarFancyFull;
-            }
+            emptyBar = LoadResources.BarEmpty;
+            fullBar = LoadResources.BarFull;
 
             Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
             Height = new StyleDimension(ItemHeight, 0f); // Set height
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f; // Center horizontally
+
+            PlayerName = playerName;
+            PlayerDamage = 0;
 
             // Create the text element centered on the bar.
             textElement = new UIText("", 0.8f) // 80% size
@@ -59,6 +56,10 @@ namespace DPSPanel.Core.Panel
         {
             this.percentage = percentage;
             this.fillColor = fillColor;
+
+            PlayerName = playerName;
+            PlayerDamage = playerDamage;
+
             textElement.SetText($"{playerName} ({playerDamage})");
         }
 
@@ -67,31 +68,22 @@ namespace DPSPanel.Core.Panel
             base.DrawSelf(sb);
             DrawDamageBarFill(sb);
             DrawDamageBarOutline(sb);
-
-            // check if singleplayer or multiplayer
-            if (Main.netMode == NetmodeID.MultiplayerClient)
-            {
-
-            }
-            else if (Main.netMode == NetmodeID.SinglePlayer)
-            {
-                DrawWeaponIcon(sb);
-            }
-
+            // DrawWeaponIcon(sb);
         }
 
         private void DrawDamageBarFill(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new Vector2(dims.X, dims.Y);
-            // Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
+            Vector2 pos = new(dims.X, dims.Y);
 
-            // Draw filled portion based on percentage.
+            // Ensure the filled portion width is correctly calculated
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
                 Rectangle sourceRect = new Rectangle(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
-                sb.Draw(fullBar.Value, new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height), sourceRect, fillColor);
+                Rectangle destRect = new Rectangle((int)pos.X, (int)pos.Y, fillWidth, (int)dims.Height);
+
+                sb.Draw(fullBar.Value, destRect, sourceRect, fillColor);
             }
         }
 
@@ -106,7 +98,7 @@ namespace DPSPanel.Core.Panel
         private void DrawWeaponIcon(SpriteBatch sb)
         {
             // Check if the weapon icon display is enabled in the config
-            Config c = ModContent.GetInstance<Config>();
+            SimpleConfig c = ModContent.GetInstance<SimpleConfig>();
             if (!c.ShowWeaponIcon)
                 return;
 

@@ -3,12 +3,11 @@ using Terraria;
 using Terraria.ModLoader;
 using Microsoft.Xna.Framework;
 using System.Linq;
-using DPSPanel.Core.Helpers;
 using Terraria.ID;
-using DPSPanel.Core.Panel;
 using static DPSPanel.DPSPanel;
+using DPSPanel.Helpers;
 
-namespace DPSPanel.Core.DamageCalculation
+namespace DPSPanel.DamageCalculation
 {
     [Autoload(Side = ModSide.Client)]
     public class BossDamageTracker : ModPlayer
@@ -177,20 +176,50 @@ namespace DPSPanel.Core.DamageCalculation
         #region Networking
         private void SendPlayerDamagePacket()
         {
-            // // get variables to send
+            // Get variables to send
             string player = Main.LocalPlayer.name;
             int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
 
-            // create the packet to send
+            // Calculate sizes
+            int playerNameSize = System.Text.Encoding.UTF8.GetByteCount(player) + Get7BitEncodedIntSize(player.Length);
+            int damageDoneSize = sizeof(int);
+            int bossIdSize = sizeof(int);
+            int bossNameSize = System.Text.Encoding.UTF8.GetByteCount(fight.bossName) + Get7BitEncodedIntSize(fight.bossName.Length);
+
+            // Log sizes
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"Packet Sizes (Bytes):");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Header (byte): 1");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Player Name (string): {playerNameSize}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Damage Done (int): {damageDoneSize}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Boss ID (int): {bossIdSize}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Boss Name (string): {bossNameSize}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"Total Packet Size: {1 + playerNameSize + damageDoneSize + bossIdSize + bossNameSize} bytes");
+
+            // Create and send the packet
             ModPacket packet = Mod.GetPacket();
             packet.Write((byte)ModMessageType.FightPacket);
             packet.Write(player);
             packet.Write(damageDone);
             packet.Write(fight.bossId);
             packet.Write(fight.bossName);
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent: {player} | Sent: {damageDone} | BossID: {fight.bossId} | BossName {fight.bossName}");
+
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent: {player} | Sent: {damageDone} | BossID: {fight.bossId} | BossName: {fight.bossName}");
             packet.Send(); // send the packet to the server
         }
+
+        // Helper to calculate the size of a 7-bit encoded integer
+        private int Get7BitEncodedIntSize(int value)
+        {
+            int count = 0;
+            uint v = (uint)value; // treat value as unsigned
+            while (v >= 0x80)
+            {
+                v >>= 7;
+                count++;
+            }
+            return count + 1;
+        }
+
         #endregion
 
         #region Helpers

@@ -1,17 +1,16 @@
-﻿using Terraria;
-using Terraria.ID;
-using Terraria.ModLoader;
+﻿using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.UI
+
 {
     public class PanelState : UIState
     {
-        public BossPanelContainer container;
+        public BossContainerElement container;
 
         public PanelState()
         {
-            container = new BossPanelContainer();
+            container = new BossContainerElement();
             Append(container);
 
             ModContent.GetInstance<DPSPanel>().Logger.Info("PanelState initialized!");

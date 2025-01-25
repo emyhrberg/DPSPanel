@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace DPSPanel.Core.Helpers
+namespace DPSPanel.Helpers
 {
     public static class PanelColors
     {

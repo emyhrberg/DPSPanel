@@ -32,6 +32,36 @@ Mods: {
 					Tooltip: ""
 				}
 			}
+
+			SimpleConfig: {
+				ShowBossIcon: {
+					Tooltip: ""
+					Label: Show Boss Icon
+				}
+
+				ShowWeaponIcon: {
+					Tooltip: ""
+					Label: Show Weapon Icon
+				}
+
+				ShowToggleButton: {
+					Tooltip: ""
+					Label: Show Toggle Button
+				}
+
+				Headers.BasicSettings: Basic Settings Header
+				DisplayName: Simple Config
+			}
+
+			AdvancedConfig: {
+				IdontKnow: {
+					Tooltip: ""
+					Label: Idont Know
+				}
+
+				Headers.AdvancedSettings: Advanced Settings Header
+				DisplayName: Advanced Config
+			}
 		}
 	}
 }

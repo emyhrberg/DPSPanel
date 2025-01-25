@@ -1,14 +1,12 @@
-﻿using DPSPanel.Core.Helpers;
+﻿using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.UI
+
 {
     [Autoload(Side = ModSide.Client)]
     public class PanelSystem : ModSystem

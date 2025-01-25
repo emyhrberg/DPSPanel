@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DPSPanel.Core.Configs;
-using DPSPanel.Core.Helpers;
+using DPSPanel.Configs;
+using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.UI
+
 {
     public class Panel : UIPanel
     {
@@ -20,12 +21,9 @@ namespace DPSPanel.Core.Panel
         private float currentYOffset = 0;
         private const float ItemHeight = 16f; // size of each item
 
-        // bar items
-        private Dictionary<string, DamageBarElement> damageBars = [];
+        // damageBars: Key = each individual playerName, Value = DamageBarElement
+        private Dictionary<string, DamageBarElement> players = [];
         private const float headerHeight = 28f;
-
-        // list of players
-        private Dictionary<string, int> players = [];
 
         public Panel()
         {
@@ -38,9 +36,8 @@ namespace DPSPanel.Core.Panel
             SetPadding(PANEL_PADDING);
         }
 
-        public void SetBossTitle(string bossName = "Boss Name")
+        public void SetBossTitle(string bossName)
         {
-            // currentBoss = npc;
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             bossTitle.Top.Set(6f, 0f);
@@ -51,22 +48,23 @@ namespace DPSPanel.Core.Panel
 
         public override void Draw(SpriteBatch sb)
         {
-            Config c = ModContent.GetInstance<Config>();
-            if (!c.EnableButton)
+            SimpleConfig c = ModContent.GetInstance<SimpleConfig>();
+            if (!c.ShowToggleButton)
                 return;
             base.Draw(sb);
         }
 
-        public void CreateDamageBar(string playerName = "PlayerName")
+        public void CreateDamageBar(string playerName)
         {
             // Check if the bar already exists
-            if (damageBars.ContainsKey(playerName))
+            if (players.ContainsKey(playerName))
                 return;
 
             // Create a new bar
-            DamageBarElement bar = new(currentYOffset);
+            DamageBarElement bar = new(currentYOffset, playerName);
+
             Append(bar);
-            damageBars[playerName] = bar;
+            players[playerName] = bar;
 
             ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating damage bar for {playerName}");
 
@@ -76,55 +74,63 @@ namespace DPSPanel.Core.Panel
 
         public void UpdateDamageBars(string playerName, int playerDamage)
         {
-            // If the player doesn't already have a bar, create one
-            if (!damageBars.ContainsKey(playerName))
+            if (!players.ContainsKey(playerName))
                 CreateDamageBar(playerName);
 
-            // Update the player's damage in the dictionary
-            players[playerName] = playerDamage;
+            // Update the player's damage in the DamageBarElement
+            var bar = players[playerName];
+            bar.PlayerDamage = playerDamage;
 
             // Sort players by damage in descending order
-            var sortedPlayers = players.OrderByDescending(p => p.Value).ToList();
+            var sortedPlayers = players
+                .OrderByDescending(p => p.Value.PlayerDamage)
+                .ToList();
 
-            // Reset Y offset for sorting
+            // Reset Y offset for re-sorting
             currentYOffset = headerHeight;
+
+            // Calculate the highest damage once
+            int highestDamage = sortedPlayers.First().Value.PlayerDamage;
 
             for (int i = 0; i < sortedPlayers.Count; i++)
             {
                 string currentPlayerName = sortedPlayers[i].Key;
-                int currentPlayerDamage = sortedPlayers[i].Value;
-
-                DamageBarElement bar = damageBars[currentPlayerName];
+                DamageBarElement currentBar = sortedPlayers[i].Value;
 
                 // Update bar position to match the sorted order
-                bar.Top.Set(currentYOffset, 0f);
+                currentBar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + ITEM_PADDING * 2;
 
-                // Calculate fill percentage based on the highest damage
-                int highest = sortedPlayers.First().Value;
-                int percentageToFill = (int)(currentPlayerDamage / (float)highest * 100);
+                // Calculate fill percentage safely
+                int percentageToFill = highestDamage > 0
+                    ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100)
+                    : 0;
 
-                // Assign a color based on the position in the sorted list
+                ModContent.GetInstance<DPSPanel>().Logger.Info($"Updating bar: {playerName}, Damage: {playerDamage}, Percentage: {percentageToFill}");
+
+                // Assign a color based on position in the sorted list
                 Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
 
-                // Update the bar for the current player
-                bar.UpdateDamageBar(percentageToFill, currentPlayerName, currentPlayerDamage, barColor);
+                // Update the current bar
+                currentBar.UpdateDamageBar(percentageToFill, currentPlayerName, currentBar.PlayerDamage, barColor);
             }
 
             ResizePanelHeight();
         }
 
+
         public void ClearPanelAndAllItems()
         {
             RemoveAllChildren();
-            damageBars = []; // reset
+            players.Clear(); // Clear the players dictionary
+            currentYOffset = headerHeight; // Reset the Y offset
+            ResizePanelHeight();
         }
 
         private void ResizePanelHeight()
         {
             // set parent container height
-            var parentContainer = Parent as BossPanelContainer;
-            if (parentContainer == null)
+            if (Parent is not BossContainerElement parentContainer)
                 return; // Exit if parentContainer is not set
             parentContainer.Height.Set(currentYOffset + ITEM_PADDING, 0f);
             parentContainer.Recalculate();

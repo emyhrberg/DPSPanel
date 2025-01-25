@@ -2,7 +2,7 @@
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Core.Helpers
+namespace DPSPanel.Helpers
 {
     public class GlobalProj : GlobalProjectile
     {

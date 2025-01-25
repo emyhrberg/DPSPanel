@@ -1,14 +1,13 @@
 ﻿using System.Linq;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.UI;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.UI
 {
-    public class BossPanelContainer : UIElement
+    public class BossContainerElement : UIElement
     {
-        public BossIconElement bossIcon;
+        public ToggleButtonElement bossIcon;
         public Panel panel;
 
         public bool dragging;
@@ -19,7 +18,7 @@ namespace DPSPanel.Core.Panel
         private const float MIN_WIDTH = 300f;  // Minimum container width
         private const float MIN_HEIGHT = 40f;  // Minimum container height
 
-        public BossPanelContainer()
+        public BossContainerElement()
         {
             // Container defaults
             Width.Set(MIN_WIDTH, 0f);
@@ -34,7 +33,7 @@ namespace DPSPanel.Core.Panel
             Append(panel);
 
             // 2) Create the icon
-            bossIcon = new BossIconElement();
+            bossIcon = new ToggleButtonElement();
             bossIcon.Left.Set(0f, 0f);
             bossIcon.Top.Set(0f, 0f);
             // Append it last, so it draws on top

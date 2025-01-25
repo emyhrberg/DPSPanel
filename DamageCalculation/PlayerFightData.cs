@@ -1,4 +1,4 @@
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.DamageCalculation
 {
     public class PlayerFightData
     {

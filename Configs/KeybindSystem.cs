@@ -1,9 +1,6 @@
 ﻿using Terraria.ModLoader;
-using Terraria;
-using DPSPanel.Core.Panel;
-using Microsoft.Xna.Framework;
 
-namespace DPSPanel.Core.Configs
+namespace DPSPanel.Configs
 {
     public class KeybindSystem : ModSystem
     {
@@ -25,7 +22,7 @@ namespace DPSPanel.Core.Configs
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
                 // toggle the button
-                ModContent.GetInstance<Config>().EnableButton = !ModContent.GetInstance<Config>().EnableButton;
+                ModContent.GetInstance<SimpleConfig>().ShowToggleButton = !ModContent.GetInstance<SimpleConfig>().ShowToggleButton;
             }
         }
     }
