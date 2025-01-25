@@ -4,6 +4,7 @@ using DPSPanel.Configs;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
@@ -58,22 +59,34 @@ namespace DPSPanel.UI
             ResizePanelHeight();
         }
 
+        public void SetBossIcon(int bossHeadId)
+        {
+            // Create the boss icon
+            BossIconElement bossIcon = new();
+            bossIcon.UpdateBossIcon(bossHeadId);
+            bossIcon.Left.Set(5f, 0f);
+            bossIcon.Top.Set(5f, 0f);
+            Append(bossIcon);
+        }
+
         public override void Draw(SpriteBatch sb)
         {
-            SimpleConfig c = ModContent.GetInstance<SimpleConfig>();
-            if (!c.ShowToggleButton)
+            Config c = ModContent.GetInstance<Config>();
+
+            if (!Main.playerInventory && !c.AlwaysShowButton)
                 return;
+
             base.Draw(sb);
         }
 
-        public void CreateDamageBar(string playerName)
+        public void CreateDamageBar(string playerName, int playerHeadIndex)
         {
             // Check if the bar already exists
             if (players.ContainsKey(playerName))
                 return;
 
             // Create a new bar
-            DamageBarElement bar = new(currentYOffset, playerName);
+            DamageBarElement bar = new(currentYOffset, playerName, playerHeadIndex);
 
             Append(bar);
             players[playerName] = bar;
@@ -84,10 +97,10 @@ namespace DPSPanel.UI
             ResizePanelHeight();
         }
 
-        public void UpdateDamageBars(string playerName, int playerDamage)
+        public void UpdateDamageBars(string playerName, int playerDamage, int playerHeadIndex)
         {
             if (!players.ContainsKey(playerName))
-                CreateDamageBar(playerName);
+                CreateDamageBar(playerName, playerHeadIndex);
 
             // Update the player's damage in the DamageBarElement
             var bar = players[playerName];
@@ -118,7 +131,7 @@ namespace DPSPanel.UI
                     ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100)
                     : 0;
 
-                ModContent.GetInstance<DPSPanel>().Logger.Info($"Updating bar: {playerName}, Damage: {playerDamage}, Percentage: {percentageToFill}");
+                ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Updating bar: {playerName}, Damage: {playerDamage}, Percentage: {percentageToFill}");
 
                 // Assign a color based on position in the sorted list
                 Color barColor = PanelColors.colors[i % PanelColors.colors.Length];

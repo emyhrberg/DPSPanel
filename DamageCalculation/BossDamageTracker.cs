@@ -15,8 +15,9 @@ namespace DPSPanel.DamageCalculation
         #region Classes
         public class BossFight
         {
+            public int bossHeadId = -1;
             public int currentLife;
-            public int bossId;
+            public int whoAmI;
             public int initialLife;
             public string bossName;
             public int damageTaken;
@@ -142,7 +143,7 @@ namespace DPSPanel.DamageCalculation
 
                 // Mod.Logger.Info($"whoAmI: {npc.whoAmI} | fight BOSS ID: {fight.bossId}");
 
-                if (fight != null && fight.bossId == npc.whoAmI)
+                if (fight != null && fight.whoAmI == npc.whoAmI)
                 {
                     fight.damageTaken += damageDone;
                     fight.currentLife = npc.life;
@@ -158,7 +159,8 @@ namespace DPSPanel.DamageCalculation
             {
                 fight = new BossFight
                 {
-                    bossId = npc.whoAmI,
+                    bossHeadId = npc.GetBossHeadTextureIndex(),
+                    whoAmI = npc.whoAmI,
                     currentLife = npc.life,
                     initialLife = npc.lifeMax,
                     bossName = npc.FullName,
@@ -180,44 +182,17 @@ namespace DPSPanel.DamageCalculation
             string player = Main.LocalPlayer.name;
             int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
 
-            // Calculate sizes
-            int playerNameSize = System.Text.Encoding.UTF8.GetByteCount(player) + Get7BitEncodedIntSize(player.Length);
-            int damageDoneSize = sizeof(int);
-            int bossIdSize = sizeof(int);
-            int bossNameSize = System.Text.Encoding.UTF8.GetByteCount(fight.bossName) + Get7BitEncodedIntSize(fight.bossName.Length);
-
-            // Log sizes
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"Packet Sizes (Bytes):");
-            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Header (byte): 1");
-            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Player Name (string): {playerNameSize}");
-            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Damage Done (int): {damageDoneSize}");
-            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Boss ID (int): {bossIdSize}");
-            ModContent.GetInstance<DPSPanel>().Logger.Info($" - Boss Name (string): {bossNameSize}");
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"Total Packet Size: {1 + playerNameSize + damageDoneSize + bossIdSize + bossNameSize} bytes");
-
             // Create and send the packet
             ModPacket packet = Mod.GetPacket();
             packet.Write((byte)ModMessageType.FightPacket);
             packet.Write(player);
             packet.Write(damageDone);
-            packet.Write(fight.bossId);
+            packet.Write(fight.whoAmI);
             packet.Write(fight.bossName);
+            packet.Write(fight.bossHeadId);
 
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent: {player} | Sent: {damageDone} | BossID: {fight.bossId} | BossName: {fight.bossName}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId}");
             packet.Send(); // send the packet to the server
-        }
-
-        // Helper to calculate the size of a 7-bit encoded integer
-        private int Get7BitEncodedIntSize(int value)
-        {
-            int count = 0;
-            uint v = (uint)value; // treat value as unsigned
-            while (v >= 0x80)
-            {
-                v >>= 7;
-                count++;
-            }
-            return count + 1;
         }
 
         #endregion

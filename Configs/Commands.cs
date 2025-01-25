@@ -20,7 +20,7 @@ namespace DPSPanel.Configs
             string target = args[0].ToLower(); // "dps" or "panel"
             if (target == "toggle")
             {
-                ModContent.GetInstance<SimpleConfig>().ShowToggleButton = !ModContent.GetInstance<SimpleConfig>().ShowToggleButton;
+                ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
             }
             else
                 throw new UsageException("Error: Incorrect argument. Valid arguments are: /dps hide, show, clear.");
@@ -41,7 +41,7 @@ namespace DPSPanel.Configs
             if (args[0] == "item")
             {
                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.container.panel.UpdateDamageBars($"PlayerName {i}", 300);
+                sys.state.container.panel.UpdateDamageBars($"PlayerName {i}", 300, -1);
                 i++;
             }
             else if (args[0] == "clear")
@@ -69,7 +69,7 @@ namespace DPSPanel.Configs
             string target = args[0].ToLower(); // "dps" or "panel"
 
             if (target == "dps")
-                ModContent.GetInstance<SimpleConfig>().ShowToggleButton = !ModContent.GetInstance<SimpleConfig>().ShowToggleButton;
+                ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
 
             // sys?.state.container.TogglePanel();
             else

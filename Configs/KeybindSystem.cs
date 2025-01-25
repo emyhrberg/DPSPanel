@@ -22,7 +22,7 @@ namespace DPSPanel.Configs
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
                 // toggle the button
-                ModContent.GetInstance<SimpleConfig>().ShowToggleButton = !ModContent.GetInstance<SimpleConfig>().ShowToggleButton;
+                ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
             }
         }
     }

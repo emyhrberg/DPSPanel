@@ -29,11 +29,12 @@ namespace DPSPanel.UI
         // Properties
         public string PlayerName { get; set; }
         public int PlayerDamage { get; set; }
+        public int PlayerHeadIndex { get; set; }
 
-        public DamageBarElement(float currentYOffset, string playerName)
+        public DamageBarElement(float currentYOffset, string playerName, int playerHeadIndex)
         {
-            emptyBar = LoadResources.BarEmpty;
-            fullBar = LoadResources.BarFull;
+            emptyBar = LoadAssets.BarEmpty;
+            fullBar = LoadAssets.BarFull;
 
             Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
             Height = new StyleDimension(ItemHeight, 0f); // Set height
@@ -42,6 +43,7 @@ namespace DPSPanel.UI
 
             PlayerName = playerName;
             PlayerDamage = 0;
+            PlayerHeadIndex = playerHeadIndex;
 
             // Create the text element centered on the bar.
             textElement = new UIText("", 0.8f) // 80% size
@@ -63,12 +65,41 @@ namespace DPSPanel.UI
             textElement.SetText($"{playerName} ({playerDamage})");
         }
 
+
+
         protected override void DrawSelf(SpriteBatch sb)
         {
             base.DrawSelf(sb);
             DrawDamageBarFill(sb);
             DrawDamageBarOutline(sb);
+            DrawPlayerHead(sb);
             // DrawWeaponIcon(sb);
+        }
+
+        private void DrawPlayerHead(SpriteBatch sb)
+        {
+            if (PlayerHeadIndex < 0 || PlayerHeadIndex >= TextureAssets.Players.Length)
+                return;
+
+            Texture2D headTexture = TextureAssets.Players[PlayerHeadIndex, 0].Value;
+            if (headTexture == null)
+                return;
+
+            CalculatedStyle dims = GetDimensions();
+
+            // Define the size of the player head
+            int headSize = 32;
+            int padding = 5; // Padding between the head and the damage bar
+
+            // Position the head to the left of the damage bar
+            Vector2 headPosition = new Vector2(dims.X - headSize - padding, dims.Y + (dims.Height - headSize) / 2f);
+            Rectangle destRect = new Rectangle((int)headPosition.X, (int)headPosition.Y, headSize, headSize);
+
+            // Optionally, draw a border around the head
+            // sb.Draw(borderTexture, destRect, Color.White); // If you have a border texture
+
+            // Draw the player head
+            sb.Draw(headTexture, destRect, Color.White);
         }
 
         private void DrawDamageBarFill(SpriteBatch sb)
@@ -98,9 +129,9 @@ namespace DPSPanel.UI
         private void DrawWeaponIcon(SpriteBatch sb)
         {
             // Check if the weapon icon display is enabled in the config
-            SimpleConfig c = ModContent.GetInstance<SimpleConfig>();
-            if (!c.ShowWeaponIcon)
-                return;
+            // Config c = ModContent.GetInstance<Config>();
+            // if (!c.AlwaysShowButton)
+            // return;
 
             // Load the appropriate texture based on the weaponItemID
             Texture2D texture;

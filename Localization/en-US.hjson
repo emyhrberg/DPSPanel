@@ -1,67 +1,26 @@
 Mods: {
 	DPSPanel: {
-		Keybinds.ToggleDPSPanel.DisplayName: Toggle Boss Panel
-
 		Configs: {
 			Config: {
+				DoNothing: {
+					Tooltip: IDK
+					Label: "[i:560] [c/9bfff0:Do nothing for now]"
+				}
+
+				Headers: {
+					AdvancedSettings: Advanced Settings Header
+					BasicSettings: Basic Settings Header
+				}
+
+				AlwaysShowButton: {
+					Tooltip: On: Always show the ninja button. Off: Only show the button when inventory is open.
+					Label: "[i:256] Always Show Button"
+				}
+
 				DisplayName: Config
-				Headers.DPSPanelConfig: DPS Panel
-
-				EnableButton: {
-					Label: "[i:560] [c/ffffff:Enable Button]"
-					Tooltip: Choose whether to enable the button to see boss damage or not.
-				}
-
-				Theme: {
-					Label: "[i:337] [c/ffffff:Damage Bar Theme]"
-					Tooltip: Change the theme of the boss damage bars that appear. Two options exist; Fancy and Generic.
-				}
-
-				ShowWeaponIcon: {
-					Label: "[i:3520] [c/ffffff:Show Weapon (experimental)]"
-					Tooltip: Choose whether to show the weapons or not in the damage bars that appear.
-				}
-
-				DrawXOnDead: {
-					Label: Draw X On Dead
-					Tooltip: ""
-				}
-
-				HighlightBossIcon: {
-					Label: Highlight Boss Icon
-					Tooltip: ""
-				}
-			}
-
-			SimpleConfig: {
-				ShowBossIcon: {
-					Tooltip: ""
-					Label: Show Boss Icon
-				}
-
-				ShowWeaponIcon: {
-					Tooltip: ""
-					Label: Show Weapon Icon
-				}
-
-				ShowToggleButton: {
-					Tooltip: ""
-					Label: Show Toggle Button
-				}
-
-				Headers.BasicSettings: Basic Settings Header
-				DisplayName: Simple Config
-			}
-
-			AdvancedConfig: {
-				IdontKnow: {
-					Tooltip: ""
-					Label: Idont Know
-				}
-
-				Headers.AdvancedSettings: Advanced Settings Header
-				DisplayName: Advanced Config
 			}
 		}
+
+		Keybinds.ToggleDPSPanel.DisplayName: Toggle D P S Panel
 	}
 }

@@ -3,23 +3,24 @@ using System.ComponentModel;
 
 namespace DPSPanel.Configs
 {
-    public class SimpleConfig : ModConfig
+    public class Config : ModConfig
     {
-        // Determines the scope of the configuration. ClientSide means it only affects the player's local game.
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
         [Header("BasicSettings")]
+        [BackgroundColor(100, 149, 237)] // CornflowerBlue. Is used for all items in BasicSettings?
 
-        [BackgroundColor(255, 99, 71)]
-        [DefaultValue(true)] // Default value is true.
-        public bool ShowToggleButton { get; set; } = false;
+        [Label("[i:256] Always Show Button")]
+        [Tooltip("On: Always show the ninja button. Off: Only show the button when inventory is open.")]
+        [DefaultValue(true)]
+        public bool AlwaysShowButton { get; set; } = true;
 
-        [BackgroundColor(255, 99, 71)]
-        [DefaultValue(false)] // Default value is true.
-        public bool ShowWeaponIcon { get; set; } = false;
+        [Header("AdvancedSettings")]
+        [BackgroundColor(255, 182, 193)] // LightPink
 
-        [BackgroundColor(255, 99, 71)]
-        [DefaultValue(false)] // Default value is true.
-        public bool ShowBossIcon { get; set; } = false;
+        [Label("[i:560] [c/9bfff0:Do nothing for now]")]
+        [Tooltip("IDK")]
+        [DefaultValue(true)]
+        public bool DoNothing { get; set; } = true;
     }
 }

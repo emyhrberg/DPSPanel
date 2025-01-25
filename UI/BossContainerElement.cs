@@ -7,7 +7,7 @@ namespace DPSPanel.UI
 {
     public class BossContainerElement : UIElement
     {
-        public ToggleButtonElement bossIcon;
+        public ToggleButtonElement toggleButton;
         public Panel panel;
 
         public bool dragging;
@@ -28,16 +28,12 @@ namespace DPSPanel.UI
 
             // 1) Create the panel
             panel = new Panel();
-            panel.Left.Set(0f, 0f);
-            panel.Top.Set(0f, 0f);
             Append(panel);
 
-            // 2) Create the icon
-            bossIcon = new ToggleButtonElement();
-            bossIcon.Left.Set(0f, 0f);
-            bossIcon.Top.Set(0f, 0f);
+            // 2) Create the button
+            toggleButton = new ToggleButtonElement();
             // Append it last, so it draws on top
-            Append(bossIcon);
+            Append(toggleButton);
 
             panel.SetBossTitle("Fight a boss to display stats!", -1);
         }
@@ -114,8 +110,8 @@ namespace DPSPanel.UI
                 {
                     Append(panel);
                     // remove & re-append the icon so it draws on top
-                    bossIcon.Remove();
-                    Append(bossIcon);
+                    toggleButton.Remove();
+                    Append(toggleButton);
                 }
             }
             else

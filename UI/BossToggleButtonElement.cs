@@ -2,6 +2,7 @@
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -19,18 +20,18 @@ namespace DPSPanel.UI
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
-            Top.Set(5f, 0f);
-            Left.Set(5f, 0f);
+            Top.Set(4f, 0f);
+            Left.Set(4f, 0f);
 
-            ninjaTexture = LoadResources.NinjaTexture.Value;
-            ninjaHighlightedTexture = LoadResources.NinjaHighlightedTexture.Value;
+            ninjaTexture = LoadAssets.NinjaTexture.Value;
+            ninjaHighlightedTexture = LoadAssets.NinjaHighlightedTexture.Value;
         }
 
         protected override void DrawSelf(SpriteBatch sb)
         {
-            SimpleConfig c = ModContent.GetInstance<SimpleConfig>();
-
-            if (c != null && !c.ShowToggleButton)
+            Config c = ModContent.GetInstance<Config>();
+            // if inventory is closed and button is not set to always show, don't draw the button
+            if (!Main.playerInventory && !c.AlwaysShowButton)
                 return;
 
             base.DrawSelf(sb);
@@ -44,6 +45,11 @@ namespace DPSPanel.UI
             if (IsMouseHovering)
             {
                 sb.Draw(ninjaHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                var parentContainer = Parent as BossContainerElement;
+                if (parentContainer.panelVisible)
+                    Main.instance.MouseText("Click to hide panel");
+                else
+                    Main.instance.MouseText("Click to show panel");
             }
             else
             {
