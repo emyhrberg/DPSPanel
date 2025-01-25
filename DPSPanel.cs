@@ -18,8 +18,6 @@ namespace DPSPanel
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
-            Logger.Info($"Received packet with length: {reader.BaseStream.Length} | from: {whoAmI} | netmode: {Main.netMode}");
-
             ModMessageType msgType = (ModMessageType)reader.ReadByte();
             switch (msgType)
             {
@@ -29,14 +27,34 @@ namespace DPSPanel
                     int bossId = reader.ReadInt32();
                     string bossName = reader.ReadString();
 
-                    Logger.Info($"Player: {playerName} | Damage: {damageDone} | Boss: {bossName} | BossID ({bossId})");
+                    if (Main.netMode == NetmodeID.Server)
+                    {
+                        // Server processes the packet and broadcasts it to all clients
+                        Logger.Info($"[Server] Received FightPacket from {playerName}: {damageDone} damage to {bossName} (ID {bossId})");
 
-                    // update UI
-                    PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                    if (sys != null)
-                        sys.state.container.panel.UpdateDamageBars(playerName, damageDone);
-                    else
-                        Logger.Warn("PanelSystem is null");
+                        // Send data to all clients
+                        ModPacket packet = GetPacket();
+                        packet.Write((byte)ModMessageType.FightPacket);
+                        packet.Write(playerName);
+                        packet.Write(damageDone);
+                        packet.Write(bossId);
+                        packet.Write(bossName);
+                        packet.Send(); // Broadcast to all clients
+                    }
+                    else if (Main.netMode == NetmodeID.MultiplayerClient)
+                    {
+                        // Client updates its UI with the received data
+                        Logger.Info($"[Client] Updating UI for {playerName}: {damageDone} damage to {bossName} (ID {bossId})");
+
+                        var panel = ModContent.GetInstance<PanelSystem>()?.state?.container?.panel;
+                        if (panel == null)
+                        {
+                            Logger.Warn("[Client] Panel is null! Ensure the UI is properly initialized.");
+                            return;
+                        }
+
+                        panel.UpdateDamageBars(playerName, damageDone);
+                    }
                     break;
             }
         }

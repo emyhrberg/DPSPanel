@@ -13,6 +13,8 @@ namespace DPSPanel.Core.Panel
         {
             container = new BossPanelContainer();
             Append(container);
+
+            ModContent.GetInstance<DPSPanel>().Logger.Info("PanelState initialized!");
         }
     }
 }

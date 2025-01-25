@@ -188,7 +188,7 @@ namespace DPSPanel.Core.DamageCalculation
             packet.Write(damageDone);
             packet.Write(fight.bossId);
             packet.Write(fight.bossName);
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"Sent: {player} | {damageDone} | {fight.bossId} | {fight.bossName}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent: {player} | Sent: {damageDone} | BossID: {fight.bossId} | BossName {fight.bossName}");
             packet.Send(); // send the packet to the server
         }
         #endregion
