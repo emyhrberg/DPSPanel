@@ -79,14 +79,14 @@ namespace DPSPanel.UI
             base.Draw(sb);
         }
 
-        public void CreateDamageBar(string playerName, int playerHeadIndex)
+        public void CreateDamageBar(string playerName, int playerWhoAmI)
         {
             // Check if the bar already exists
             if (players.ContainsKey(playerName))
                 return;
 
             // Create a new bar
-            DamageBarElement bar = new(currentYOffset, playerName, playerHeadIndex);
+            DamageBarElement bar = new(currentYOffset, playerName, playerWhoAmI);
 
             Append(bar);
             players[playerName] = bar;
@@ -97,10 +97,10 @@ namespace DPSPanel.UI
             ResizePanelHeight();
         }
 
-        public void UpdateDamageBars(string playerName, int playerDamage, int playerHeadIndex)
+        public void UpdateDamageBars(string playerName, int playerDamage, int playerWhoAmI)
         {
             if (!players.ContainsKey(playerName))
-                CreateDamageBar(playerName, playerHeadIndex);
+                CreateDamageBar(playerName, playerWhoAmI);
 
             // Update the player's damage in the DamageBarElement
             var bar = players[playerName];

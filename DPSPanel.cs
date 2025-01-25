@@ -26,8 +26,7 @@ namespace DPSPanel
                     int bossWhoAmI = reader.ReadInt32();
                     string bossName = reader.ReadString();
                     int bossHeadId = reader.ReadInt32();
-                    // int playerHeadIndex = reader.ReadInt32();
-                    int playerHeadIndex = -1;
+                    int playerWhoAmI = reader.ReadInt32();
 
                     if (Main.netMode == NetmodeID.Server)
                     {
@@ -42,17 +41,17 @@ namespace DPSPanel
                         packet.Write(bossWhoAmI);
                         packet.Write(bossName);
                         packet.Write(bossHeadId);
-                        // packet.Write(Main.player[whoAmI].head); // for drawing players heads
+                        packet.Write(playerWhoAmI);
+                        Logger.Info($"[Server] sent WHOAMI: {playerWhoAmI}");
                         packet.Send(); // Broadcast to all clients
                     }
                     else if (Main.netMode == NetmodeID.MultiplayerClient)
                     {
                         // Client updates its UI with the received data
-                        Logger.Info($"[Client] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerHeadIndex: {playerHeadIndex}");
+                        Logger.Info($"[Client] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
 
                         PanelSystem sys = ModContent.GetInstance<PanelSystem>();
                         Panel panel = sys.state.container.panel;
-
                         if (panel.CurrentBossID != bossWhoAmI)
                         {
                             // new boss fight, clear panel and set title
@@ -61,7 +60,7 @@ namespace DPSPanel
                             panel.SetBossTitle(bossName, bossWhoAmI);
                         }
 
-                        panel.UpdateDamageBars(playerName, damageDone, playerHeadIndex);
+                        panel.UpdateDamageBars(playerName, damageDone, playerWhoAmI);
                     }
                     break;
             }

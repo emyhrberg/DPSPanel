@@ -1,4 +1,6 @@
-﻿using Terraria.ModLoader;
+﻿using DPSPanel.Helpers;
+using Microsoft.Xna.Framework.Graphics;
+using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace DPSPanel.UI

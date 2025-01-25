@@ -1,4 +1,5 @@
 ﻿using DPSPanel.UI;
+using Terraria;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Configs
@@ -33,7 +34,7 @@ namespace DPSPanel.Configs
         public override string Command => "a"; // main action (/a)
         public override string Description => "use /spawn item"; // Is shown when using "/help"
 
-        int i = 0;
+        int i = -1;
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
@@ -41,7 +42,10 @@ namespace DPSPanel.Configs
             if (args[0] == "item")
             {
                 PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                sys.state.container.panel.UpdateDamageBars($"PlayerName {i}", 300, -1);
+                // damage = random number between 100 and 2000
+                int damage = Main.rand.Next(100, 2000);
+                int playerHeadIndex = 0;
+                sys.state.container.panel.UpdateDamageBars($"PlayerName {i}", damage, playerHeadIndex);
                 i++;
             }
             else if (args[0] == "clear")

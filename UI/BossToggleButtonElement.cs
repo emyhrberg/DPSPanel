@@ -37,7 +37,7 @@ namespace DPSPanel.UI
             base.DrawSelf(sb);
 
             // get the dimensions of the element
-            const float scale = 0.7f; // Scale factor
+            const float scale = 0.65f; // Scale factor. Try to make as big as the player head icons.
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X + (dims.Width - ninjaTexture.Width * scale) / 2f,
                             dims.Y + (dims.Height - ninjaTexture.Height * scale) / 2f);

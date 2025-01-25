@@ -57,6 +57,10 @@ namespace DPSPanel.UI
             state.Activate();
             ui.SetState(state);
             ModContent.GetInstance<DPSPanel>().Logger.Info("PanelSystem initialized!");
+
+            // Test drawing player heads
+            // state.container.panel.UpdateDamageBars($"PlayerName {'a'}", 300, 0);
+            // state.container.panel.UpdateDamageBars($"PlayerName {'b'}", 500, 0);
         }
 
         public override void UpdateUI(GameTime gameTime)
@@ -73,8 +77,8 @@ namespace DPSPanel.UI
                     "DPSPanel: UI System", // Debug layer
                     delegate
                     {
-                        // Main drawing function
-                        // DrawAllPlayerHeads();
+                        // test drawing here
+                        // DrawPlayerHeads();
 
                         // Main UI system drawing
                         ui.Draw(Main.spriteBatch, new GameTime());
@@ -85,77 +89,44 @@ namespace DPSPanel.UI
             }
         }
 
-        private void DrawAllPlayerHeads()
+        public void DrawPlayerHeads()
         {
-            if (playerRendersField == null || playerRenders == null)
-                return;
+            // Define the size of each player head icon
+            int headSize = 32;
+            int padding = 5; // Space between the head and the damage bar
 
-            int index = 0;
+            // Starting position for the first player's head
+            // Adjust X based on where you want the heads relative to the damage bars
+            Vector2 startPosition = new Vector2(10, 50); // Example values
 
-            foreach (Player player in Main.player)
+            // Iterate through all possible players
+            for (int i = 0; i < Main.maxPlayers; i++)
             {
+                Player player = Main.player[i];
+
+                // Skip inactive or null players
                 if (player == null || !player.active)
                     continue;
 
-                if (player.whoAmI < 0 || player.whoAmI >= playerRenders.Length)
-                {
-                    ModContent.GetInstance<DPSPanel>().Logger.Warn($"Player {player.name} has invalid whoAmI index {player.whoAmI}.");
-                    continue;
-                }
+                // Get the border color for the player's head
+                Color headBordersColor = Main.GetPlayerHeadBordersColor(player);
 
-                PlayerHeadDrawRenderTargetContent playerHeadRender = playerRenders[player.whoAmI];
-                if (playerHeadRender == null)
-                {
-                    ModContent.GetInstance<DPSPanel>().Logger.Warn($"PlayerHeadDrawRenderTargetContent for player {player.name} is null.");
-                    continue;
-                }
+                // Calculate the Y position based on the player's index in the sorted damage bars
+                // Assuming damage bars are sorted and arranged vertically with consistent spacing
+                float yPosition = 50 + i * (headSize + padding);
 
-                // Backup and force the player to face right
-                int originalDirection = player.direction;
-                player.direction = 1;
+                // Define the position for the player's head
+                Vector2 headPosition = new Vector2(startPosition.X, yPosition);
 
-                // Setup render target
-                playerHeadRender.UsePlayer(player);
-                playerHeadRender.UseColor(Main.GetPlayerHeadBordersColor(player));
-                playerHeadRender.Request();
-
-                // Check if the render target is ready
-                if (playerHeadRender.IsReady)
-                {
-                    RenderTarget2D target = playerHeadRender.GetTarget();
-
-                    // Define the destination rectangle
-                    Rectangle destinationRect = new Rectangle(
-                        (int)(startPosition.X + index * spacing),
-                        (int)(startPosition.Y),
-                        32, // Width of the head
-                        32  // Height of the head
-                    );
-
-                    // Draw the player head with SpriteEffects.FlipHorizontally to ensure it faces right
-                    Main.spriteBatch.Draw(
-                        target,
-                        destinationRect,
-                        null,
-                        Color.White,
-                        0f,
-                        target.Size() / 2f,
-                        SpriteEffects.None, // No flipping needed since direction is set to 1
-                        0f
-                    );
-
-                    // Restore the player's original direction
-                    player.direction = originalDirection;
-
-                    // Debug info
-                    // ModContent.GetInstance<DPSPanel>().Logger.Info($"Drawing Player {player.name}'s head at {destinationRect.Location}.");
-                }
-                else
-                {
-                    ModContent.GetInstance<DPSPanel>().Logger.Info($"Player {player.name}'s head render target is not ready.");
-                }
-
-                index++;
+                // Draw the player's head using the existing MapPlayerRenderer
+                Main.MapPlayerRenderer.DrawPlayerHead(
+                    Main.Camera,      // Current camera
+                    player,           // Player to draw
+                    headPosition,     // Position to draw the head
+                    1f,               // Alpha (opacity)
+                    0.8f,             // Scale
+                    headBordersColor  // Border color
+                );
             }
         }
     }

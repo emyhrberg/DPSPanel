@@ -190,8 +190,9 @@ namespace DPSPanel.DamageCalculation
             packet.Write(fight.whoAmI);
             packet.Write(fight.bossName);
             packet.Write(fight.bossHeadId);
+            packet.Write(Main.LocalPlayer.whoAmI);
 
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId}");
+            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
             packet.Send(); // send the packet to the server
         }
 

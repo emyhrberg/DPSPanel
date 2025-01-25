@@ -35,7 +35,7 @@ namespace DPSPanel.UI
             // Append it last, so it draws on top
             Append(toggleButton);
 
-            panel.SetBossTitle("Fight a boss to display stats!", -1);
+            panel.SetBossTitle("Boss Damage System", -1);
         }
 
         #region Dragging
