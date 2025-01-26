@@ -1,4 +1,5 @@
 ﻿using DPSPanel.UI;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -10,8 +11,8 @@ namespace DPSPanel.Configs
         public override string Command => "dps"; // The main command is "/dps"
         public override string Description => "Usage: /dps <add> <clear> <toggle>"; // Is shown when using "/help"
 
-        // create list of example players using real funny russian names. only 4 players for now
-        private string[] players = ["Vladimir", "Ivan", "Dmitri", "Sergei"];
+        // create list of example players using real funny russian names. 10 players
+        private string[] players = ["Vladimir", "Ivan", "Dmitri", "Sergei, Alexei", "Yuri", "Anatoli", "Boris", "Mikhail", "Nikolai", "Pavel"];
         int i = 0;
 
         public override void Action(CommandCaller caller, string input, string[] args)
@@ -45,6 +46,11 @@ namespace DPSPanel.Configs
             else if (target == "toggle")
             {
                 ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
+
+                Rectangle pos = Main.LocalPlayer.getRect();
+                Color color = ModContent.GetInstance<Config>().AlwaysShowButton ? Color.Green : Color.Red;
+                string text = ModContent.GetInstance<Config>().AlwaysShowButton ? "Button will always show" : "Button will only show when inventory is open";
+                CombatText.NewText(pos, color, text);
             }
             else
             {

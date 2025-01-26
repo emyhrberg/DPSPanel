@@ -9,10 +9,11 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using DPSPanel.Configs;
 using DPSPanel.Helpers;
+using Terraria.ModLoader.UI;
 
 namespace DPSPanel.UI
 {
-    public class WeaponBarElement : UIElement
+    public class WeaponDamageBarElement : UIElement
     {
         private readonly Asset<Texture2D> emptyBar; // Background 
         private readonly Asset<Texture2D> fullBar;  // Foreground fill texture
@@ -26,7 +27,7 @@ namespace DPSPanel.UI
         private int weaponItemID;
         private string weaponName;           // Weapon name
 
-        public WeaponBarElement(float currentYOffset)
+        public WeaponDamageBarElement(float currentYOffset)
         {
             // check config settings for theme
             Config c = ModContent.GetInstance<Config>();

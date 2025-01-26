@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using DPSPanel.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -56,21 +57,21 @@ namespace DPSPanel.UI
         #region Custom Buttons
         private void AddCustomButtons()
         {
-            Config c = ModContent.GetInstance<Config>();
-            if (!c.ShowClearButton)
-                return;
+            // Config c = ModContent.GetInstance<Config>();
+            // if (!c.ShowClearButton)
+            //     return;
 
             // Clear Button
-            clearButton = new CustomButtonElement("Clear", "Clear all damage data", () =>
-            {
-                panel.ClearPanelAndAllItems();
-                panel.SetBossTitle("Boss Damage System", -1);
-                Main.NewText("Damage data cleared.", Color.Green);
-            });
-            clearButton.HAlign = 1.0f; // Right-aligned
-            clearButton.Top.Set(0f, 0f); // Top-aligned
-            clearButton.Width.Set(10f, 0f); // Set width
-            Append(clearButton);
+            // clearButton = new CustomButtonElement("Clear", "Clear all damage data", () =>
+            // {
+            //     panel.ClearPanelAndAllItems();
+            //     panel.SetBossTitle("Boss Damage System", -1);
+            //     Main.NewText("Damage data cleared.", Color.Green);
+            // });
+            // clearButton.HAlign = 1.0f; // Right-aligned
+            // clearButton.Top.Set(0f, 0f); // Top-aligned
+            // clearButton.Width.Set(10f, 0f); // Set width
+            // Append(clearButton);
 
             // // Lock Draggable Button
             // // var lockButton = new CustomButtonElement("Lock", "Toggle dragging", () =>
@@ -185,9 +186,9 @@ namespace DPSPanel.UI
                     toggleButton.Remove();
                     Append(toggleButton);
 
-                    Config c = ModContent.GetInstance<Config>();
-                    if (c.ShowClearButton && clearButton != null)
-                        Append(clearButton);
+                    // Config c = ModContent.GetInstance<Config>();
+                    // if (c.ShowClearButton && clearButton != null)
+                    // Append(clearButton);
                 }
             }
             else
@@ -196,7 +197,7 @@ namespace DPSPanel.UI
                 {
                     panel.Remove();
                     clearButton?.Remove();
-                    Main.NewText("Panel hidden. Note that you can use /a item or /a clear or /dps toggle", Color.SteelBlue);
+                    // Main.NewText("Panel hidden. In chat, you can type /dps <toggle> <item> <clear> ", Color.SteelBlue);
                 }
             }
         }

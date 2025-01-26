@@ -27,7 +27,7 @@ namespace DPSPanel.UI
         private Dictionary<string, DamageBarElement> players = [];
 
         // singleplayer: weaponBars: Key = each individual weaponName, Value = WeaponBarElement
-        private Dictionary<string, WeaponBarElement> damageBars = [];
+        private Dictionary<string, WeaponDamageBarElement> damageBars = [];
 
         // bossTitle: Title of the boss
         public int CurrentBossID;
@@ -175,7 +175,7 @@ namespace DPSPanel.UI
         {
             if (!damageBars.ContainsKey(barName))
             {
-                WeaponBarElement bar = new(currentYOffset);
+                WeaponDamageBarElement bar = new(currentYOffset);
                 Append(bar);
                 damageBars[barName] = bar;
 
@@ -212,7 +212,7 @@ namespace DPSPanel.UI
                     // Removed: return;
                 }
 
-                WeaponBarElement bar = damageBars[wpn.weaponName];
+                WeaponDamageBarElement bar = damageBars[wpn.weaponName];
 
                 // Update with the current data.
                 int percentageToFill = (int)(wpn.damage / (float)highest * 100);

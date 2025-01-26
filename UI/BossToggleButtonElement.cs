@@ -51,16 +51,32 @@ namespace DPSPanel.UI
             if (isHoverValid)
             {
                 sb.Draw(ninjaHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-                if (parentContainer.panelVisible)
-                    Main.instance.MouseText("Click to hide panel");
-                else
-                    Main.instance.MouseText("Click to show panel");
+                // if (parentContainer.panelVisible)
+                Main.instance.MouseText("Left click to toggle panel \nRight click to hide and only show when inventory is open");
+                // else
+                // Main.instance.MouseText("Click to show panel");
             }
             else
             {
                 sb.Draw(ninjaTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             }
         }
+
+        #region RightClick
+        public override void RightMouseDown(UIMouseEvent evt)
+        {
+            base.RightMouseDown(evt);
+
+            // on right click we toggle the config setting to only show in inventory.
+            ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
+
+            Rectangle pos = Main.LocalPlayer.getRect();
+            // change color and text based on the config setting
+            Color color = ModContent.GetInstance<Config>().AlwaysShowButton ? Color.Green : Color.Red;
+            string text = ModContent.GetInstance<Config>().AlwaysShowButton ? "Button will always show" : "Button will only show when inventory is open";
+            CombatText.NewText(pos, color, text);
+        }
+        #endregion
 
         #region ClickDragHotFix
         public override void LeftMouseDown(UIMouseEvent evt)

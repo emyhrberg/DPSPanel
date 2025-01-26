@@ -7,6 +7,7 @@ using Terraria.ID;
 using static DPSPanel.DPSPanel;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
+using DPSPanel.Configs;
 
 namespace DPSPanel.DamageCalculation
 {
@@ -60,6 +61,13 @@ namespace DPSPanel.DamageCalculation
         #region Hooks
         public override void OnEnterWorld()
         {
+            if (Main.netMode == NetmodeID.SinglePlayer)
+                return;
+
+            Config c = ModContent.GetInstance<Config>();
+            if (!c.ShowPopupMessage)
+                return;
+
             Main.NewText(
                 "[DPSPanel] Hello, " + Main.LocalPlayer.name +
                 "! To use DPSPanel, type /dps toggle in chat or toggle with K (set the keybind in Settings -> Controls).",

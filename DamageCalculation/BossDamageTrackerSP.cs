@@ -11,6 +11,7 @@ using log4net;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
 using DPSPanel.DamageCalculation;
+using DPSPanel.Configs;
 
 namespace DPSPanel.Core.Panel
 {
@@ -133,10 +134,13 @@ namespace DPSPanel.Core.Panel
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
+            Config c = ModContent.GetInstance<Config>();
+            if (!c.ShowPopupMessage)
+                return;
+
             Main.NewText(
-                "Hello, " + Main.LocalPlayer.name +
-                "! To use the DPS panel, type /dps toggle in chat or toggle with K (set the keybind in controls).",
-                Color.Yellow
+                "[DPSPanel] Start a boss fight to display stats! You can also toggle the display with K (set the keybind in Settings -> Controls).",
+                Color.SkyBlue
             );
         }
 
@@ -346,10 +350,6 @@ namespace DPSPanel.Core.Panel
                 fight.isAlive = false;
                 fight.FixFinalBlowDiscrepancy(weapon); // ensure total damage == boss max HP
                 fight.SendBossFightToPanel();
-
-                // set height to 10
-                // PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                // sys.state.container.panel.Height.Set(10, 0f);
 
                 // fightId++;
                 fight = null;

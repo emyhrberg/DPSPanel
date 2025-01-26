@@ -44,9 +44,13 @@ namespace DPSPanel.UI
                 // you can do something here, but when dead the player disappears and is undrawable so you have to make a clone before death or something
             }
 
+            // make a clone and have it always face right
+            Player rightFacingClone = (Player)player.Clone();
+            rightFacingClone.direction = 1;
+
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
-                player,
+                rightFacingClone,
                 drawPosition,
                 1f, // alpha/transparency
                 1.1f, // scale

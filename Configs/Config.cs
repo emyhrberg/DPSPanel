@@ -25,15 +25,16 @@ namespace DPSPanel.Configs
         [Header("AdvancedSettings")]
 
         [Label("Disable Valid Hover Highlight")]
-        [BackgroundColor(35, 132, 250)] // CornflowerBlue
-        [Tooltip("If enabled, disables the valid hover highlight during certain mouse interactions.")]
-        [DefaultValue(false)]
+        [BackgroundColor(247, 186, 197)] // Light pink
+        [Tooltip("Basically, if you are using weapons it will not highlight the toggle button when hovering over the button.")]
+        [DefaultValue(true)]
         public bool DisableValidHoverHighlight { get; set; } = false;
 
-        [Label("Show Clear Button (currently disabled)")]
+        [Header("EvenMoreSettings")]
+        [Label("Popup Message")]
         [BackgroundColor(35, 132, 250)] // CornflowerBlue
-        [Tooltip("If enabled, shows the clear button.")]
-        [DefaultValue(false)]
-        public bool ShowClearButton { get; set; } = false;
+        [Tooltip("Shows a popup message every time when entering a new world.")]
+        [DefaultValue(true)]
+        public bool ShowPopupMessage { get; set; } = false;
     }
 }
