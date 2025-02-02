@@ -60,7 +60,7 @@ namespace DPSPanel.UI
                     delegate
                     {
                         // test drawing here
-                        nog();
+                        // nog();
 
                         // Main UI system drawing
                         ui.Draw(Main.spriteBatch, new GameTime());

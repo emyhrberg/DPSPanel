@@ -19,7 +19,7 @@ Mods: {
 				}
 
 				AlwaysShowButton: {
-					Tooltip: On: Always show the ninja button. Off: Only show the button when inventory is open.
+					Tooltip: On: Always show the toggle button. Off: Only show the button when inventory is open.
 					Label: "[i:256] Always Show Button"
 				}
 
@@ -28,6 +28,11 @@ Mods: {
 				ShowPopupMessage: {
 					Label: Popup Message
 					Tooltip: Shows a popup message every time when entering a new world.
+				}
+
+				MaxWeaponsDisplayed: {
+					Tooltip: Set the maximum number of weapons to display in the panel.
+					Label: Max Weapons Displayed
 				}
 			}
 		}

@@ -51,7 +51,7 @@ namespace DPSPanel.UI
             // AddCustomButtons();
 
             int invalidBossIdTemp = -1;
-            panel.SetBossTitle("Boss Damage System", invalidBossIdTemp);
+            panel.SetBossTitle("DPSPanel", invalidBossIdTemp);
         }
 
         #region Custom Buttons
@@ -65,7 +65,7 @@ namespace DPSPanel.UI
             // clearButton = new CustomButtonElement("Clear", "Clear all damage data", () =>
             // {
             //     panel.ClearPanelAndAllItems();
-            //     panel.SetBossTitle("Boss Damage System", -1);
+            //     panel.SetBossTitle("DPSPanel", -1);
             //     Main.NewText("Damage data cleared.", Color.Green);
             // });
             // clearButton.HAlign = 1.0f; // Right-aligned

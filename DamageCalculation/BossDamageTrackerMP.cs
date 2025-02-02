@@ -216,7 +216,7 @@ namespace DPSPanel.DamageCalculation
         {
             string sourceWeapon = GlobalProj.sourceWeapon?.Name;
             if (string.IsNullOrEmpty(sourceWeapon))
-                sourceWeapon = "unknown";
+                sourceWeapon = "Unknown";
             return sourceWeapon;
         }
 

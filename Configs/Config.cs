@@ -12,7 +12,7 @@ namespace DPSPanel.Configs
 
         [Label("[i:256] Always Show Button")]
         [BackgroundColor(35, 132, 250)] // CornflowerBlue
-        [Tooltip("On: Always show the ninja button. Off: Only show the button when inventory is open.")]
+        [Tooltip("On: Always show the toggle button. Off: Only show the button when inventory is open.")]
         [DefaultValue(true)]
         public bool AlwaysShowButton { get; set; } = true;
 
@@ -30,9 +30,14 @@ namespace DPSPanel.Configs
         [DefaultValue(true)]
         public bool DisableValidHoverHighlight { get; set; } = false;
 
-        [Header("EvenMoreSettings")]
+        [Label("Max Weapons Displayed")]
+        [BackgroundColor(247, 186, 197)] // Light pink
+        [Tooltip("Set the maximum number of weapons to display in the panel.")]
+        [DefaultValue(10)]
+        public int MaxWeaponsDisplayed { get; set; } = 10;
+
         [Label("Popup Message")]
-        [BackgroundColor(35, 132, 250)] // CornflowerBlue
+        [BackgroundColor(247, 186, 197)] // Light pink
         [Tooltip("Shows a popup message every time when entering a new world.")]
         [DefaultValue(true)]
         public bool ShowPopupMessage { get; set; } = false;

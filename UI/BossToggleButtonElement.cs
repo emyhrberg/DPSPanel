@@ -11,8 +11,8 @@ namespace DPSPanel.UI
 {
     public class ToggleButtonElement : UIElement
     {
-        private Texture2D ninjaTexture;
-        private Texture2D ninjaHighlightedTexture;
+        private Texture2D toggleBtnTexture;
+        private Texture2D toggleBtnHighlightedTexture;
         private Vector2 clickStartPosition; // Start position of a mouse click
         private bool isDragging;
 
@@ -23,8 +23,8 @@ namespace DPSPanel.UI
             Top.Set(4f, 0f);
             Left.Set(4f, 0f);
 
-            ninjaTexture = LoadAssets.NinjaTexture.Value;
-            ninjaHighlightedTexture = LoadAssets.NinjaHighlightedTexture.Value;
+            toggleBtnTexture = LoadAssets.ToggleButtonTexture.Value;
+            toggleBtnHighlightedTexture = LoadAssets.ToggleButtonTextureHighlighted.Value;
         }
 
         protected override void DrawSelf(SpriteBatch sb)
@@ -36,10 +36,10 @@ namespace DPSPanel.UI
             base.DrawSelf(sb);
 
             // Get the dimensions of the element
-            const float scale = 0.65f; // Scale factor
+            const float scale = 0.8f; // Scale factor
             CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new(dims.X + (dims.Width - ninjaTexture.Width * scale) / 2f,
-                              dims.Y + (dims.Height - ninjaTexture.Height * scale) / 2f);
+            Vector2 pos = new(dims.X + (dims.Width - toggleBtnTexture.Width * scale) / 2f,
+                              dims.Y + (dims.Height - toggleBtnTexture.Height * scale) / 2f);
 
             var parentContainer = Parent as BossContainerElement;
 
@@ -50,7 +50,7 @@ namespace DPSPanel.UI
 
             if (isHoverValid)
             {
-                sb.Draw(ninjaHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                sb.Draw(toggleBtnHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                 // if (parentContainer.panelVisible)
                 Main.instance.MouseText("Left click to toggle panel \nRight click to hide and only show when inventory is open");
                 // else
@@ -58,7 +58,7 @@ namespace DPSPanel.UI
             }
             else
             {
-                sb.Draw(ninjaTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                sb.Draw(toggleBtnTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             }
         }
 

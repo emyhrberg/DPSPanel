@@ -41,7 +41,7 @@ namespace DPSPanel.Configs
             else if (target == "clear")
             {
                 sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle("Boss Damage System", -1);
+                sys.state.container.panel.SetBossTitle("DPSPanel", -1);
             }
             else if (target == "toggle")
             {

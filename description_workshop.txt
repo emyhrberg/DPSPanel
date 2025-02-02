@@ -5,17 +5,9 @@ This mod displays information about damage done during boss fights in multiplaye
 - Multiplayer: Shows the damage each player has contributed towards a boss fight.
 
 [h1] How to use: [/h1]
-- Currently there is a ninja icon which you can use to toggle the display.
+- Currently there is a toggle button which you can use to toggle the display.
 - You can also assign a hotkey to toggle the display.
-- There are some config options which allow you to hide the button unless your inventory is open.
-
-[h1] Demo [/h1]
-[video mp4=https://i.imgur.com/ZuN2VHP.mp4][/video]
-
-[h1] Known bugs [/h1]
-Known bugs (I haven't tested extensively yet, as the mod is still in development):
-- Player joins in middle of multiplayer boss fight may reset the calculation (I may have fixed this).
-- Multiple bosses alive simultaneously is not handled very well yet.
+- You can also choose to only show the button when your inventory is open.
 
 [h1] Planned features [/h1]
 Planned features (unsorted list):
@@ -31,5 +23,4 @@ Planned features (unsorted list):
 10. Add clear button on panel possibly
 11. On join new world, reset the panel for the client
 12. Draw a still head instead of the live head of all the players
-13. Change ninja icon to something else
 14. Add list of boss fights, possibly saving boss fights as a json file permanently so user can always see stats, even from previous sessions

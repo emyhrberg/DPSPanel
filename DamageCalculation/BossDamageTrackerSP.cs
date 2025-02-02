@@ -34,6 +34,32 @@ namespace DPSPanel.Core.Panel
                 var weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
                 if (weapon == null)
                 {
+                    // Check if we already reach max cap of weapons
+                    Config c = ModContent.GetInstance<Config>();
+                    if (weapons.Count >= c.MaxWeaponsDisplayed)
+                    {
+                        // Add to unknown weapon
+                        Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
+                        if (unknownWeapon != null)
+                        {
+                            unknownWeapon.damage += damageDone;
+                        }
+                        else
+                        {
+                            unknownWeapon = new Weapon
+                            {
+                                weaponName = "Unknown",
+                                weaponItemID = -1, // Invalid ID so no icon is drawn
+                                damage = damageDone
+                            };
+                            weapons.Add(unknownWeapon);
+                            weapons = weapons.OrderByDescending(w => w.damage).ToList();
+                            PanelSystem sys2 = ModContent.GetInstance<PanelSystem>();
+                            sys2.state.container.panel.CreateWeaponDamageBar("Unknown");
+                        }
+                        return;
+                    }
+
                     // Add a new weapon to the fight
                     weapon = new Weapon
                     {
@@ -333,7 +359,7 @@ namespace DPSPanel.Core.Panel
         {
             string sourceWeapon = GlobalProj.sourceWeapon?.Name;
             if (string.IsNullOrEmpty(sourceWeapon))
-                sourceWeapon = "unknown";
+                sourceWeapon = "Unknown";
             return sourceWeapon;
         }
 
