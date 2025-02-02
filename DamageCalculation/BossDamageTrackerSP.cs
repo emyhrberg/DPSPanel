@@ -85,45 +85,48 @@ namespace DPSPanel.Core.Panel
                 {
                     int totalTrackedDamage = weapons.Sum(w => w.damage);
                     int unknownDamage = initialLife - totalTrackedDamage;
-                    // add to unknown
-
 
                     ILog logger = ModContent.GetInstance<DPSPanel>().Logger;
-                    logger.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} weapon: {weapon.weaponName} | damage: {weapon.damage}");
-                    // add to damage if weapon exists
 
-                    Weapon finalWeapon = weapons.FirstOrDefault(w => w.weaponName == weapon.weaponName);
-                    if (finalWeapon != null)
-                        finalWeapon.damage += unknownDamage;
+                    // If the final blow weapon reference is null, treat it as "Unknown"
+                    if (weapon == null)
+                    {
+                        logger.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} (final blow weapon is null)");
 
+                        // Try to update the existing "Unknown" weapon damage
+                        Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
+                        if (unknownWeapon != null)
+                        {
+                            unknownWeapon.damage += unknownDamage;
+                        }
+                        else
+                        {
+                            // If "Unknown" doesn't exist, create it
+                            unknownWeapon = new Weapon
+                            {
+                                weaponName = "Unknown",
+                                weaponItemID = -1, // Invalid ID so no icon is drawn
+                                damage = unknownDamage
+                            };
+                            weapons.Add(unknownWeapon);
 
-                    // TODO if the final blow is an unknown weapon... doesnt work.
-                    // Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
-                    // if (unknownWeapon != null)
-                    // {
-                    //     unknownWeapon.damage += unknownDamage;
-                    // }
-                    // else
-                    // {
-                    //     unknownWeapon = new Weapon
-                    //     {
-                    //         weaponName = "Unknown",
-                    //         weaponItemID = -1, // Invalid ID so no icon is drawn
-                    //         damage = unknownDamage
-                    //     };
-                    //     weapons.Add(unknownWeapon);
-                    //     weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                    //     PanelSystem sys = ModContent.GetInstance<PanelSystem>();
-                    //     sys.state.container.panel.CreateDamageBar("Unknown");
-                    // }
+                            // Ensure the list is re-sorted and update the UI accordingly
+                            weapons = weapons.OrderByDescending(w => w.damage).ToList();
+                            PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                            sys.state.container.panel.CreateWeaponDamageBar("Unknown");
+                        }
+                    }
+                    else
+                    {
+                        logger.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} weapon: {weapon.weaponName} | damage: {weapon.damage}");
 
-                    // if (weapon != null)
-                    // {
-                    //     // Add discrepancy to the weapon that landed the final blow
-                    //     int discrepancy = initialLife - damageTaken;
-                    //     weapon.damage += discrepancy;
-                    //     damageTaken = initialLife;
-                    // }
+                        // Add the discrepancy to the weapon that landed the final blow
+                        Weapon finalWeapon = weapons.FirstOrDefault(w => w.weaponName == weapon.weaponName);
+                        if (finalWeapon != null)
+                        {
+                            finalWeapon.damage += unknownDamage;
+                        }
+                    }
                 }
             }
 
@@ -350,7 +353,7 @@ namespace DPSPanel.Core.Panel
 
                 var sys = ModContent.GetInstance<PanelSystem>();
                 sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle(npc.FullName, npc.whoAmI);
+                sys.state.container.panel.SetBossTitle(npc.FullName, npc.GetBossHeadTextureIndex());
                 // sys.state.container.bossIcon.UpdateBossIcon(npc);
             }
         }

@@ -14,9 +14,6 @@ namespace DPSPanel.UI
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
-            Top.Set(-10f, 0f);
-            Left.Set(0, 0f);
-
             HAlign = 0.5f;
         }
 
@@ -24,8 +21,11 @@ namespace DPSPanel.UI
         {
             base.DrawSelf(sb);
 
+            if (bossHeadID == -1)
+                return;
+
             // ensure index is valid!
-            if (bossHeadID >= 0 || bossHeadID <= TextureAssets.NpcHeadBoss.Length)
+            if (bossHeadID >= 0 && bossHeadID <= TextureAssets.NpcHeadBoss.Length && TextureAssets.NpcHead[bossHeadID]?.Value != null)
             {
                 Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[bossHeadID]?.Value;
                 CalculatedStyle dims = GetDimensions();

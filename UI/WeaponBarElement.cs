@@ -97,8 +97,10 @@ namespace DPSPanel.UI
 
             // Load the appropriate texture based on the weaponItemID
             Texture2D texture;
-            if (weaponItemID == -1) // Invalid item ID, use a default or placeholder icon
-                texture = TextureAssets.Buff[BuffID.Confused].Value; // Example: Confused debuff as placeholder
+            if (weaponItemID == -1 && TextureAssets.NpcHead[0].Value != null)
+                // texture = TextureAssets.Buff[BuffID.Confused].Value; // Example: Confused debuff as placeholder
+                // Use NPCHEAD[0] as placeholder (a question mark)
+                texture = TextureAssets.NpcHead[0].Value;
             else
                 texture = TextureAssets.Item[weaponItemID].Value;
 

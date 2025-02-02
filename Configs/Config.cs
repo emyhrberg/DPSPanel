@@ -10,7 +10,7 @@ namespace DPSPanel.Configs
         [Header("BasicSettings")]
         // [BackgroundColor(100, 149, 237)] // CornflowerBlue
 
-        [Label("[i:256] Always Show Button")]
+        [Label("[i:256] Show Button Always")]
         [BackgroundColor(35, 132, 250)] // CornflowerBlue
         [Tooltip("On: Always show the toggle button. Off: Only show the button when inventory is open.")]
         [DefaultValue(true)]
@@ -22,22 +22,26 @@ namespace DPSPanel.Configs
         [DefaultValue(true)]
         public bool ShowPlayerIcon { get; set; } = true;
 
-        [Header("AdvancedSettings")]
+        [Label("[i:271] Show Boss Icon")]
+        [BackgroundColor(35, 132, 250)] // CornflowerBlue
+        [Tooltip("Set to true to show boss icons.")]
+        [DefaultValue(true)]
+        public bool ShowBossIcon { get; set; } = true;
 
         [Label("Disable Valid Hover Highlight")]
-        [BackgroundColor(247, 186, 197)] // Light pink
+        [BackgroundColor(35, 132, 250)] // CornflowerBlue
         [Tooltip("Basically, if you are using weapons it will not highlight the toggle button when hovering over the button.")]
         [DefaultValue(true)]
         public bool DisableValidHoverHighlight { get; set; } = false;
 
         [Label("Max Weapons Displayed")]
-        [BackgroundColor(247, 186, 197)] // Light pink
+        [BackgroundColor(35, 132, 250)] // CornflowerBlue
         [Tooltip("Set the maximum number of weapons to display in the panel.")]
         [DefaultValue(10)]
         public int MaxWeaponsDisplayed { get; set; } = 10;
 
         [Label("Popup Message")]
-        [BackgroundColor(247, 186, 197)] // Light pink
+        [BackgroundColor(35, 132, 250)] // CornflowerBlue
         [Tooltip("Shows a popup message every time when entering a new world.")]
         [DefaultValue(true)]
         public bool ShowPopupMessage { get; set; } = false;

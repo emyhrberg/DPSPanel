@@ -5,22 +5,7 @@ This mod displays information about damage done during boss fights in multiplaye
 - Multiplayer: Shows the damage each player has contributed towards a boss fight.
 
 [h1] How to use: [/h1]
-- Currently there is a toggle button which you can use to toggle the display.
+- Currently there is a toggle button which you can use to toggle the visibility of the display.
 - You can also assign a hotkey to toggle the display.
 - You can also choose to only show the button when your inventory is open.
-
-[h1] Planned features [/h1]
-Planned features (unsorted list):
-1. Add highest weapon icon
-2. Add hover for each player
-3. Add next/prev buttons for multiple boss fights
-4. Check if invasions, calamity bosses and weapons work
-5. Highlight / cross out dead players
-6. Draw weapon icon in multiplayer (and config toggle)
-7. Add only count contributing players (and config toggle)
-8. Draw boss icon (and config toggle)
-9. Add compact/simple view setting
-10. Add clear button on panel possibly
-11. On join new world, reset the panel for the client
-12. Draw a still head instead of the live head of all the players
-14. Add list of boss fights, possibly saving boss fights as a json file permanently so user can always see stats, even from previous sessions
+- You can also use the chat command /dps for additional options.

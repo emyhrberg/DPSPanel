@@ -51,11 +51,16 @@ namespace DPSPanel.UI
             CurrentBossID = bossID;
             CurrentBossName = bossName;
 
-            // Add the element to the panel
+            // Add the text to the panel
             UIText bossTitle = new(bossName, 1.0f);
             bossTitle.HAlign = 0.5f;
             bossTitle.Top.Set(6f, 0f);
             Append(bossTitle);
+
+            // Add the boss icon
+            Config c = ModContent.GetInstance<Config>();
+            if (bossID != -1 && c.ShowBossIcon)
+                SetBossIcon(bossID);
 
             // Resize panel height
             currentYOffset = bossHeaderHeight;
@@ -66,9 +71,8 @@ namespace DPSPanel.UI
         {
             // Create the boss icon
             BossIconElement bossIcon = new();
+            bossIcon.Left.Set(100f, 0f);
             bossIcon.UpdateBossIcon(bossHeadId);
-            bossIcon.Left.Set(5f, 0f);
-            bossIcon.Top.Set(5f, 0f);
             Append(bossIcon);
         }
 
