@@ -6,8 +6,10 @@ namespace DPSPanel.Helpers
 {
     public static class LoadAssets
     {
-        public static Asset<Texture2D> BarEmpty;
-        public static Asset<Texture2D> BarFull;
+        public static Asset<Texture2D> BarEmpty300;
+        public static Asset<Texture2D> BarFull300;
+        public static Asset<Texture2D> BarEmpty150;
+        public static Asset<Texture2D> BarFull150;
 
         public static Asset<Texture2D> ToggleButtonTexture;
         public static Asset<Texture2D> ToggleButtonTextureHighlighted;
@@ -18,11 +20,15 @@ namespace DPSPanel.Helpers
         public static void PreloadAllAssets()
         {
 
-            BarEmpty = PreloadAsset("BarEmpty");
-            BarFull = PreloadAsset("BarFull");
+            BarEmpty300 = PreloadAsset("BarEmpty300");
+            BarFull300 = PreloadAsset("BarFull300");
+            BarEmpty150 = PreloadAsset("BarEmpty150");
+            BarFull150 = PreloadAsset("BarFull150");
 
             ToggleButtonTexture = PreloadAsset("ToggleButton");
             ToggleButtonTextureHighlighted = PreloadAsset("ToggleButtonHighlighted");
+
+
         }
     }
 }

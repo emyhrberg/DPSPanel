@@ -1,46 +1,51 @@
 Mods: {
 	DPSPanel: {
-		Keybinds.ToggleDPSPanel.DisplayName: Toggle DPS Panel
-
 		Configs: {
 			Config: {
 				DisableValidHoverHighlight: {
-					Tooltip: Basically, if you are using weapons it will not highlight the toggle button when hovering over the button.
-					Label: Highlight Toggle Button When Hovering
-				}
-
-				DisplayName: Config
-
-				Headers: {
-					DamageCalculation: Damage Calculation
-					UI: UI
-				}
-
-				TrackAllEntities: {
-					Label: Track Damage to All Entities During Boss Fight
-					Tooltip: Enable this to ensure that the boss's minions are also included in the damage calculation.
-				}
-
-				AlwaysShowButton: {
-					Label: Show Toggle Button
-					Tooltip: On: Always show the toggle button. Off: Only show the toggle button when you have weapons in your inventory.
-				}
-
-				ShowPlayerIcon: {
-					Label: Show Player Icon
-					Tooltip: On: Always show player icons.
-				}
-
-				ShowBossIcon: {
-					Label: "[i:560] Show Boss Icon"
-					Tooltip: On: Always show boss icons.
+					Tooltip: Set to false to remove the annoyance of the toggle button flashing when you're using weapons.
+					Label: Highlight Toggle Button When Using Weapons
 				}
 
 				MaxWeaponsDisplayed: {
+					Tooltip: Set the maximum number of weapons to display in the panel. (experimental)
 					Label: Max Weapons Displayed
-					Tooltip: Set the maximum number of weapons to display in the panel.
 				}
+
+				ShowBossIcon: {
+					Tooltip: On: Always show boss icons.
+					Label: "[i:560] Show Boss Icon"
+				}
+
+				ShowPlayerIcon: {
+					Tooltip: On: Always show player icons.
+					Label: Show Player Icon
+				}
+
+				AlwaysShowButton: {
+					Tooltip: On: Always show the toggle button. Off: Only show the toggle button when you have weapons in your inventory.
+					Label: Show Toggle Button
+				}
+
+				Headers: {
+					UI: UI
+					DamageCalculation: Damage Calculation
+				}
+
+				TrackAllEntities: {
+					Tooltip: Enable this to ensure that the boss's minions are also included in the damage calculation.
+					Label: Track Damage to All Entities During Boss Fight
+				}
+
+				BarWidth: {
+					Tooltip: Set the width of the bars. (experimental)
+					Label: Bar Width
+				}
+
+				DisplayName: Config
 			}
 		}
+
+		Keybinds.ToggleDPSPanel.DisplayName: Toggle DPS Panel
 	}
 }

@@ -20,9 +20,6 @@ namespace DPSPanel.UI
         private UserInterface ui;
         internal PanelState state;
 
-        private readonly Vector2 startPosition = new Vector2(20, 20); // Starting position for drawing heads
-        private const int spacing = 50; // Spacing between player heads
-
         public override void Load()
         {
             LoadAssets.PreloadAllAssets();

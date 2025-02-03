@@ -26,14 +26,15 @@ namespace DPSPanel.UI
         public Panel panel;
         public bool panelVisible = true;
 
-        private const float MIN_WIDTH = 300f;  // Minimum container width
-        private const float MIN_HEIGHT = 40f;  // Minimum container height
-
         public BossContainerElement()
         {
             // Container defaults
-            Width.Set(MIN_WIDTH, 0f);
-            Height.Set(MIN_HEIGHT, 0f);
+            Config c = ModContent.GetInstance<Config>();
+            if (c.BarWidth == "150") // PANEL WIDTH
+                Width.Set(150, 0f);
+            else if (c.BarWidth == "300")
+                Width.Set(300, 0f);
+
             VAlign = 0.07f; // 7% down from top
             HAlign = 0.5f;  // center horizontally
 

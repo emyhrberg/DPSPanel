@@ -38,16 +38,23 @@ namespace DPSPanel.Configs
 
         [Label("Max Weapons Displayed")]
         [BackgroundColor(192, 54, 64)] // Calamity Red
-        [Tooltip("Set the maximum number of weapons to display in the panel.")]
+        [Tooltip("Set the maximum number of weapons to display in the panel. (experimental)")]
         [DefaultValue(10)]
         public int MaxWeaponsDisplayed { get; set; } = 10;
 
-        [Label("Highlight Toggle Button When Hovering")]
+        [Label("Highlight Toggle Button When Using Weapons")]
         [BackgroundColor(192, 54, 64)] // Calamity Red
-        [Tooltip("Basically, if you are using weapons it will not highlight the toggle button when hovering over the button.")]
+        [Tooltip("Set to false to remove the annoyance of the toggle button flashing when you're using weapons.")]
         [DefaultValue(true)]
         public bool DisableValidHoverHighlight { get; set; } = false;
 
-
+        [Label("Bar Width")]
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [Tooltip("Set the width of the bars. (experimental)")]
+        [DrawTicks]
+        [OptionStrings(["150", "300"])]
+        [DefaultValue("300")]
+        [ReloadRequired]
+        public string BarWidth { get; set; } = "300";
     }
 }

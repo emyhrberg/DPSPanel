@@ -17,7 +17,6 @@ namespace DPSPanel.UI
         // Panel
         private readonly float PANEL_PADDING = 5f;
         private readonly float ITEM_PADDING = 10f;
-        private readonly float PANEL_WIDTH = 300f; // 300 width
         private readonly float PANEL_HEIGHT = 40f; // is reset anyways by parent
         private readonly Color panelColor = new(49, 84, 141);
         private float currentYOffset = 0;
@@ -36,7 +35,12 @@ namespace DPSPanel.UI
 
         public Panel()
         {
-            Width.Set(PANEL_WIDTH, 0f);
+            Config c = ModContent.GetInstance<Config>();
+            if (c.BarWidth == "150")
+                Width.Set(150, 0f);
+            else if (c.BarWidth == "300")
+                Width.Set(300, 0f);
+
             Height.Set(PANEL_HEIGHT, 0f);
             BackgroundColor = panelColor;
 
@@ -71,7 +75,18 @@ namespace DPSPanel.UI
         {
             // Create the boss icon
             BossIconElement bossIcon = new();
-            bossIcon.Left.Set(100f, 0f);
+
+            // left offset based on slider width
+            Config c = ModContent.GetInstance<Config>();
+            float leftOffset = 0f;
+
+            if (c.BarWidth == "150")
+                leftOffset = 60f;
+            else if (c.BarWidth == "300")
+                leftOffset = 100f;
+
+            bossIcon.Left.Set(leftOffset, 0f);
+
             bossIcon.UpdateBossIcon(bossHeadId);
             Append(bossIcon);
         }

@@ -31,8 +31,17 @@ namespace DPSPanel.UI
         {
             // check config settings for theme
             Config c = ModContent.GetInstance<Config>();
-            emptyBar = LoadAssets.BarEmpty;
-            fullBar = LoadAssets.BarFull;
+
+            if (c.BarWidth == "150")
+            {
+                emptyBar = LoadAssets.BarEmpty150;
+                fullBar = LoadAssets.BarFull150;
+            }
+            else if (c.BarWidth == "300")
+            {
+                emptyBar = LoadAssets.BarEmpty300;
+                fullBar = LoadAssets.BarFull300;
+            }
 
             Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
             Height = new StyleDimension(ItemHeight, 0f); // Set height

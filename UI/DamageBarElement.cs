@@ -32,8 +32,17 @@ namespace DPSPanel.UI
         public DamageBarElement(float currentYOffset, string playerName, int playerWhoAmI)
         {
             // Load bar textures
-            emptyBar = LoadAssets.BarEmpty;
-            fullBar = LoadAssets.BarFull;
+            Config c = ModContent.GetInstance<Config>();
+            if (c.BarWidth == "150")
+            {
+                emptyBar = LoadAssets.BarEmpty150;
+                fullBar = LoadAssets.BarFull150;
+            }
+            else if (c.BarWidth == "300")
+            {
+                emptyBar = LoadAssets.BarEmpty300;
+                fullBar = LoadAssets.BarFull300;
+            }
 
             // Set dimensions and alignment
             Width = new StyleDimension(0, 1.0f); // Fill the width of the parent
@@ -55,7 +64,6 @@ namespace DPSPanel.UI
             Append(textElement);
 
             // Add player head if the player is active
-            Config c = ModContent.GetInstance<Config>();
             if (c.ShowPlayerIcon)
             {
                 if (playerWhoAmI >= 0 && playerWhoAmI < Main.player.Length && Main.player[playerWhoAmI].active)
