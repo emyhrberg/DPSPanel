@@ -158,21 +158,6 @@ namespace DPSPanel.Core.Panel
         // private int fightId = 0;
 
         #region Hooks
-        public override void OnEnterWorld()
-        {
-            if (Main.netMode != NetmodeID.SinglePlayer)
-                return;
-
-            Config c = ModContent.GetInstance<Config>();
-            if (!c.ShowPopupMessage)
-                return;
-
-            Main.NewText(
-                "[DPSPanel] Start a boss fight to display stats! You can also toggle the display with K (set the keybind in Settings -> Controls).",
-                Color.SkyBlue
-            );
-        }
-
         public override void PreUpdate()
         {
             if (Main.netMode != NetmodeID.SinglePlayer)
@@ -198,8 +183,6 @@ namespace DPSPanel.Core.Panel
                         NPC npc = Main.npc[i];
                         if (IsValidBoss(npc) && npc.life > 0)
                         {
-                            if (IgnoreGolem(npc))
-                                continue;
                             detectedBoss = npc;
                             break; // Found a valid boss, no need to check further
                         }
@@ -286,9 +269,6 @@ namespace DPSPanel.Core.Panel
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
-            if (IgnoreGolem(target))
-                return;
-
             // Pass the actual item type (ID) explicitly for melee
             int actualItemID = item?.type ?? -1;
             string actualItemName = item?.Name ?? "unknownitem";
@@ -300,9 +280,6 @@ namespace DPSPanel.Core.Panel
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
-            if (IgnoreGolem(target))
-                return;
-
             string weaponName = GetSourceWeaponName();
             int weaponID = GetSourceWeaponItemID();
             TrackBossDamage(weaponID, weaponName, damageDone, target);
@@ -312,13 +289,25 @@ namespace DPSPanel.Core.Panel
         #region Methods
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
-            if (IsValidBoss(npc))
-            {
-                // If the boss died, handle final blow then end fight
-                Weapon currentWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
+            Config c = ModContent.GetInstance<Config>();
 
-                if (HandleBossDeath(npc, currentWeapon))
+            if (fight != null && !npc.friendly)
+            {
+                // If not tracking all entities and the NPC is not the boss, return
+                if (!c.TrackAllEntities && !(npc.boss && npc.FullName == fight.bossName))
                     return;
+
+                // If the NPC is the actual boss.
+                if (npc.boss && npc.FullName == fight.bossName)
+                {
+                    // If the boss died, handle final blow then end fight
+                    Weapon currentWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
+
+                    if (HandleBossDeath(npc, currentWeapon))
+                        return;
+
+                    fight.currentLife = npc.life;
+                }
 
                 // Otherwise update the fight info
                 if (Main.netMode == NetmodeID.SinglePlayer)
@@ -327,7 +316,6 @@ namespace DPSPanel.Core.Panel
                 }
 
                 fight.damageTaken += damageDone;
-                fight.currentLife = npc.life;
 
                 // Update UI and log
                 fight.SendBossFightToPanel();

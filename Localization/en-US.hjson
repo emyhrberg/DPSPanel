@@ -4,38 +4,42 @@ Mods: {
 
 		Configs: {
 			Config: {
-				ShowPopupMessage: {
-					Tooltip: Shows a popup message every time when entering a new world.
-					Label: Popup Message
-				}
-
-				MaxWeaponsDisplayed: {
-					Tooltip: Set the maximum number of weapons to display in the panel.
-					Label: Max Weapons Displayed
-				}
-
 				DisableValidHoverHighlight: {
 					Tooltip: Basically, if you are using weapons it will not highlight the toggle button when hovering over the button.
-					Label: Disable Valid Hover Highlight
+					Label: Highlight Toggle Button When Hovering
 				}
 
-				ShowBossIcon: {
-					Tooltip: Set to true to show boss icons (restart boss fight to execute).
-					Label: "[i:560] Show Boss Icon"
+				DisplayName: Config
+
+				Headers: {
+					DamageCalculation: Damage Calculation
+					UI: UI
 				}
 
-				ShowPlayerIcon: {
-					Tooltip: Set to true to show player icons.
-					Label: "[i:271] Show Player Icon"
+				TrackAllEntities: {
+					Label: Track Damage to All Entities During Boss Fight
+					Tooltip: Enable this to ensure that the boss's minions are also included in the damage calculation.
 				}
 
 				AlwaysShowButton: {
-					Tooltip: On: Always show the toggle button. Off: Only show the button when inventory is open.
-					Label: "[i:256] Show Button Always"
+					Label: Show Toggle Button
+					Tooltip: On: Always show the toggle button. Off: Only show the toggle button when you have weapons in your inventory.
 				}
 
-				Headers.BasicSettings: DPSPanel Config
-				DisplayName: Config
+				ShowPlayerIcon: {
+					Label: Show Player Icon
+					Tooltip: On: Always show player icons.
+				}
+
+				ShowBossIcon: {
+					Label: "[i:560] Show Boss Icon"
+					Tooltip: On: Always show boss icons.
+				}
+
+				MaxWeaponsDisplayed: {
+					Label: Max Weapons Displayed
+					Tooltip: Set the maximum number of weapons to display in the panel.
+				}
 			}
 		}
 	}

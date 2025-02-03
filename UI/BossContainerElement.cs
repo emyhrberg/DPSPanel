@@ -24,7 +24,6 @@ namespace DPSPanel.UI
         // elements
         public ToggleButtonElement toggleButton;
         public Panel panel;
-        public CustomButtonElement clearButton;
         public bool panelVisible = true;
 
         private const float MIN_WIDTH = 300f;  // Minimum container width
@@ -47,43 +46,9 @@ namespace DPSPanel.UI
             // Append it last, so it draws on top
             Append(toggleButton);
 
-            // 3) Add custom buttons
-            // AddCustomButtons();
-
             int invalidBossIdTemp = -1;
             panel.SetBossTitle("DPSPanel", invalidBossIdTemp);
         }
-
-        #region Custom Buttons
-        private void AddCustomButtons()
-        {
-            // Config c = ModContent.GetInstance<Config>();
-            // if (!c.ShowClearButton)
-            //     return;
-
-            // Clear Button
-            // clearButton = new CustomButtonElement("Clear", "Clear all damage data", () =>
-            // {
-            //     panel.ClearPanelAndAllItems();
-            //     panel.SetBossTitle("DPSPanel", -1);
-            //     Main.NewText("Damage data cleared.", Color.Green);
-            // });
-            // clearButton.HAlign = 1.0f; // Right-aligned
-            // clearButton.Top.Set(0f, 0f); // Top-aligned
-            // clearButton.Width.Set(10f, 0f); // Set width
-            // Append(clearButton);
-
-            // // Lock Draggable Button
-            // // var lockButton = new CustomButtonElement("Lock", "Toggle dragging", () =>
-            // {
-            //     isDraggable = !isDraggable;
-            //     Main.NewText($"Dragging {(isDraggable ? "enabled" : "disabled")}.", isDraggable ? Color.Green : Color.Red);
-            // });
-            // lockButton.Left.Set(115f, 0f); // Positioned next to Clear Button
-            // lockButton.Top.Set(5f, 0f);
-            // Append(lockButton);
-        }
-        #endregion
 
         #region Dragging
         public override void LeftMouseDown(UIMouseEvent evt)
@@ -196,7 +161,6 @@ namespace DPSPanel.UI
                 if (Children.Contains(panel))
                 {
                     panel.Remove();
-                    clearButton?.Remove();
                     // Main.NewText("Panel hidden. In chat, you can type /dps <toggle> <item> <clear> ", Color.SteelBlue);
                 }
             }

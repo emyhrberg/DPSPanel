@@ -59,22 +59,6 @@ namespace DPSPanel.DamageCalculation
         private BossFight fight;
 
         #region Hooks
-        public override void OnEnterWorld()
-        {
-            if (Main.netMode == NetmodeID.SinglePlayer)
-                return;
-
-            Config c = ModContent.GetInstance<Config>();
-            if (!c.ShowPopupMessage)
-                return;
-
-            Main.NewText(
-                "[DPSPanel] Hello, " + Main.LocalPlayer.name +
-                "! To use DPSPanel, type /dps toggle in chat or toggle with K (set the keybind in Settings -> Controls).",
-                Color.SkyBlue
-            );
-        }
-
         public override void PreUpdate()
         {
             // Check once per second
