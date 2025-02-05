@@ -15,8 +15,8 @@ namespace DPSPanel.UI
 {
     public class WeaponDamageBarElement : UIElement
     {
-        private readonly Asset<Texture2D> emptyBar; // Background 
-        private readonly Asset<Texture2D> fullBar;  // Foreground fill texture
+        private Asset<Texture2D> emptyBar; // Background 
+        private Asset<Texture2D> fullBar;  // Foreground fill texture
         private readonly UIText textElement;          // Text element for 
         private const float ItemHeight = 40f; // size of each item
 
@@ -27,8 +27,11 @@ namespace DPSPanel.UI
         private int weaponItemID;
         private string weaponName;           // Weapon name
 
+        public static WeaponDamageBarElement Instance;
+
         public WeaponDamageBarElement(float currentYOffset)
         {
+            Instance = this;
             // check config settings for theme
             Config c = ModContent.GetInstance<Config>();
 
@@ -55,6 +58,25 @@ namespace DPSPanel.UI
                 VAlign = 0.5f,
             };
             Append(textElement);
+        }
+
+        public static void UpdateBarWidth(Config c)
+        {
+            if (Instance == null)
+            {
+                ModContent.GetInstance<DPSPanel>().Logger.Warn("Instance is null in WeaponDamageBarElement");
+                return;
+            }
+            if (c.BarWidth == "150")
+            {
+                Instance.emptyBar = LoadAssets.BarEmpty150;
+                Instance.fullBar = LoadAssets.BarFull150;
+            }
+            else if (c.BarWidth == "300")
+            {
+                Instance.emptyBar = LoadAssets.BarEmpty300;
+                Instance.fullBar = LoadAssets.BarFull300;
+            }
         }
 
         public void UpdateDamageBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)

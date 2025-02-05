@@ -13,8 +13,8 @@ namespace DPSPanel.UI
 {
     public class DamageBarElement : UIElement
     {
-        private readonly Asset<Texture2D> emptyBar; // Background 
-        private readonly Asset<Texture2D> fullBar;  // Foreground fill texture
+        private Asset<Texture2D> emptyBar; // Background 
+        private Asset<Texture2D> fullBar;  // Foreground fill texture
         private readonly UIText textElement;        // Text element for displaying player info
         private const float ItemHeight = 40f;       // Height of each damage bar
 
@@ -29,8 +29,11 @@ namespace DPSPanel.UI
         // Player head element
         private PlayerHeadElement playerHeadElement;
 
+        public static DamageBarElement Instance;
+
         public DamageBarElement(float currentYOffset, string playerName, int playerWhoAmI)
         {
+            Instance = this;
             // Load bar textures
             Config c = ModContent.GetInstance<Config>();
             if (c.BarWidth == "150")
@@ -72,6 +75,24 @@ namespace DPSPanel.UI
                     playerHeadElement = new PlayerHeadElement(player);
                     Append(playerHeadElement);
                 }
+            }
+        }
+
+        public static void UpdateBarWidth(Config config)
+        {
+            if (Instance == null)
+                return;
+
+            // If you’re updating a particular instance, ensure you have a way to reference it.
+            if (config.BarWidth == "150")
+            {
+                Instance.emptyBar = LoadAssets.BarEmpty150;
+                Instance.fullBar = LoadAssets.BarFull150;
+            }
+            else if (config.BarWidth == "300")
+            {
+                Instance.emptyBar = LoadAssets.BarEmpty300;
+                Instance.fullBar = LoadAssets.BarFull300;
             }
         }
 

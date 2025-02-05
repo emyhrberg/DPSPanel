@@ -32,9 +32,12 @@ namespace DPSPanel.UI
         public int CurrentBossID;
         public string CurrentBossName;
         private const float bossHeaderHeight = 28f;
+        public BossIconElement bossIcon = new();
+        public static Panel Instance;
 
         public Panel()
         {
+            Instance = this;
             Config c = ModContent.GetInstance<Config>();
             if (c.BarWidth == "150")
                 Width.Set(150, 0f);
@@ -74,21 +77,26 @@ namespace DPSPanel.UI
         public void SetBossIcon(int bossHeadId)
         {
             // Create the boss icon
-            BossIconElement bossIcon = new();
-
             // left offset based on slider width
             Config c = ModContent.GetInstance<Config>();
-            float leftOffset = 0f;
 
             if (c.BarWidth == "150")
-                leftOffset = 60f;
+                bossIcon.Left.Set(60f, 0f);
             else if (c.BarWidth == "300")
-                leftOffset = 100f;
-
-            bossIcon.Left.Set(leftOffset, 0f);
+                bossIcon.Left.Set(100f, 0f);
 
             bossIcon.UpdateBossIcon(bossHeadId);
             Append(bossIcon);
+        }
+
+        public static void UpdateBarWidth(Config c)
+        {
+            if (Instance == null)
+                return;
+            if (c.BarWidth == "150")
+                Instance.bossIcon.Left.Set(60f, 0f);
+            else if (c.BarWidth == "300")
+                Instance.bossIcon.Left.Set(60f, 0f);
         }
 
         public override void Draw(SpriteBatch sb)

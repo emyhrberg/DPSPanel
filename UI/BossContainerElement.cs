@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using DPSPanel.Configs;
 using Microsoft.Xna.Framework;
@@ -25,9 +26,11 @@ namespace DPSPanel.UI
         public ToggleButtonElement toggleButton;
         public Panel panel;
         public bool panelVisible = true;
+        public static BossContainerElement Instance;
 
         public BossContainerElement()
         {
+            Instance = this;
             // Container defaults
             Config c = ModContent.GetInstance<Config>();
             if (c.BarWidth == "150") // PANEL WIDTH
@@ -49,6 +52,21 @@ namespace DPSPanel.UI
 
             int invalidBossIdTemp = -1;
             panel.SetBossTitle("DPSPanel", invalidBossIdTemp);
+        }
+
+        public static void UpdateBarWidth(Config config)
+        {
+            if (Instance == null || config == null)
+                return;
+
+            // Example of updating width dynamically:
+            if (config.BarWidth == "150")
+                Instance.Width.Set(150, 0f);
+            else if (config.BarWidth == "300")
+                Instance.Width.Set(300, 0f);
+
+            // If needed, trigger a layout update:
+            Instance.Recalculate();
         }
 
         #region Dragging

@@ -1,5 +1,7 @@
 ﻿using Terraria.ModLoader.Config;
 using System.ComponentModel;
+using Terraria.ModLoader;
+using DPSPanel.UI;
 
 namespace DPSPanel.Configs
 {
@@ -7,8 +9,8 @@ namespace DPSPanel.Configs
     {
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-        [Header("DamageCalculation")]
 
+        [Header("DamageCalculation")]
         // boss often spawns minions so we need to check if we track damage to only the boss or to all entities during the fight
         [Label("Track Damage to All Entities During Boss Fight")]
         [BackgroundColor(192, 54, 64)] // Calamity Red
@@ -54,7 +56,22 @@ namespace DPSPanel.Configs
         [DrawTicks]
         [OptionStrings(["150", "300"])]
         [DefaultValue("300")]
-        [ReloadRequired]
+        // [ReloadRequired]
         public string BarWidth { get; set; } = "300";
+
+        public override void OnChanged()
+        {
+            Config c = ModContent.GetInstance<Config>();
+            if (c != null)
+                UpdateBarWidth(c);
+        }
+
+        private void UpdateBarWidth(Config c)
+        {
+            BossContainerElement.UpdateBarWidth(c);
+            DamageBarElement.UpdateBarWidth(c);
+            Panel.UpdateBarWidth(c);
+            WeaponDamageBarElement.UpdateBarWidth(c);
+        }
     }
 }
