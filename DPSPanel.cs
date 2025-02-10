@@ -57,7 +57,7 @@ namespace DPSPanel
                             // new boss fight, clear panel and set title
                             Logger.Info($"[Client] New boss fight detected: {bossName} (whoamI {bossWhoAmI}) | headID: {bossHeadId}");
                             panel.ClearPanelAndAllItems();
-                            panel.SetBossTitle(bossName, bossWhoAmI);
+                            panel.SetBossTitle(bossName, bossHeadId);
                         }
 
                         panel.UpdateDamageBars(playerName, damageDone, playerWhoAmI);

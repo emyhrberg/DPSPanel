@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using DPSPanel.Core.Configs;
+using DPSPanel.Helpers;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -57,6 +59,9 @@ namespace DPSPanel.Core.DamageCalculation
         #region Hooks
         public override void PreUpdate()
         {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
             // Check once per second
             int frequencyCheck = 60;
 
@@ -97,6 +102,9 @@ namespace DPSPanel.Core.DamageCalculation
 
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
             if (IgnoreGolem(target))
                 return;
 
@@ -108,6 +116,9 @@ namespace DPSPanel.Core.DamageCalculation
 
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
             if (IgnoreGolem(target))
                 return;
 
@@ -120,23 +131,85 @@ namespace DPSPanel.Core.DamageCalculation
         #region Damage Tracking
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
-            if (IsValidBoss(npc))
+            Config c = ModContent.GetInstance<Config>();
+
+            // Debug log: report the call details.
+            Log.Info($"[BossFight] TrackBossDamage called with weaponID: {weaponID}, weaponName: {weaponName}, damageDone: {damageDone}, NPC: {npc.FullName}, boss flag: {npc.boss}, current life: {npc.life}");
+
+            // No active fight? Then nothing to do.
+            if (fight == null)
             {
-                if (fight != null && npc.life <= 0)
+                Log.Info("[BossFight] No active fight detected. Exiting method.");
+                return;
+            }
+
+            // Determine whether this NPC is the designated boss.
+            bool isDesignatedBoss = npc.boss && npc.FullName == fight.bossName;
+
+            // If config is set to track all entities during a boss fight...
+            if (c.TrackAllEntities)
+            {
+                Log.Info("[BossFight] Config: TrackAllEntities is enabled. Tracking damage for all Log.Info during this boss fight.");
+
+                // If this is the designated boss and it has died, end the fight.
+                if (isDesignatedBoss && npc.life <= 0)
                 {
+                    Log.Info("[BossFight] Designated boss has died. Ending fight.");
                     fight.isAlive = false;
                     SendPlayerDamagePacket();
                     fight = null;
                     return;
                 }
 
-                if (fight != null && fight.whoAmI == npc.whoAmI)
+                // Regardless of NPC type, add the damage.
+                fight.damageTaken += damageDone;
+                Log.Info($"[BossFight] Added {damageDone} damage. Total damage is now {fight.damageTaken}.");
+
+                // Only update the boss’s current life if this NPC is the designated boss.
+                if (isDesignatedBoss)
                 {
-                    // Update the fight data
+                    fight.currentLife = npc.life;
+                    Log.Info($"[BossFight] Updated designated boss's current life to {npc.life}.");
+                }
+
+                // Update the player damage record and send out an update packet.
+                fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
+                SendPlayerDamagePacket();
+            }
+            // Else, only track damage for the designated boss.
+            else
+            {
+                Log.Info("[BossFight] Config: Tracking only the designated boss.");
+
+                // Ignore damage if this is not the designated boss.
+                if (!isDesignatedBoss)
+                {
+                    Log.Info("[BossFight] NPC is not the designated boss. Ignoring damage.");
+                    return;
+                }
+
+                // If the designated boss dies, end the fight.
+                if (npc.life <= 0)
+                {
+                    Log.Info("[BossFight] Designated boss has died. Ending fight.");
+                    fight.isAlive = false;
+                    SendPlayerDamagePacket();
+                    fight = null;
+                    return;
+                }
+
+                // Ensure that the NPC hit is the one we're tracking.
+                if (fight.whoAmI == npc.whoAmI)
+                {
                     fight.damageTaken += damageDone;
                     fight.currentLife = npc.life;
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
+                    Log.Info($"[BossFight] Added {damageDone} damage to designated boss. Total damage is now {fight.damageTaken}.");
                     SendPlayerDamagePacket();
+                }
+                else
+                {
+                    Log.Info("[BossFight] The NPC hit does not match the tracked designated boss. Ignoring damage.");
                 }
             }
         }

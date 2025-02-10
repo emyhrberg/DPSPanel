@@ -183,11 +183,8 @@ namespace DPSPanel.Core.DamageCalculation
 
                     if (detectedBoss != null)
                     {
-                        if (Main.netMode == NetmodeID.SinglePlayer)
-                        {
-                            CreateNewBossFight(detectedBoss);
-                            Mod.Logger.Info($"Boss {fight.bossName} created!");
-                        }
+                        CreateNewBossFight(detectedBoss);
+                        Mod.Logger.Info($"(SP) Boss {fight.bossName} created!");
                     }
                 }
 

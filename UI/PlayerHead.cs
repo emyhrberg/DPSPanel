@@ -12,15 +12,10 @@ namespace DPSPanel.UI
     {
         private readonly Player player;
 
-        // make a get set for fillcolor
-        public Color FillColor { get; set; }
 
         public PlayerHead(Player player)
         {
             this.player = player;
-
-            // default fill color white
-            FillColor = Color.White;
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -48,16 +43,21 @@ namespace DPSPanel.UI
             Player rightFacingClone = (Player)player.Clone();
 
             // do NOT force direction as this messes up the minimap.
-            // rightFacingClone.direction = 1;
+            // save direction
+            int savedDirection = player.direction;
+
+            rightFacingClone.direction = 1;
 
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
-                rightFacingClone,
+                rightFacingClone, // cloned player
                 drawPosition,
                 1f, // alpha/transparency
-                0.8f, // scale
-                Color.White * 0.01f // border color
+                0.9f, // scale
+                Color.White // border color
             );
+            player.direction = savedDirection;
+
         }
     }
 }
