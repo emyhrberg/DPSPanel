@@ -34,11 +34,6 @@ Mods: {
 					Tooltip: Set the size of the bars to a fixed value of either 150 or 300
 				}
 
-				DisableHoverHighlight: {
-					Label: Disable Hover Highlight
-					Tooltip: Disables all highlighting actions, if you find it interfering with boss fights
-				}
-
 				ShowOnlyWhenInventoryOpen: {
 					Label: Show Only When Inventory Open
 					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it
@@ -46,7 +41,7 @@ Mods: {
 
 				HighlightButtonWhenHovering: {
 					Label: Highlight Button When Hovering
-					Tooltip: ""
+					Tooltip: You can disable this if you find the button highlighting to interfere with boss fights
 				}
 			}
 		}

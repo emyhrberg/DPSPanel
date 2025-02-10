@@ -4,7 +4,7 @@ using MonoMod.Cil;
 using Terraria.Graphics.Renderers;
 using Terraria.ModLoader;
 
-namespace UI
+namespace DPSPanel.UI
 {
     public class PlayerHeadFlipSystem : ModSystem
     {
@@ -29,7 +29,7 @@ namespace UI
 
                 c.EmitLdsfld(typeof(PlayerHeadFlipSystem).GetField(nameof(shouldFlipHeadDraw)));
                 c.EmitBrfalse(skipCentering);
-                c.EmitDelegate<Func<Vector2, Vector2>>((Vector2 inCenter) =>
+                c.EmitDelegate<Func<Vector2, Vector2>>(inCenter =>
                 {
                     return new Vector2(inCenter.X * 0.8f, inCenter.Y);
                 });

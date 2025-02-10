@@ -40,24 +40,17 @@ namespace DPSPanel.UI
             }
 
             // make a clone and have it always face right
-            Player rightFacingClone = (Player)player.Clone();
-
-            // do NOT force direction as this messes up the minimap.
-            // save direction
-            int savedDirection = player.direction;
-
-            rightFacingClone.direction = 1;
+            PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
 
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
-                rightFacingClone, // cloned player
+                player, // player to draw
                 drawPosition,
                 1f, // alpha/transparency
                 0.9f, // scale
                 Color.White // border color
             );
-            player.direction = savedDirection;
-
+            PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
         }
     }
 }
