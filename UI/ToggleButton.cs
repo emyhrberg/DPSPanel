@@ -43,7 +43,7 @@ namespace DPSPanel.UI
 
 
             // Draw either the button or highlighted button based on hover state
-            if (IsMouseHovering && !c.DisableHoverHighlight)
+            if (IsMouseHovering && c.HighlightButtonWhenHovering)
             {
                 sb.Draw(imgHighlighted, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                 Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open");
@@ -62,7 +62,7 @@ namespace DPSPanel.UI
             // on right click we toggle the config setting to only show in inventory.
             ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
 
-            string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Only show when inventory is open";
+            string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Show DPSPanel only when inventory is open";
             Main.NewText(text, Color.White);
         }
         #endregion

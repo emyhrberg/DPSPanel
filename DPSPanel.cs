@@ -6,6 +6,7 @@ using Terraria.ModLoader;
 
 namespace DPSPanel
 {
+    [Autoload(Side = ModSide.Both)]
     public class DPSPanel : Mod
     {
         public enum ModMessageType
@@ -15,7 +16,7 @@ namespace DPSPanel
 
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
-            if (Main.netMode == NetmodeID.SinglePlayer)
+            if (Main.netMode != NetmodeID.MultiplayerClient)
                 return;
 
             ModMessageType msgType = (ModMessageType)reader.ReadByte();

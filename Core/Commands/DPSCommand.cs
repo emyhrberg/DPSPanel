@@ -48,7 +48,7 @@ namespace DPSPanel.Core.Configs
             {
                 ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
 
-                string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show" : "Only show when inventory is open";
+                string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Show DPSPanel only when inventory is open";
                 Main.NewText(text, Color.White);
             }
             else

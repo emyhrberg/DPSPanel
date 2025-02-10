@@ -29,7 +29,7 @@ namespace DPSPanel.Core.Keybinds
                 ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
 
                 // change color and text based on the config setting
-                string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Only show when inventory is open";
+                string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Show DPSPanel only when inventory is open";
                 Main.NewText(text, Color.White);
             }
         }

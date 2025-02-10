@@ -35,12 +35,12 @@ namespace DPSPanel.Core.Configs
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
-        public bool DisableHoverHighlight { get; set; } = false;
+        public bool HighlightButtonWhenHovering { get; set; } = true;
 
         [Range(150, 300)]
         [Increment(150)]
         [DrawTicks]
-        [DefaultValue(300)]
+        [DefaultValue(150)]
         [BackgroundColor(192, 54, 64)] // Calamity Red
         public int BarWidth { get; set; } = 300;
 
