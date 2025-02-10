@@ -1,0 +1,7 @@
+0.3.5:
+- Fix bug where minimap head icon wouldn't update head direction
+- Fix bug where BossHead would show the wrong icon in multiplayer
+- Change player head icon sizes from scale 1.1f to 0.9f
+- Change player head icon to always face right instead of left
+- Added multiplayer track all entities, it was not implemented until now
+- Added option to display consumed boss summoning items in chat
