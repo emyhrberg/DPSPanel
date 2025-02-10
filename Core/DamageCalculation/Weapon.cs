@@ -1,4 +1,4 @@
-namespace DPSPanel.DamageCalculation
+namespace DPSPanel.Core.DamageCalculation
 {
     public class Weapon
     {

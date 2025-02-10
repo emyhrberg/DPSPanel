@@ -1,19 +1,19 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DPSPanel.Core.Configs;
+using DPSPanel.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria.UI;
-using Terraria.GameContent.UI.Elements;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
-using DPSPanel.Configs;
-using DPSPanel.Helpers;
 using Terraria.ModLoader.UI;
+using Terraria.UI;
 
 namespace DPSPanel.UI
 {
-    public class WeaponDamageBarElement : UIElement
+    public class WeaponBar : UIElement
     {
         private Asset<Texture2D> emptyBar; // Background 
         private Asset<Texture2D> fullBar;  // Foreground fill texture
@@ -27,23 +27,23 @@ namespace DPSPanel.UI
         private int weaponItemID;
         private string weaponName;           // Weapon name
 
-        public static WeaponDamageBarElement Instance;
+        public static WeaponBar Instance;
 
-        public WeaponDamageBarElement(float currentYOffset)
+        public WeaponBar(float currentYOffset)
         {
             Instance = this;
             // check config settings for theme
             Config c = ModContent.GetInstance<Config>();
 
-            if (c.BarWidth == "150")
+            if (c.BarWidth == 150)
             {
-                emptyBar = LoadAssets.BarEmpty150;
-                fullBar = LoadAssets.BarFull150;
+                emptyBar = Assets.BarEmpty150;
+                fullBar = Assets.BarFull150;
             }
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
             {
-                emptyBar = LoadAssets.BarEmpty300;
-                fullBar = LoadAssets.BarFull300;
+                emptyBar = Assets.BarEmpty300;
+                fullBar = Assets.BarFull300;
             }
 
             Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
@@ -67,15 +67,15 @@ namespace DPSPanel.UI
                 ModContent.GetInstance<DPSPanel>().Logger.Warn("Instance is null in WeaponDamageBarElement");
                 return;
             }
-            if (c.BarWidth == "150")
+            if (c.BarWidth == 150)
             {
-                Instance.emptyBar = LoadAssets.BarEmpty150;
-                Instance.fullBar = LoadAssets.BarFull150;
+                Instance.emptyBar = Assets.BarEmpty150;
+                Instance.fullBar = Assets.BarFull150;
             }
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
             {
-                Instance.emptyBar = LoadAssets.BarEmpty300;
-                Instance.fullBar = LoadAssets.BarFull300;
+                Instance.emptyBar = Assets.BarEmpty300;
+                Instance.fullBar = Assets.BarFull300;
             }
         }
 
@@ -171,7 +171,7 @@ namespace DPSPanel.UI
             int iconY = (int)(dims.Y + (dims.Height - scaledHeight) / 2f);
 
             // Define the destination rectangle with the calculated size and position
-            Rectangle destRect = new Rectangle(iconX, iconY, scaledWidth, scaledHeight);
+            Rectangle destRect = new(iconX, iconY, scaledWidth, scaledHeight);
 
             // Draw the texture scaled to fit the destination rectangle
             sb.Draw(texture, destRect, Color.White);

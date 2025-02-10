@@ -1,19 +1,14 @@
-﻿using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System;
-using Terraria.GameContent;
-using Terraria.ID;
-using log4net.Repository.Hierarchy;
-using log4net;
+using DPSPanel.Core.Configs;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
-using DPSPanel.DamageCalculation;
-using DPSPanel.Configs;
+using Terraria;
+using Terraria.ID;
+using Terraria.ModLoader;
 
-namespace DPSPanel.Core.Panel
+namespace DPSPanel.Core.DamageCalculation
 {
     public class BossDamageTrackerSP : ModPlayer
     {
@@ -31,7 +26,7 @@ namespace DPSPanel.Core.Panel
             public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
             {
                 // Check if the weapon already exists
-                var weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
+                Weapon weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
                 if (weapon == null)
                 {
                     // Check if we already reach max cap of weapons
@@ -54,7 +49,7 @@ namespace DPSPanel.Core.Panel
                             };
                             weapons.Add(unknownWeapon);
                             weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                            PanelSystem sys2 = ModContent.GetInstance<PanelSystem>();
+                            MainSystem sys2 = ModContent.GetInstance<MainSystem>();
                             sys2.state.container.panel.CreateWeaponDamageBar("Unknown");
                         }
                         return;
@@ -69,7 +64,7 @@ namespace DPSPanel.Core.Panel
                     };
                     weapons.Add(weapon);
                     weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                    PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                    MainSystem sys = ModContent.GetInstance<MainSystem>();
                     sys.state.container.panel.CreateWeaponDamageBar(weaponName);
                 }
                 else
@@ -86,12 +81,10 @@ namespace DPSPanel.Core.Panel
                     int totalTrackedDamage = weapons.Sum(w => w.damage);
                     int unknownDamage = initialLife - totalTrackedDamage;
 
-                    ILog logger = ModContent.GetInstance<DPSPanel>().Logger;
-
                     // If the final blow weapon reference is null, treat it as "Unknown"
                     if (weapon == null)
                     {
-                        logger.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} (final blow weapon is null)");
+                        Log.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} (final blow weapon is null)");
 
                         // Try to update the existing "Unknown" weapon damage
                         Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
@@ -112,13 +105,13 @@ namespace DPSPanel.Core.Panel
 
                             // Ensure the list is re-sorted and update the UI accordingly
                             weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                            PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                            MainSystem sys = ModContent.GetInstance<MainSystem>();
                             sys.state.container.panel.CreateWeaponDamageBar("Unknown");
                         }
                     }
                     else
                     {
-                        logger.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} weapon: {weapon.weaponName} | damage: {weapon.damage}");
+                        Log.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} weapon: {weapon.weaponName} | damage: {weapon.damage}");
 
                         // Add the discrepancy to the weapon that landed the final blow
                         Weapon finalWeapon = weapons.FirstOrDefault(w => w.weaponName == weapon.weaponName);
@@ -133,7 +126,7 @@ namespace DPSPanel.Core.Panel
             public void SendBossFightToPanel()
             {
                 weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                MainSystem sys = ModContent.GetInstance<MainSystem>();
                 sys.state.container.panel.UpdateWeaponDamageBars(weapons);
             }
 
@@ -241,7 +234,7 @@ namespace DPSPanel.Core.Panel
                                 fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
 
                                 // Create damage bar for "Unknown" in the UI
-                                PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                                MainSystem sys = ModContent.GetInstance<MainSystem>();
                                 sys.state.container.panel.CreateWeaponDamageBar("Unknown");
                             }
                             else
@@ -339,9 +332,10 @@ namespace DPSPanel.Core.Panel
                 };
                 Mod.Logger.Info("New boss fight created: " + fight.bossName);
 
-                var sys = ModContent.GetInstance<PanelSystem>();
+                var sys = ModContent.GetInstance<MainSystem>();
                 sys.state.container.panel.ClearPanelAndAllItems();
                 sys.state.container.panel.SetBossTitle(npc.FullName, npc.GetBossHeadTextureIndex());
+                Log.Info("Boss fight created: " + fight.bossName);
                 // sys.state.container.bossIcon.UpdateBossIcon(npc);
             }
         }

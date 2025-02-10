@@ -1,13 +1,12 @@
-using Terraria.ModLoader;
-using Terraria.GameContent.UI.Elements;
-using Terraria.Graphics.Renderers;
-using MonoMod.Cil;
 using System;
 using Microsoft.Xna.Framework;
+using MonoMod.Cil;
+using Terraria.Graphics.Renderers;
+using Terraria.ModLoader;
 
 namespace UI
 {
-    public class FlipHeadDrawSystem : ModSystem
+    public class PlayerHeadFlipSystem : ModSystem
     {
         public static bool shouldFlipHeadDraw = true;
 
@@ -28,7 +27,7 @@ namespace UI
 
                 ILLabel skipCentering = il.DefineLabel();
 
-                c.EmitLdsfld(typeof(FlipHeadDrawSystem).GetField(nameof(shouldFlipHeadDraw)));
+                c.EmitLdsfld(typeof(PlayerHeadFlipSystem).GetField(nameof(shouldFlipHeadDraw)));
                 c.EmitBrfalse(skipCentering);
                 c.EmitDelegate<Func<Vector2, Vector2>>((Vector2 inCenter) =>
                 {
@@ -43,7 +42,7 @@ namespace UI
                 ILLabel normRet = il.DefineLabel();
                 ILLabel altLabel = il.DefineLabel();
 
-                c.EmitLdsfld(typeof(FlipHeadDrawSystem).GetField(nameof(shouldFlipHeadDraw)));
+                c.EmitLdsfld(typeof(PlayerHeadFlipSystem).GetField(nameof(shouldFlipHeadDraw)));
                 c.EmitBrtrue(altLabel); // if(!shouldFlipHeadDraw)
                                         // {
                 c.Index++;                // push 0

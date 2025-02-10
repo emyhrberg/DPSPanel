@@ -2,7 +2,7 @@
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Helpers
+namespace DPSPanel.Core.DamageCalculation
 {
     public class GlobalProj : GlobalProjectile
     {

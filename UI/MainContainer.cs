@@ -1,7 +1,6 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
-using DPSPanel.Configs;
+using DPSPanel.Core.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -15,7 +14,7 @@ namespace DPSPanel.UI
     // 3) Damage bars
     // 4) Weapon bars
     // So this is the entirety of what we drag around the screen.
-    public class BossContainerElement : UIElement
+    public class MainContainer : UIElement
     {
         // dragging
         public bool dragging;
@@ -23,19 +22,19 @@ namespace DPSPanel.UI
         private Vector2 offset;
 
         // elements
-        public ToggleButtonElement toggleButton;
+        public ToggleButton toggleButton;
         public Panel panel;
         public bool panelVisible = true;
-        public static BossContainerElement Instance;
+        public static MainContainer Instance;
 
-        public BossContainerElement()
+        public MainContainer()
         {
             Instance = this;
             // Container defaults
             Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == "150") // PANEL WIDTH
+            if (c.BarWidth == 150) // PANEL WIDTH
                 Width.Set(150, 0f);
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
                 Width.Set(300, 0f);
 
             VAlign = 0.07f; // 7% down from top
@@ -46,7 +45,7 @@ namespace DPSPanel.UI
             Append(panel);
 
             // 2) Create the button
-            toggleButton = new ToggleButtonElement();
+            toggleButton = new ToggleButton();
             // Append it last, so it draws on top
             Append(toggleButton);
 
@@ -60,9 +59,9 @@ namespace DPSPanel.UI
                 return;
 
             // Example of updating width dynamically:
-            if (config.BarWidth == "150")
+            if (config.BarWidth == 150)
                 Instance.Width.Set(150, 0f);
-            else if (config.BarWidth == "300")
+            else if (config.BarWidth == 300)
                 Instance.Width.Set(300, 0f);
 
             // If needed, trigger a layout update:
@@ -169,10 +168,6 @@ namespace DPSPanel.UI
                     // remove & re-append the icon so it draws on top
                     toggleButton.Remove();
                     Append(toggleButton);
-
-                    // Config c = ModContent.GetInstance<Config>();
-                    // if (c.ShowClearButton && clearButton != null)
-                    // Append(clearButton);
                 }
             }
             else
@@ -180,7 +175,6 @@ namespace DPSPanel.UI
                 if (Children.Contains(panel))
                 {
                     panel.Remove();
-                    // Main.NewText("Panel hidden. In chat, you can type /dps <toggle> <item> <clear> ", Color.SteelBlue);
                 }
             }
         }

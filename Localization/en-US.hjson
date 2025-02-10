@@ -2,47 +2,47 @@ Mods: {
 	DPSPanel: {
 		Configs: {
 			Config: {
-				DisableValidHoverHighlight: {
-					Tooltip: Set to false to remove the annoyance of the toggle button flashing when you're using weapons.
-					Label: Highlight Toggle Button When Using Weapons
-				}
-
-				MaxWeaponsDisplayed: {
-					Tooltip: Set the maximum number of weapons to display in the panel. (experimental)
-					Label: Max Weapons Displayed
-				}
-
-				ShowBossIcon: {
-					Tooltip: On: Always show boss icons.
-					Label: "[i:560] Show Boss Icon"
-				}
-
-				ShowPlayerIcon: {
-					Tooltip: On: Always show player icons.
-					Label: Show Player Icon
-				}
-
-				AlwaysShowButton: {
-					Tooltip: On: Always show the toggle button. Off: Only show the toggle button when you have weapons in your inventory.
-					Label: Show Toggle Button
-				}
+				DisplayName: Config
 
 				Headers: {
-					UI: UI
 					DamageCalculation: Damage Calculation
+					PanelSettings: Panel Settings
 				}
 
 				TrackAllEntities: {
-					Tooltip: Enable this to ensure that the boss's minions are also included in the damage calculation.
-					Label: Track Damage to All Entities During Boss Fight
+					Label: Track All Entities
+					Tooltip: Tracks damage done to all entities during a boss fight, otherwise tracks only damage done to boss itself
+				}
+
+				ShowPlayerIcon: {
+					Label: Show Player Icon
+					Tooltip: Show icons for every player during a boss fight
+				}
+
+				ShowBossIcon: {
+					Label: Show Boss Icon
+					Tooltip: Show the boss icon at the panel title
+				}
+
+				MaxWeaponsDisplayed: {
+					Label: Max Weapons Displayed
+					Tooltip: The maximum number of weapon bars that can be displayed at one point
 				}
 
 				BarWidth: {
-					Tooltip: Set the width of the bars. (experimental)
 					Label: Bar Width
+					Tooltip: Set the size of the bars to a fixed value of either 150 or 300
 				}
 
-				DisplayName: Config
+				DisableHoverHighlight: {
+					Label: Disable Hover Highlight
+					Tooltip: Disables all highlighting actions, if you find it interfering with boss fights
+				}
+
+				ShowOnlyWhenInventoryOpen: {
+					Label: Show Only When Inventory Open
+					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it
+				}
 			}
 		}
 

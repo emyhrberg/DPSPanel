@@ -1,15 +1,11 @@
 ﻿using System.Collections.Generic;
-using Terraria;
-using Terraria.ModLoader;
-using Microsoft.Xna.Framework;
 using System.Linq;
+using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using static DPSPanel.DPSPanel;
-using DPSPanel.Helpers;
-using DPSPanel.UI;
-using DPSPanel.Configs;
 
-namespace DPSPanel.DamageCalculation
+namespace DPSPanel.Core.DamageCalculation
 {
     [Autoload(Side = ModSide.Client)]
     public class BossDamageTrackerMP : ModPlayer
@@ -134,8 +130,6 @@ namespace DPSPanel.DamageCalculation
                     return;
                 }
 
-                // Mod.Logger.Info($"whoAmI: {npc.whoAmI} | fight BOSS ID: {fight.bossId}");
-
                 if (fight != null && fight.whoAmI == npc.whoAmI)
                 {
                     // Update the fight data
@@ -162,7 +156,7 @@ namespace DPSPanel.DamageCalculation
                     players = [],
                     isAlive = true
                 };
-                // Mod.Logger.Info("New boss fight created: " + fight.bossName);
+                Mod.Logger.Info("(MP) New boss fight created: " + fight.bossName);
 
                 SendPlayerDamagePacket();
             }

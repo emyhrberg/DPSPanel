@@ -1,8 +1,8 @@
+using System.IO;
+using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using System.IO;
-using DPSPanel.UI;
 
 namespace DPSPanel
 {
@@ -32,7 +32,7 @@ namespace DPSPanel
                     if (Main.netMode == NetmodeID.Server)
                     {
                         // Server processes the packet and broadcasts it to all clients
-                        Logger.Info($"[Server] Received FightPacket from {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI})");
+                        Logger.Info($"[Server] Received FightPacket from {playerName}: {damageDone} damage to {bossName} (bossWhoAmI {bossWhoAmI}) | bossHeadID: {bossHeadId} | playerWhoAmI: {playerWhoAmI}");
 
                         // Send data to all clients
                         ModPacket packet = GetPacket();
@@ -43,7 +43,6 @@ namespace DPSPanel
                         packet.Write(bossName);
                         packet.Write(bossHeadId);
                         packet.Write(playerWhoAmI);
-                        Logger.Info($"[Server] sent WHOAMI: {playerWhoAmI}");
                         packet.Send(); // Broadcast to all clients
                     }
                     else if (Main.netMode == NetmodeID.MultiplayerClient)
@@ -51,7 +50,7 @@ namespace DPSPanel
                         // Client updates its UI with the received data
                         Logger.Info($"[Client] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
 
-                        PanelSystem sys = ModContent.GetInstance<PanelSystem>();
+                        MainSystem sys = ModContent.GetInstance<MainSystem>();
                         Panel panel = sys.state.container.panel;
                         if (panel.CurrentBossID != bossWhoAmI)
                         {

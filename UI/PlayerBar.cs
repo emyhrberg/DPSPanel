@@ -1,17 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DPSPanel.Core.Configs;
+using DPSPanel.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
-using Terraria.UI;
-using Terraria.GameContent.UI.Elements;
 using Terraria;
 using Terraria.GameContent;
-using DPSPanel.Helpers;
-using DPSPanel.Configs;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
+using Terraria.UI;
 
 namespace DPSPanel.UI
 {
-    public class DamageBarElement : UIElement
+    public class PlayerBar : UIElement
     {
         private Asset<Texture2D> emptyBar; // Background 
         private Asset<Texture2D> fullBar;  // Foreground fill texture
@@ -27,24 +27,24 @@ namespace DPSPanel.UI
         public int PlayerWhoAmI { get; set; }
 
         // Player head element
-        private PlayerHeadElement playerHeadElement;
+        private PlayerHead playerHeadElement;
 
-        public static DamageBarElement Instance;
+        public static PlayerBar Instance;
 
-        public DamageBarElement(float currentYOffset, string playerName, int playerWhoAmI)
+        public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
         {
             Instance = this;
             // Load bar textures
             Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == "150")
+            if (c.BarWidth == 150)
             {
-                emptyBar = LoadAssets.BarEmpty150;
-                fullBar = LoadAssets.BarFull150;
+                emptyBar = Assets.BarEmpty150;
+                fullBar = Assets.BarFull150;
             }
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
             {
-                emptyBar = LoadAssets.BarEmpty300;
-                fullBar = LoadAssets.BarFull300;
+                emptyBar = Assets.BarEmpty300;
+                fullBar = Assets.BarFull300;
             }
 
             // Set dimensions and alignment
@@ -72,7 +72,7 @@ namespace DPSPanel.UI
                 if (playerWhoAmI >= 0 && playerWhoAmI < Main.player.Length && Main.player[playerWhoAmI].active)
                 {
                     Player player = Main.player[playerWhoAmI];
-                    playerHeadElement = new PlayerHeadElement(player);
+                    playerHeadElement = new PlayerHead(player);
                     Append(playerHeadElement);
                 }
             }
@@ -84,15 +84,15 @@ namespace DPSPanel.UI
                 return;
 
             // If you’re updating a particular instance, ensure you have a way to reference it.
-            if (config.BarWidth == "150")
+            if (config.BarWidth == 150)
             {
-                Instance.emptyBar = LoadAssets.BarEmpty150;
-                Instance.fullBar = LoadAssets.BarFull150;
+                Instance.emptyBar = Assets.BarEmpty150;
+                Instance.fullBar = Assets.BarFull150;
             }
-            else if (config.BarWidth == "300")
+            else if (config.BarWidth == 300)
             {
-                Instance.emptyBar = LoadAssets.BarEmpty300;
-                Instance.fullBar = LoadAssets.BarFull300;
+                Instance.emptyBar = Assets.BarEmpty300;
+                Instance.fullBar = Assets.BarFull300;
             }
         }
 

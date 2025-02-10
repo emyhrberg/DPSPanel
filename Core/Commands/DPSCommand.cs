@@ -3,9 +3,9 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Configs
+namespace DPSPanel.Core.Configs
 {
-    public class Commands : ModCommand
+    public class DPSCommand : ModCommand
     {
         public override CommandType Type => CommandType.Chat; // Makes the command available in chat
         public override string Command => "dps"; // The main command is "/dps"
@@ -18,7 +18,7 @@ namespace DPSPanel.Configs
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
-            var sys = ModContent.GetInstance<PanelSystem>();
+            var sys = ModContent.GetInstance<MainSystem>();
 
             // validate args
             if (args.Length != 1)
@@ -46,12 +46,10 @@ namespace DPSPanel.Configs
             }
             else if (target == "toggle")
             {
-                ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
+                ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
 
-                Rectangle pos = Main.LocalPlayer.getRect();
-                Color color = ModContent.GetInstance<Config>().AlwaysShowButton ? Color.Green : Color.Red;
-                string text = ModContent.GetInstance<Config>().AlwaysShowButton ? "Button will always show" : "Button will only show when inventory is open";
-                CombatText.NewText(pos, color, text);
+                string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show" : "Only show when inventory is open";
+                Main.NewText(text, Color.White);
             }
             else
             {

@@ -1,4 +1,4 @@
-using DPSPanel.Configs;
+using DPSPanel.Core.Configs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
@@ -8,14 +8,14 @@ using Terraria.UI;
 
 namespace DPSPanel.UI
 {
-    public class PlayerHeadElement : UIElement
+    public class PlayerHead : UIElement
     {
         private readonly Player player;
 
         // make a get set for fillcolor
         public Color FillColor { get; set; }
 
-        public PlayerHeadElement(Player player)
+        public PlayerHead(Player player)
         {
             this.player = player;
 
@@ -46,15 +46,17 @@ namespace DPSPanel.UI
 
             // make a clone and have it always face right
             Player rightFacingClone = (Player)player.Clone();
-            rightFacingClone.direction = 1;
+
+            // do NOT force direction as this messes up the minimap.
+            // rightFacingClone.direction = 1;
 
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
                 rightFacingClone,
                 drawPosition,
                 1f, // alpha/transparency
-                1.1f, // scale
-                FillColor // border color
+                0.8f, // scale
+                Color.White * 0.01f // border color
             );
         }
     }

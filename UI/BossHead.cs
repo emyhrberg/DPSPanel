@@ -1,16 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DPSPanel.Helpers;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Terraria;
+using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
-using Terraria.GameContent;
-using Terraria;
 namespace DPSPanel.UI
 {
-    public class BossIconElement : UIElement
+    public class BossHead : UIElement
     {
         public int bossHeadID;
 
-        public BossIconElement()
+        public BossHead()
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
@@ -41,6 +42,7 @@ namespace DPSPanel.UI
         public void UpdateBossIcon(int _headID)
         {
             bossHeadID = _headID;
+            Log.Info("Updated boss icon to " + bossHeadID);
         }
     }
 }

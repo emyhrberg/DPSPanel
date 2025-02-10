@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DPSPanel.Configs;
-using DPSPanel.DamageCalculation;
+using DPSPanel.Core.Configs;
+using DPSPanel.Core.DamageCalculation;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +10,6 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
 namespace DPSPanel.UI
-
 {
     public class Panel : UIPanel
     {
@@ -22,26 +21,26 @@ namespace DPSPanel.UI
         private float currentYOffset = 0;
         private const float ItemHeight = 16f; // size of each item
 
-        // damageBars: Key = each individual playerName, Value = DamageBarElement
-        private Dictionary<string, DamageBarElement> players = [];
+        // multiplayer: damageBars: Key = each individual playerName, Value = DamageBarElement
+        private Dictionary<string, PlayerBar> players = [];
 
         // singleplayer: weaponBars: Key = each individual weaponName, Value = WeaponBarElement
-        private Dictionary<string, WeaponDamageBarElement> damageBars = [];
+        private Dictionary<string, WeaponBar> damageBars = [];
 
         // bossTitle: Title of the boss
         public int CurrentBossID;
         public string CurrentBossName;
         private const float bossHeaderHeight = 28f;
-        public BossIconElement bossIcon = new();
+        public BossHead bossIcon = new();
         public static Panel Instance;
 
         public Panel()
         {
             Instance = this;
             Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == "150")
+            if (c.BarWidth == 150)
                 Width.Set(150, 0f);
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
                 Width.Set(300, 0f);
 
             Height.Set(PANEL_HEIGHT, 0f);
@@ -80,9 +79,9 @@ namespace DPSPanel.UI
             // left offset based on slider width
             Config c = ModContent.GetInstance<Config>();
 
-            if (c.BarWidth == "150")
+            if (c.BarWidth == 150)
                 bossIcon.Left.Set(60f, 0f);
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
                 bossIcon.Left.Set(100f, 0f);
 
             bossIcon.UpdateBossIcon(bossHeadId);
@@ -93,9 +92,9 @@ namespace DPSPanel.UI
         {
             if (Instance == null)
                 return;
-            if (c.BarWidth == "150")
+            if (c.BarWidth == 150)
                 Instance.bossIcon.Left.Set(60f, 0f);
-            else if (c.BarWidth == "300")
+            else if (c.BarWidth == 300)
                 Instance.bossIcon.Left.Set(60f, 0f);
         }
 
@@ -103,7 +102,7 @@ namespace DPSPanel.UI
         {
             Config c = ModContent.GetInstance<Config>();
 
-            if (!Main.playerInventory && !c.AlwaysShowButton)
+            if (!Main.playerInventory && !c.ShowOnlyWhenInventoryOpen)
                 return;
 
             base.Draw(sb);
@@ -116,7 +115,7 @@ namespace DPSPanel.UI
                 return;
 
             // Create a new bar
-            DamageBarElement bar = new(currentYOffset, playerName, playerWhoAmI);
+            PlayerBar bar = new(currentYOffset, playerName, playerWhoAmI);
 
             Append(bar);
             players[playerName] = bar;
@@ -150,7 +149,7 @@ namespace DPSPanel.UI
             for (int i = 0; i < sortedPlayers.Count; i++)
             {
                 string currentPlayerName = sortedPlayers[i].Key;
-                DamageBarElement currentBar = sortedPlayers[i].Value;
+                PlayerBar currentBar = sortedPlayers[i].Value;
 
                 // Update bar position to match the sorted order
                 currentBar.Top.Set(currentYOffset, 0f);
@@ -185,7 +184,7 @@ namespace DPSPanel.UI
         private void ResizePanelHeight()
         {
             // set parent container height
-            if (Parent is not BossContainerElement parentContainer)
+            if (Parent is not MainContainer parentContainer)
                 return; // Exit if parentContainer is not set
             parentContainer.Height.Set(currentYOffset + ITEM_PADDING, 0f);
             parentContainer.Recalculate();
@@ -202,7 +201,7 @@ namespace DPSPanel.UI
         {
             if (!damageBars.ContainsKey(barName))
             {
-                WeaponDamageBarElement bar = new(currentYOffset);
+                WeaponBar bar = new(currentYOffset);
                 Append(bar);
                 damageBars[barName] = bar;
 
@@ -239,7 +238,7 @@ namespace DPSPanel.UI
                     // Removed: return;
                 }
 
-                WeaponDamageBarElement bar = damageBars[wpn.weaponName];
+                WeaponBar bar = damageBars[wpn.weaponName];
 
                 // Update with the current data.
                 int percentageToFill = (int)(wpn.damage / (float)highest * 100);

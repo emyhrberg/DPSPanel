@@ -1,10 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using DPSPanel.Core.Configs;
+using DPSPanel.Helpers;
+using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Configs
+namespace DPSPanel.Core.Keybinds
 {
-    public class KeybindSystem : ModSystem
+    public class TogglePanelKeybindSystem : ModSystem
     {
         public static ModKeybind toggleDPSPanelKeybind { get; private set; }
 
@@ -24,13 +26,11 @@ namespace DPSPanel.Configs
             if (toggleDPSPanelKeybind?.JustPressed == true)
             {
                 // toggle the button
-                ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
+                ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
 
-                Rectangle pos = Main.LocalPlayer.getRect();
                 // change color and text based on the config setting
-                Color color = ModContent.GetInstance<Config>().AlwaysShowButton ? Color.Green : Color.Red;
-                string text = ModContent.GetInstance<Config>().AlwaysShowButton ? "Button will always show" : "Button will only show when inventory is open";
-                CombatText.NewText(pos, color, text);
+                string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Only show when inventory is open";
+                Main.NewText(text, Color.White);
             }
         }
     }

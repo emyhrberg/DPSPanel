@@ -4,3 +4,4 @@ version = 0.3.4
 side=both
 hideCode = true
 hideResources = true
+buildIgnore = Assets\Old*

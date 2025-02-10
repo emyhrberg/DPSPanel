@@ -1,4 +1,4 @@
-﻿using DPSPanel.Configs;
+﻿using DPSPanel.Core.Configs;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -9,28 +9,28 @@ using Terraria.UI;
 namespace DPSPanel.UI
 
 {
-    public class ToggleButtonElement : UIElement
+    public class ToggleButton : UIElement
     {
-        private Texture2D toggleBtnTexture;
-        private Texture2D toggleBtnHighlightedTexture;
+        private Texture2D img;
+        private Texture2D imgHighlighted;
         private Vector2 clickStartPosition; // Start position of a mouse click
         private bool isDragging;
 
-        public ToggleButtonElement()
+        public ToggleButton()
         {
             Width.Set(30f, 0f);
             Height.Set(30f, 0f);
             Top.Set(4f, 0f);
             Left.Set(4f, 0f);
 
-            toggleBtnTexture = LoadAssets.ToggleButtonTexture.Value;
-            toggleBtnHighlightedTexture = LoadAssets.ToggleButtonTextureHighlighted.Value;
+            img = Assets.ToggleButton.Value;
+            imgHighlighted = Assets.ToggleButtonHighlighted.Value;
         }
 
         protected override void DrawSelf(SpriteBatch sb)
         {
             Config c = ModContent.GetInstance<Config>();
-            if (!Main.playerInventory && !c.AlwaysShowButton)
+            if (!Main.playerInventory && !c.ShowOnlyWhenInventoryOpen)
                 return;
 
             base.DrawSelf(sb);
@@ -38,27 +38,19 @@ namespace DPSPanel.UI
             // Get the dimensions of the element
             const float scale = 0.8f; // Scale factor
             CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new(dims.X + (dims.Width - toggleBtnTexture.Width * scale) / 2f,
-                              dims.Y + (dims.Height - toggleBtnTexture.Height * scale) / 2f);
+            Vector2 pos = new(dims.X + (dims.Width - img.Width * scale) / 2f,
+                              dims.Y + (dims.Height - img.Height * scale) / 2f);
 
-            var parentContainer = Parent as BossContainerElement;
 
-            // Check hover behavior based on config
-            bool isHoverValid = c.DisableValidHoverHighlight
-                ? IsMouseHovering
-                : IsMouseHovering && (!Main.mouseLeft || parentContainer.clickStartInsidePanel);
-
-            if (isHoverValid)
+            // Draw either the button or highlighted button based on hover state
+            if (IsMouseHovering && !c.DisableHoverHighlight)
             {
-                sb.Draw(toggleBtnHighlightedTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-                // if (parentContainer.panelVisible)
-                Main.instance.MouseText("Left click to toggle panel \nRight click to hide and only show when inventory is open");
-                // else
-                // Main.instance.MouseText("Click to show panel");
+                sb.Draw(imgHighlighted, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open");
             }
             else
             {
-                sb.Draw(toggleBtnTexture, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
+                sb.Draw(img, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
             }
         }
 
@@ -68,13 +60,10 @@ namespace DPSPanel.UI
             base.RightMouseDown(evt);
 
             // on right click we toggle the config setting to only show in inventory.
-            ModContent.GetInstance<Config>().AlwaysShowButton = !ModContent.GetInstance<Config>().AlwaysShowButton;
+            ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
 
-            Rectangle pos = Main.LocalPlayer.getRect();
-            // change color and text based on the config setting
-            Color color = ModContent.GetInstance<Config>().AlwaysShowButton ? Color.Green : Color.Red;
-            string text = ModContent.GetInstance<Config>().AlwaysShowButton ? "Button will always show" : "Button will only show when inventory is open";
-            CombatText.NewText(pos, color, text);
+            string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Only show when inventory is open";
+            Main.NewText(text, Color.White);
         }
         #endregion
 
@@ -101,7 +90,7 @@ namespace DPSPanel.UI
             // Only toggle the panel if it was not a drag
             if (!isDragging)
             {
-                var parentContainer = Parent as BossContainerElement;
+                var parentContainer = Parent as MainContainer;
 
                 // Ensure the parent container is not null before accessing it
                 if (parentContainer == null)
