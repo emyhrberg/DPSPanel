@@ -4,7 +4,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -24,7 +23,7 @@ namespace DPSPanel.UI
         // Properties
         public string PlayerName { get; set; }
         public int PlayerDamage { get; set; }
-        public int PlayerWhoAmI { get; set; }
+        public int PlayerWhoAmI { get; set; } // kinda Unused.
 
         // Player head element
         private PlayerHead playerHeadElement;
@@ -67,7 +66,7 @@ namespace DPSPanel.UI
             Append(textElement);
 
             // Add player head if the player is active
-            if (c.ShowPlayerIcon)
+            if (c.ShowPlayerIcons)
             {
                 if (playerWhoAmI >= 0 && playerWhoAmI < Main.player.Length && Main.player[playerWhoAmI].active)
                 {
@@ -104,9 +103,6 @@ namespace DPSPanel.UI
             PlayerName = playerName;
             PlayerDamage = playerDamage;
 
-            // update fill color? config option?
-            // playerHeadElement.FillColor = fillColor;
-
             textElement.SetText($"{playerName} ({playerDamage})");
         }
 
@@ -126,8 +122,8 @@ namespace DPSPanel.UI
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
-                Rectangle sourceRect = new Rectangle(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
-                Rectangle destRect = new Rectangle((int)position.X, (int)position.Y, fillWidth, (int)dims.Height);
+                Rectangle sourceRect = new(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
+                Rectangle destRect = new((int)position.X, (int)position.Y, fillWidth, (int)dims.Height);
 
                 spriteBatch.Draw(fullBar.Value, destRect, sourceRect, fillColor);
             }
@@ -136,8 +132,8 @@ namespace DPSPanel.UI
         private void DrawDamageBarOutline(SpriteBatch spriteBatch)
         {
             CalculatedStyle dims = GetDimensions();
-            Vector2 position = new Vector2(dims.X, dims.Y);
-            Rectangle rect = new Rectangle((int)position.X, (int)position.Y, (int)dims.Width, (int)dims.Height);
+            Vector2 position = new(dims.X, dims.Y);
+            Rectangle rect = new((int)position.X, (int)position.Y, (int)dims.Width, (int)dims.Height);
             spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
         }
     }

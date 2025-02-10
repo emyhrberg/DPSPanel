@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using DPSPanel.Helpers;
+using log4net.Repository.Hierarchy;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -12,21 +13,59 @@ namespace DPSPanel.Core.Items
     public class ItemUseTracker : GlobalItem
     {
         private List<int> bossSummoningItems = [
-            ItemID.SlimeCrown,
-            ItemID.DeerThing,
-            ItemID.SuspiciousLookingEye,
-            ItemID.WormFood,
-            ItemID.MechanicalEye,
-            ItemID.MechanicalWorm,
-            ItemID.MechanicalSkull,
-            ItemID.LihzahrdPowerCell,
+            // pre-HM
+            ItemID.SlimeCrown, // king slime
+            ItemID.SuspiciousLookingEye, // eye of cthulhu
+            ItemID.WormFood, // eater of worlds
+            ItemID.BloodySpine, // brain of cthulhu
+            ItemID.Abeemination, // queen bee
+            ItemID.ClothierVoodooDoll, // skeletron
+            ItemID.DeerThing, // deerclops
+
+            // HM
+            4988, // queen slime (gelatin crystal)
+
+            ItemID.MechanicalEye, // the twins
+            ItemID.MechanicalWorm, // the destroyer
+            ItemID.MechanicalSkull, // skeletron prime
+            ItemID.LihzahrdPowerCell, // golem
+
+            // invasions
+            ItemID.GoblinBattleStandard, // goblin army
+            ItemID.SnowGlobe, // frost legion
+            ItemID.PirateMap, // pirate invasion
+            ItemID.PumpkinMoonMedallion, // pumpkin moon
+            ItemID.NaughtyPresent, // frost moon
         ];
+
+        // NOTE: missing:
+        // pre-HM:
+        // wof
+
+        // HM:
+        // plantera
+        // duke fishron
+        // lunatic cultist
 
         public override bool InstancePerEntity => true;
 
         public override void OnConsumeItem(Item item, Player player)
         {
-            Log.Info("UseItem called");
+            Log.Info("UseItem called. item.Name: " + item.Name);
+
+            // add calamity boss summoning items
+            Mod calamity = ModLoader.GetMod("CalamityMod");
+            if (calamity == null)
+            {
+                Log.Info("no calamity");
+            }
+            else
+            {
+                Log.Info("calamity");
+            }
+            // add calamity boss summoning items
+
+            // add thorium boss summoning items
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
                 return;

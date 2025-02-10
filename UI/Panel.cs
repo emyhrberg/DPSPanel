@@ -120,7 +120,7 @@ namespace DPSPanel.UI
             Append(bar);
             players[playerName] = bar;
 
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating damage bar for {playerName}");
+            Log.Info($"Creating damage bar for {playerName}");
 
             currentYOffset += ItemHeight + ITEM_PADDING * 2; // Adjust Y offset for the next element
             ResizePanelHeight();
@@ -160,7 +160,7 @@ namespace DPSPanel.UI
                     ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100)
                     : 0;
 
-                ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Updating bar: {playerName}, Damage: {playerDamage}, Percentage: {percentageToFill}");
+                Log.Info($"[Client] Updating bar: {playerName}, Damage: {playerDamage}, Percentage: {percentageToFill}");
 
                 // Assign a color based on position in the sorted list
                 Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
@@ -190,7 +190,7 @@ namespace DPSPanel.UI
             parentContainer.Recalculate();
 
             // debug to logger the current height
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"Panel.cs: Setting Panel height: {currentYOffset + ITEM_PADDING}");
+            Log.Info($"Panel.cs: Setting Panel height: {currentYOffset + ITEM_PADDING}");
 
             Height.Set(currentYOffset + ITEM_PADDING, 0f);
             Recalculate();
@@ -205,7 +205,7 @@ namespace DPSPanel.UI
                 Append(bar);
                 damageBars[barName] = bar;
 
-                ModContent.GetInstance<DPSPanel>().Logger.Info($"Creating weapon bar for {barName}");
+                Log.Info($"Creating weapon bar for {barName}");
 
                 // Removed the following lines to prevent double resizing and Y-offset changes
                 // currentYOffset += ItemHeight + ITEM_PADDING * 2;

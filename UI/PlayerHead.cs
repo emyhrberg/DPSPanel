@@ -2,7 +2,6 @@ using DPSPanel.Core.Configs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.UI;
 
@@ -12,7 +11,6 @@ namespace DPSPanel.UI
     {
         private readonly Player player;
 
-
         public PlayerHead(Player player)
         {
             this.player = player;
@@ -21,7 +19,7 @@ namespace DPSPanel.UI
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             Config c = ModContent.GetInstance<Config>();
-            if (!c.ShowPlayerIcon)
+            if (!c.ShowPlayerIcons)
                 return;
 
             base.DrawSelf(spriteBatch);

@@ -18,24 +18,24 @@ namespace DPSPanel.Core.Configs
         [Header("PanelSettings")]
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
-        public bool ShowOnlyWhenInventoryOpen { get; set; } = true;
-
-        [BackgroundColor(192, 54, 64)] // Calamity Red
-        [DefaultValue(true)]
-        public bool ShowPlayerIcon { get; set; } = true;
+        public bool ShowPlayerIcons { get; set; } = true;
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
         public bool ShowBossIcon { get; set; } = true;
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
-        [DefaultValue(10)]
-        [Range(1, 10)]
-        public int MaxWeaponsDisplayed { get; set; } = 10;
+        [DefaultValue(true)]
+        public bool ShowOnlyWhenInventoryOpen { get; set; } = true;
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
         public bool HighlightButtonWhenHovering { get; set; } = true;
+
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(10)]
+        [Range(1, 10)]
+        public int MaxWeaponsDisplayed { get; set; } = 10;
 
         [Range(150, 300)]
         [Increment(150)]

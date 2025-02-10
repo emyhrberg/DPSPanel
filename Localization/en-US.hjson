@@ -10,37 +10,37 @@ Mods: {
 				}
 
 				TrackAllEntities: {
-					Label: Track All Entities
+					Label: "[i:StardustCellStaff] Track All Entities"
 					Tooltip: Tracks damage done to all entities during a boss fight, otherwise tracks only damage done to boss itself
 				}
 
-				ShowPlayerIcon: {
-					Label: Show Player Icon
+				ShowPlayerIcons: {
+					Label: "[i:CactusHelmet] Show Player Icons"
 					Tooltip: Show icons for every player during a boss fight
 				}
 
 				ShowBossIcon: {
-					Label: Show Boss Icon
+					Label: "[i:SlimeCrown] Show Boss Icon"
 					Tooltip: Show the boss icon at the panel title
 				}
 
 				MaxWeaponsDisplayed: {
-					Label: Max Weapons Displayed
+					Label: "[i:PlatinumBroadsword] Max Weapons Displayed"
 					Tooltip: The maximum number of weapon bars that can be displayed at one point
 				}
 
 				BarWidth: {
-					Label: Bar Width
+					Label: "[i:TeamBlockRedPlatform] Bar Width"
 					Tooltip: Set the size of the bars to a fixed value of either 150 or 300
 				}
 
 				ShowOnlyWhenInventoryOpen: {
-					Label: Show Only When Inventory Open
+					Label: "[i:DeerclopsPetItem] Show Only When Inventory Open"
 					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it
 				}
 
 				HighlightButtonWhenHovering: {
-					Label: Highlight Button When Hovering
+					Label: "[i:LivingIchorBlock] Highlight Button When Hovering"
 					Tooltip: You can disable this if you find the button highlighting to interfere with boss fights
 				}
 			}

@@ -127,7 +127,7 @@ namespace DPSPanel.UI
             // Main.LocalPlayer.mouseInterface = true;
 
             // log state of clickstartinsidepanel
-            // ModContent.GetInstance<DPSPanel>().Logger.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
+            // Log.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
 
             if (dragging)
             {
@@ -152,6 +152,17 @@ namespace DPSPanel.UI
             }
         }
         #endregion
+
+        public override bool ContainsPoint(Vector2 point)
+        {
+            // If panel is hidden, only consider the toggle button clickable/draggable
+            if (!panelVisible)
+            {
+                return toggleButton.ContainsPoint(point);
+            }
+            // Otherwise, use the default logic
+            return base.ContainsPoint(point);
+        }
 
         #region Show/Hide Panel
         public void TogglePanel()

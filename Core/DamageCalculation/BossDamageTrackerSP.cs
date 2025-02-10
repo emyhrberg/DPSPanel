@@ -162,7 +162,7 @@ namespace DPSPanel.Core.DamageCalculation
                 // 1) If there's an active fight and the boss is no longer alive or present, stop tracking
                 if (fight != null && !Main.npc.Any(npc => npc.active && npc.boss && npc.FullName == fight.bossName))
                 {
-                    Mod.Logger.Info($"Boss {fight.bossName} was killed or despawned!");
+                    Log.Info($"Boss {fight.bossName} was killed or despawned!");
                     fight = null; // stop tracking
                 }
 

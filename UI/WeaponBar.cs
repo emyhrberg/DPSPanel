@@ -64,7 +64,7 @@ namespace DPSPanel.UI
         {
             if (Instance == null)
             {
-                ModContent.GetInstance<DPSPanel>().Logger.Warn("Instance is null in WeaponDamageBarElement");
+                Log.Warn("Instance is null in WeaponDamageBarElement");
                 return;
             }
             if (c.BarWidth == 150)

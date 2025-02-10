@@ -95,7 +95,7 @@ namespace DPSPanel.UI
                 // Ensure the parent container is not null before accessing it
                 if (parentContainer == null)
                 {
-                    ModContent.GetInstance<DPSPanel>().Logger.Warn("Parent container is null. TogglePanel() cannot be called.");
+                    Log.Warn("Parent container is null. TogglePanel() cannot be called.");
                     return;
                 }
 

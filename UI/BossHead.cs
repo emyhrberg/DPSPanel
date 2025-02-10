@@ -35,14 +35,13 @@ namespace DPSPanel.UI
             }
             else
             {
-                ModContent.GetInstance<DPSPanel>().Logger.Info($"Invalid boss index {bossHeadID}");
+                Log.Info($"Invalid boss index {bossHeadID}");
             }
         }
 
         public void UpdateBossIcon(int _headID)
         {
             bossHeadID = _headID;
-            Log.Info("Updated boss icon to " + bossHeadID);
         }
     }
 }

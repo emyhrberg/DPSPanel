@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -20,7 +21,7 @@ namespace DPSPanel.UI
 
             state.Activate();
             ui.SetState(state);
-            ModContent.GetInstance<DPSPanel>().Logger.Info("MainSystem initialized!");
+            Log.Info("MainSystem initialized!");
         }
 
         public override void UpdateUI(GameTime gameTime)
