@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Core.Configs;
+using DPSPanel.Core.Networking;
 using DPSPanel.Helpers;
 using Terraria;
 using Terraria.ID;
@@ -156,7 +157,7 @@ namespace DPSPanel.Core.DamageCalculation
                 {
                     Log.Info("[BossFight] Designated boss has died. Ending fight.");
                     fight.isAlive = false;
-                    SendPlayerDamagePacket();
+                    PacketSender.SendPlayerDamagePacket(fight);
                     fight = null;
                     return;
                 }
@@ -174,7 +175,7 @@ namespace DPSPanel.Core.DamageCalculation
 
                 // Update the player damage record and send out an update packet.
                 fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
-                SendPlayerDamagePacket();
+                PacketSender.SendPlayerDamagePacket(fight);
             }
             // Else, only track damage for the designated boss.
             else
@@ -193,7 +194,7 @@ namespace DPSPanel.Core.DamageCalculation
                 {
                     Log.Info("[BossFight] Designated boss has died. Ending fight.");
                     fight.isAlive = false;
-                    SendPlayerDamagePacket();
+                    PacketSender.SendPlayerDamagePacket(fight);
                     fight = null;
                     return;
                 }
@@ -205,7 +206,7 @@ namespace DPSPanel.Core.DamageCalculation
                     fight.currentLife = npc.life;
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
                     Log.Info($"[BossFight] Added {damageDone} damage to designated boss. Total damage is now {fight.damageTaken}.");
-                    SendPlayerDamagePacket();
+                    PacketSender.SendPlayerDamagePacket(fight);
                 }
                 else
                 {
@@ -231,35 +232,9 @@ namespace DPSPanel.Core.DamageCalculation
                 };
                 Mod.Logger.Info("(MP) New boss fight created: " + fight.bossName);
 
-                SendPlayerDamagePacket();
+                PacketSender.SendPlayerDamagePacket(fight);
             }
         }
-        #endregion
-
-        #region Networking
-        private void SendPlayerDamagePacket()
-        {
-            if (Main.netMode == NetmodeID.SinglePlayer)
-                return;
-
-            // Get variables to send
-            string player = Main.LocalPlayer.name;
-            int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
-
-            // Create and send the packet
-            ModPacket packet = Mod.GetPacket();
-            packet.Write((byte)ModMessageType.FightPacket);
-            packet.Write(player);
-            packet.Write(damageDone);
-            packet.Write(fight.whoAmI);
-            packet.Write(fight.bossName);
-            packet.Write(fight.bossHeadId);
-            packet.Write(Main.LocalPlayer.whoAmI);
-
-            ModContent.GetInstance<DPSPanel>().Logger.Info($"[Client] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
-            packet.Send(); // send the packet to the server
-        }
-
         #endregion
 
         #region Helpers

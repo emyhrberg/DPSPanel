@@ -43,6 +43,11 @@ Mods: {
 					Label: Show Only When Inventory Open
 					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it
 				}
+
+				HighlightButtonWhenHovering: {
+					Label: Highlight Button When Hovering
+					Tooltip: ""
+				}
 			}
 		}
 
