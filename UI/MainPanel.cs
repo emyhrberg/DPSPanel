@@ -106,12 +106,10 @@ namespace DPSPanel.UI
                 Log.Info($"[MainPanel.CreatePlayerBar] Skipping creation for player '{playerName}' (ID: {playerWhoAmI}) because a PlayerBar already exists. Total PlayerBars: {playerBars.Count}");
                 return;
             }
-            Log.Info($"[MainPanel.CreatePlayerBar] Creating new PlayerBar for '{playerName}' (ID: {playerWhoAmI}) at currentYOffset: {currentYOffset}");
             PlayerBar bar = new PlayerBar(currentYOffset, playerName, playerWhoAmI);
             Append(bar);
             playerBars[playerWhoAmI] = bar;
             currentYOffset += ItemHeight + ITEM_PADDING * 2;
-            Log.Info($"[MainPanel.CreatePlayerBar] Created PlayerBar for '{playerName}' (ID: {playerWhoAmI}). Updated currentYOffset: {currentYOffset}. Total PlayerBars now: {playerBars.Count}");
             ResizePanelHeight();
         }
 

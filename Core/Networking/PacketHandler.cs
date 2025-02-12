@@ -105,7 +105,7 @@ namespace DPSPanel.Core.Networking
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
                 MainPanel panel = sys.state.container.panel;
                 // If a new boss fight is detected, clear & set a new title.
-                if (panel.CurrentBossID != bossWhoAmI)
+                if (panel.CurrentBossID != bossHeadId)
                 {
                     panel.ClearPanelAndAllItems();
                     panel.SetBossTitle(bossName, bossHeadId);

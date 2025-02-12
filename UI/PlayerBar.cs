@@ -71,11 +71,6 @@ namespace DPSPanel.UI
                     Player player = Main.player[playerWhoAmI];
                     playerHeadElement = new PlayerHead(player);
                     Append(playerHeadElement);
-                    Log.Info($"[PlayerBar.Constructor] Added player head for '{playerName}' (ID: {playerWhoAmI}).");
-                }
-                else
-                {
-                    Log.Info($"[PlayerBar.Constructor] Skipped adding player head for '{playerName}' (ID: {playerWhoAmI}) due to invalid ID or inactive player.");
                 }
             }
 
