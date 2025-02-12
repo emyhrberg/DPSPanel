@@ -34,14 +34,9 @@ Mods: {
 					Tooltip: You can disable this if you find the button highlighting to interfere with boss fights
 				}
 
-				ShowWeaponsPanelDuringBossFight: {
+				ShowWeaponsDuringBossFight: {
 					Label: "[i:LivingFrostFireBlock] Show Weapons Panel During Boss Fight"
 					Tooltip: You can disable this if you find the weapons panel to interfere with boss fights
-				}
-
-				ShowWeaponsDuringBossFight: {
-					Tooltip: ""
-					Label: Show Weapons During Boss Fight
 				}
 			}
 		}

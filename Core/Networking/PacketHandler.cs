@@ -36,11 +36,9 @@ namespace DPSPanel.Core.Networking
             }
         }
 
-        // In PacketHandler.cs, replace the existing HandleFightPacket function with the following:
-
         private static void HandleFightPacket(BinaryReader reader)
         {
-            // Read boss fight context.
+            // Receive boss fight context from the server.
             int bossWhoAmI = reader.ReadInt32();
             string bossName = reader.ReadString();
             int bossHeadId = reader.ReadInt32();
@@ -48,20 +46,20 @@ namespace DPSPanel.Core.Networking
             int initialLife = reader.ReadInt32();
             int damageTaken = reader.ReadInt32();
 
-            // Read player list.
+            // Read players.
             int playerCount = reader.ReadInt32();
-            List<(string playerName, int playerDamage, int playerWhoAmI)> players = new List<(string, int, int)>();
+            List<PlayerFightData> players = [];
             for (int i = 0; i < playerCount; i++)
             {
                 string pName = reader.ReadString();
                 int pDamage = reader.ReadInt32();
                 int pWhoAmI = reader.ReadInt32();
-                players.Add((pName, pDamage, pWhoAmI));
+                players.Add(new PlayerFightData(pWhoAmI, pName, pDamage));
             }
 
             // Read weapons.
             int weaponCount = reader.ReadInt32();
-            List<Weapon> weapons = new List<Weapon>();
+            List<Weapon> weapons = [];
             for (int i = 0; i < weaponCount; i++)
             {
                 string wpnName = reader.ReadString();
@@ -102,11 +100,9 @@ namespace DPSPanel.Core.Networking
             }
             else if (Main.netMode == NetmodeID.MultiplayerClient)
             {
+                // Relay the data from the server to the client's UI.
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
                 MainPanel panel = sys.state.container.panel;
-
-                // set current life
-                panel.SetCurrentBossLife(currentLife);
 
                 // If a new boss fight is detected, clear & set a new title.
                 if (panel.CurrentBossWhoAmI != bossWhoAmI)

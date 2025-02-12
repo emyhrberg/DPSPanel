@@ -81,14 +81,16 @@ namespace DPSPanel.UI
             if (playerDamagePanel != null)
             {
                 // Also check if we are dragging the main container
-                // MainSystem sys = ModContent.GetInstance<MainSystem>();
+                MainSystem sys = ModContent.GetInstance<MainSystem>();
                 // bool dragging = sys.state.container.dragging;
 
                 // Check if config option and if boss is alive
                 Config c = ModContent.GetInstance<Config>();
                 bool showOnHover = c.ShowWeaponsDuringBossFight;
-                bool isBossAlive = false;
-                if (!showOnHover)
+                bool isBossAlive = sys.state.container.panel.CurrentBossAlive;
+                Log.Info("ShowOnHover: " + showOnHover + " IsBossAlive: " + isBossAlive);
+
+                if (!showOnHover && isBossAlive)
                 {
                     playerDamagePanel.IsVisible = false;
                     return;

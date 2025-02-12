@@ -29,7 +29,7 @@ namespace DPSPanel.UI
         // Dictionary for damage panels.
         private Dictionary<string, PlayerDamagePanel> damagePanels = new Dictionary<string, PlayerDamagePanel>();
 
-        public int CurrentBossLife; // their health. updated in PacketHandler.
+        public bool CurrentBossAlive = false; // their health. updated in PacketHandler.
         public int CurrentBossWhoAmI;
         public int CurrentBossID;
         public string CurrentBossName;
@@ -51,7 +51,7 @@ namespace DPSPanel.UI
             CurrentBossID = bossID;
             CurrentBossName = bossName;
             UIText bossTitle = new(bossName, 1.0f);
-            bossTitle.HAlign = 0.5f;
+            bossTitle.HAlign = 0.52f;
             bossTitle.Top.Set(6f, 0f);
             Append(bossTitle);
 
@@ -63,9 +63,9 @@ namespace DPSPanel.UI
             ResizePanelHeight();
         }
 
-        public void SetCurrentBossLife(int life)
+        public void SetCurrentBossAliveFlag(bool isAlive)
         {
-            CurrentBossLife = life;
+            CurrentBossAlive = isAlive;
         }
 
         public void SetBossIcon(int bossHeadId)

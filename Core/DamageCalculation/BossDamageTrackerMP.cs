@@ -146,8 +146,7 @@ namespace DPSPanel.Core.DamageCalculation
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
             Config c = ModContent.GetInstance<Config>();
-
-            // (Your existing code to verify the fight and the designated boss goes here.)
+            MainSystem sys = ModContent.GetInstance<MainSystem>();
 
             // No active fight? Then nothing to do.
             if (fight == null)
@@ -162,8 +161,13 @@ namespace DPSPanel.Core.DamageCalculation
                     fight.isAlive = false;
                     PacketSender.SendPlayerDamagePacket(fight);
                     fight = null;
+
+                    sys.state.container.panel.CurrentBossAlive = false;
+                    Log.Info("Boss fight ended.");
                     return;
                 }
+
+                sys.state.container.panel.CurrentBossAlive = true;
 
                 fight.damageTaken += damageDone;
                 if (isDesignatedBoss)
@@ -187,11 +191,14 @@ namespace DPSPanel.Core.DamageCalculation
                     fight.isAlive = false;
                     PacketSender.SendPlayerDamagePacket(fight);
                     fight = null;
+                    sys.state.container.panel.CurrentBossAlive = false;
+                    Log.Info("Boss fight ended.");
                     return;
                 }
 
                 if (fight.whoAmI == npc.whoAmI)
                 {
+                    sys.state.container.panel.CurrentBossAlive = true;
                     fight.damageTaken += damageDone;
                     fight.currentLife = npc.life;
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, Main.LocalPlayer.whoAmI, damageDone);
