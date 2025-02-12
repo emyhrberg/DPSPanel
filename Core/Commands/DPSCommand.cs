@@ -23,7 +23,7 @@ namespace DPSPanel.Core.Configs
             // validate args
             if (args.Length != 1)
             {
-                throw new UsageException("Error: Incorrect command. Use /help for tips.");
+                throw new UsageException("Error: Please provide an argument. Usage: /dps <add> <clear> <toggle>");
             }
 
             string target = args[0];
@@ -53,7 +53,7 @@ namespace DPSPanel.Core.Configs
             }
             else
             {
-                throw new UsageException("Error: Incorrect argument. Use /help for tips.");
+                throw new UsageException($"Error: Argument '{target}' not found. Usage: /dps <add> <clear> <toggle>");
             }
         }
     }

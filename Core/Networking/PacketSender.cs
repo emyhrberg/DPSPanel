@@ -48,7 +48,7 @@ namespace DPSPanel.Core.Networking
                 fightPacket.Write(weapon.damage);
             }
 
-            Log.Info($"[PacketSender.cs] Sent boss fight packet with {fight.players.Count} players. Boss: {fight.bossName}, DamageTaken: {fight.damageTaken}");
+            // Log.Info($"[PacketSender.cs] Sent boss fight packet with {fight.players.Count} players. Boss: {fight.bossName}, DamageTaken: {fight.damageTaken}");
             fightPacket.Send(); // Broadcast the packet
         }
     }

@@ -25,11 +25,7 @@ namespace DPSPanel.UI
 
         public PlayerDamagePanel()
         {
-            Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == 150)
-                Width.Set(150, 0f);
-            else if (c.BarWidth == 300)
-                Width.Set(300, 0f);
+            Width.Set(150, 0f);
 
             // Start with a minimal height (will be updated by UpdateWeaponBars).
             Height.Set(40f, 0f);

@@ -12,18 +12,6 @@ namespace DPSPanel.Core.DamageCalculation
 {
     public class BossDamageTrackerSP : ModPlayer
     {
-        #region testing 
-        public override void OnEnterWorld()
-        {
-            int playerHeadIndex = 0; // 0 is local player
-            var sys = ModContent.GetInstance<MainSystem>();
-            // sys.state.container.panel.UpdatePlayerBars("Name1", Main.rand.Next(100, 2000), playerHeadIndex, []);
-            // sys.state.container.panel.UpdatePlayerBars("Name2", Main.rand.Next(100, 2000), playerHeadIndex, []);
-            // sys.state.container.panel.UpdatePlayerBars("Name3", Main.rand.Next(100, 2000), playerHeadIndex, []);
-        }
-
-        #endregion
-
         #region Classes
         public class BossFight
         {
@@ -43,29 +31,6 @@ namespace DPSPanel.Core.DamageCalculation
                 {
                     // Check if we already reach max cap of weapons
                     Config c = ModContent.GetInstance<Config>();
-                    if (weapons.Count >= c.MaxWeaponsDisplayed)
-                    {
-                        // Add to unknown weapon
-                        Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
-                        if (unknownWeapon != null)
-                        {
-                            unknownWeapon.damage += damageDone;
-                        }
-                        else
-                        {
-                            unknownWeapon = new Weapon(-1, "Unknown", damageDone)
-                            {
-                                weaponName = "Unknown",
-                                weaponItemID = -1, // Invalid ID so no icon is drawn
-                                damage = damageDone
-                            };
-                            weapons.Add(unknownWeapon);
-                            weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                            MainSystem sys2 = ModContent.GetInstance<MainSystem>();
-                            sys2.state.container.panel.CreateWeaponBarSP("Unknown");
-                        }
-                        return;
-                    }
 
                     // Add a new weapon to the fight
                     weapon = new Weapon(weaponID, weaponName, damageDone);

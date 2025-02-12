@@ -25,22 +25,10 @@ namespace DPSPanel.UI
         private int weaponItemID;
         private string weaponName;
 
-        public static WeaponBar Instance;
-
         public WeaponBar(float currentYOffset)
         {
-            Instance = this;
-            Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == 150)
-            {
-                emptyBar = Assets.BarEmpty150;
-                fullBar = Assets.BarFull150;
-            }
-            else if (c.BarWidth == 300)
-            {
-                emptyBar = Assets.BarEmpty300;
-                fullBar = Assets.BarFull300;
-            }
+            emptyBar = Assets.BarEmpty150;
+            fullBar = Assets.BarFull150;
 
             Width = new StyleDimension(0, 1.0f);
             Height = new StyleDimension(ItemHeight, 0f);
@@ -53,25 +41,6 @@ namespace DPSPanel.UI
                 VAlign = 0.5f,
             };
             Append(textElement);
-        }
-
-        public static void UpdateBarWidth(Config c)
-        {
-            if (Instance == null)
-            {
-                Log.Warn("Instance is null in WeaponBar");
-                return;
-            }
-            if (c.BarWidth == 150)
-            {
-                Instance.emptyBar = Assets.BarEmpty150;
-                Instance.fullBar = Assets.BarFull150;
-            }
-            else if (c.BarWidth == 300)
-            {
-                Instance.emptyBar = Assets.BarEmpty300;
-                Instance.fullBar = Assets.BarFull300;
-            }
         }
 
         public void UpdateWeaponBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
@@ -94,7 +63,7 @@ namespace DPSPanel.UI
         private void DrawDamageBarFill(SpriteBatch sb)
         {
             CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new Vector2(dims.X, dims.Y);
+            Vector2 pos = new(dims.X, dims.Y);
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
@@ -115,7 +84,7 @@ namespace DPSPanel.UI
         {
             Texture2D texture;
             if (weaponItemID == -1)
-                texture = TextureAssets.NpcHead[0].Value; // Placeholder texture.
+                texture = TextureAssets.NpcHead[0].Value; // Placeholder texture (a question mark)
             else
                 texture = TextureAssets.Item[weaponItemID].Value;
 

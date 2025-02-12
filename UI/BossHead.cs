@@ -13,8 +13,8 @@ namespace DPSPanel.UI
 
         public BossHead()
         {
-            Width.Set(30f, 0f);
-            Height.Set(30f, 0f);
+            Width.Set(26f, 0f);
+            Height.Set(26f, 0f);
             HAlign = 0.5f;
         }
 
@@ -30,7 +30,7 @@ namespace DPSPanel.UI
             {
                 Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[_bossHeadID]?.Value;
                 CalculatedStyle dims = GetDimensions();
-                Vector2 pos = new(dims.X, dims.Y);
+                Rectangle pos = dims.ToRectangle();
                 sb.Draw(bossHeadTexture, pos, Color.White);
             }
             else

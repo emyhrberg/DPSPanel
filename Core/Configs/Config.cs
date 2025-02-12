@@ -30,19 +30,11 @@ namespace DPSPanel.Core.Configs
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
-        public bool HighlightButtonWhenHovering { get; set; } = true;
+        public bool ShowHighlightButtonWhenHovering { get; set; } = true;
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
-        [DefaultValue(10)]
-        [Range(1, 10)]
-        public int MaxWeaponsDisplayed { get; set; } = 10;
-
-        [Range(150, 300)]
-        [Increment(150)]
-        [DrawTicks]
-        [DefaultValue(150)]
-        [BackgroundColor(192, 54, 64)] // Calamity Red
-        public int BarWidth { get; set; } = 300;
+        [DefaultValue(true)]
+        public bool ShowWeaponsDuringBossFight { get; set; } = true;
 
         public override void OnChanged()
         {
@@ -50,15 +42,6 @@ namespace DPSPanel.Core.Configs
             if (c == null) return;
 
             // update stuff after config changes
-            UpdateBarWidth(c);
-        }
-
-        private static void UpdateBarWidth(Config c)
-        {
-            MainContainer.UpdateBarWidth(c);
-            PlayerBar.UpdateBarWidth(c);
-            MainPanel.UpdateBarWidth(c);
-            WeaponBar.UpdateBarWidth(c);
         }
     }
 }

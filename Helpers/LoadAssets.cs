@@ -15,8 +15,6 @@ namespace DPSPanel.Helpers
     public static class Assets
     {
         // Textures
-        public static Asset<Texture2D> BarEmpty300;
-        public static Asset<Texture2D> BarFull300;
         public static Asset<Texture2D> BarEmpty150;
         public static Asset<Texture2D> BarFull150;
         public static Asset<Texture2D> ToggleButton;
@@ -24,8 +22,6 @@ namespace DPSPanel.Helpers
 
         public static void PreloadAllAssets()
         {
-            BarEmpty300 = PreloadAsset("BarEmpty300");
-            BarFull300 = PreloadAsset("BarFull300");
             BarEmpty150 = PreloadAsset("BarEmpty150");
             BarFull150 = PreloadAsset("BarFull150");
             ToggleButton = PreloadAsset("ToggleButton");
@@ -33,7 +29,7 @@ namespace DPSPanel.Helpers
         }
 
         /// <summary>
-        /// Preloads an asset with ImmediateLoad mode in the "DPSPanel/Assets" directory.
+        /// Preloads an asset with "ImmediateLoad" mode in the "DPSPanel/Assets" directory.
         /// </summary>
         private static Asset<Texture2D> PreloadAsset(string path)
         {

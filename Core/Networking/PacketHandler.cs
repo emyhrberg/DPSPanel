@@ -104,6 +104,10 @@ namespace DPSPanel.Core.Networking
             {
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
                 MainPanel panel = sys.state.container.panel;
+
+                // set current life
+                panel.SetCurrentBossLife(currentLife);
+
                 // If a new boss fight is detected, clear & set a new title.
                 if (panel.CurrentBossWhoAmI != bossWhoAmI)
                 {

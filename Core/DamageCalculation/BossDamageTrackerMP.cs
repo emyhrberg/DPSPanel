@@ -32,25 +32,6 @@ namespace DPSPanel.Core.DamageCalculation
                 Weapon weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
                 if (weapon == null)
                 {
-                    // Check if we already reach max cap of weapons
-                    Config c = ModContent.GetInstance<Config>();
-                    if (weapons.Count >= c.MaxWeaponsDisplayed)
-                    {
-                        // Add to unknown weapon
-                        Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
-                        if (unknownWeapon != null)
-                        {
-                            unknownWeapon.damage += damageDone;
-                        }
-                        else
-                        {
-                            unknownWeapon = new Weapon(-1, "Unknown", damageDone);
-                            weapons.Add(unknownWeapon);
-                            weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                        }
-                        return;
-                    }
-
                     // Add a new weapon to the fight
                     weapon = new Weapon(weaponID, weaponName, damageDone);
                     weapons.Add(weapon);
@@ -75,12 +56,12 @@ namespace DPSPanel.Core.DamageCalculation
                 {
                     player = new PlayerFightData(playerWhoAmI, playerName, damageDone);
                     players.Add(player);
-                    Log.Info($"[BossDamageTrackerMP.UpdatePlayerDamage] Added new player '{playerName}' (ID: {playerWhoAmI}) with initial damage: {damageDone}. Total players now: {players.Count}");
+                    // Log.Info($"[BossDamageTrackerMP.UpdatePlayerDamage] Added new player '{playerName}' (ID: {playerWhoAmI}) with initial damage: {damageDone}. Total players now: {players.Count}");
                 }
                 else
                 {
                     player.playerDamage += damageDone;
-                    Log.Info($"[BossDamageTrackerMP.UpdatePlayerDamage] Updated player '{playerName}' (ID: {playerWhoAmI}) damage to: {player.playerDamage}");
+                    // Log.Info($"[BossDamageTrackerMP.UpdatePlayerDamage] Updated player '{playerName}' (ID: {playerWhoAmI}) damage to: {player.playerDamage}");
                 }
             }
 

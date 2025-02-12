@@ -29,22 +29,16 @@ namespace DPSPanel.UI
         // Dictionary for damage panels.
         private Dictionary<string, PlayerDamagePanel> damagePanels = new Dictionary<string, PlayerDamagePanel>();
 
+        public int CurrentBossLife; // their health. updated in PacketHandler.
         public int CurrentBossWhoAmI;
         public int CurrentBossID;
         public string CurrentBossName;
         private const float bossHeaderHeight = 28f;
         public BossHead bossIcon = new BossHead();
-        public static MainPanel Instance;
 
         public MainPanel()
         {
-            Instance = this;
-            Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == 150)
-                Width.Set(150, 0f);
-            else if (c.BarWidth == 300)
-                Width.Set(300, 0f);
-
+            Width.Set(150, 0f);
             Height.Set(PANEL_HEIGHT, 0f);
             BackgroundColor = panelColor;
             HAlign = 0.5f;
@@ -56,10 +50,8 @@ namespace DPSPanel.UI
             CurrentBossWhoAmI = bossWhoAmI;
             CurrentBossID = bossID;
             CurrentBossName = bossName;
-            UIText bossTitle = new UIText(bossName, 1.0f)
-            {
-                HAlign = 0.5f
-            };
+            UIText bossTitle = new(bossName, 1.0f);
+            bossTitle.HAlign = 0.5f;
             bossTitle.Top.Set(6f, 0f);
             Append(bossTitle);
 
@@ -71,26 +63,16 @@ namespace DPSPanel.UI
             ResizePanelHeight();
         }
 
-        public void SetBossIcon(int bossHeadId)
+        public void SetCurrentBossLife(int life)
         {
-            Config c = ModContent.GetInstance<Config>();
-            if (c.BarWidth == 150)
-                bossIcon.Left.Set(60f, 0f);
-            else if (c.BarWidth == 300)
-                bossIcon.Left.Set(100f, 0f);
-
-            bossIcon.SetBossHeadID(bossHeadId);
-            Append(bossIcon);
+            CurrentBossLife = life;
         }
 
-        public static void UpdateBarWidth(Config c)
+        public void SetBossIcon(int bossHeadId)
         {
-            if (Instance == null)
-                return;
-            if (c.BarWidth == 150)
-                Instance.bossIcon.Left.Set(60f, 0f);
-            else if (c.BarWidth == 300)
-                Instance.bossIcon.Left.Set(60f, 0f);
+            bossIcon.Left.Set(60f, 0f);
+            bossIcon.SetBossHeadID(bossHeadId);
+            Append(bossIcon);
         }
 
         public override void Draw(SpriteBatch sb)
@@ -105,10 +87,9 @@ namespace DPSPanel.UI
         {
             if (playerBars.ContainsKey(playerWhoAmI))
             {
-                Log.Info($"[MainPanel.CreatePlayerBar] Skipping creation for player '{playerName}' (ID: {playerWhoAmI}) because a PlayerBar already exists. Total PlayerBars: {playerBars.Count}");
                 return;
             }
-            PlayerBar bar = new PlayerBar(currentYOffset, playerName, playerWhoAmI);
+            PlayerBar bar = new(currentYOffset, playerName, playerWhoAmI);
             Append(bar);
             playerBars[playerWhoAmI] = bar;
             currentYOffset += ItemHeight + ITEM_PADDING * 2;
@@ -119,11 +100,11 @@ namespace DPSPanel.UI
         // Updated UpdatePlayerBars function in MainPanel.cs
         public void UpdatePlayerBars(string playerName, int playerDamage, int playerWhoAmI, List<Weapon> weapons)
         {
-            Log.Info($"[MainPanel.UpdatePlayerBars] Called for player '{playerName}' (ID: {playerWhoAmI}): Damage={playerDamage}, WeaponsCount={weapons?.Count ?? 0}");
+            // Log.Info($"[MainPanel.UpdatePlayerBars] Called for player '{playerName}' (ID: {playerWhoAmI}): Damage={playerDamage}, WeaponsCount={weapons?.Count ?? 0}");
 
             if (!playerBars.ContainsKey(playerWhoAmI))
             {
-                Log.Info($"[MainPanel.UpdatePlayerBars] No PlayerBar for '{playerName}' (ID: {playerWhoAmI}) found. Creating one.");
+                // Log.Info($"[MainPanel.UpdatePlayerBars] No PlayerBar for '{playerName}' (ID: {playerWhoAmI}) found. Creating one.");
                 CreatePlayerBar(playerName, playerWhoAmI);
             }
 
@@ -132,7 +113,6 @@ namespace DPSPanel.UI
 
             // Sort players by descending damage so that the highest damage is first.
             var sortedPlayers = playerBars.OrderByDescending(p => p.Value.PlayerDamage).ToList();
-            Log.Info($"[MainPanel.UpdatePlayerBars] Sorted {sortedPlayers.Count} PlayerBars. Order: {string.Join(", ", sortedPlayers.Select(p => $"{p.Key}:{p.Value.PlayerDamage}"))}");
 
             currentYOffset = bossHeaderHeight;
             int highestDamage = sortedPlayers.First().Value.PlayerDamage;
@@ -141,19 +121,15 @@ namespace DPSPanel.UI
                 string currentPlayerName = sortedPlayers[i].Value.PlayerName;
                 PlayerBar currentBar = sortedPlayers[i].Value;
                 currentBar.Top.Set(currentYOffset, 0f);
-                Log.Info($"[MainPanel.UpdatePlayerBars] Setting '{currentPlayerName}' (ID: {sortedPlayers[i].Key}) PlayerBar top at offset: {currentYOffset}. (PlayerDamage = {currentBar.PlayerDamage})");
                 currentYOffset += ItemHeight + ITEM_PADDING * 2;
 
                 int percentageToFill = highestDamage > 0 ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100) : 0;
                 Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
-                Log.Info($"[MainPanel.UpdatePlayerBars] For '{currentPlayerName}' (ID: {sortedPlayers[i].Key}): percentageToFill = {percentageToFill}%, Color = {barColor}, Index = {i}");
                 currentBar.UpdatePlayerBar(percentageToFill, currentPlayerName, currentBar.PlayerDamage, barColor);
             }
 
-            Log.Info($"[MainPanel.UpdatePlayerBars] Updating weapon data for '{playerName}' (ID: {playerWhoAmI})");
             playerBars[playerWhoAmI].UpdateWeaponData(weapons);
             ResizePanelHeight();
-            Log.Info($"[MainPanel.UpdatePlayerBars] Finished updating. Total PlayerBars = {playerBars.Count}, Final currentYOffset = {currentYOffset}");
         }
 
         public void ClearPanelAndAllItems()
@@ -175,7 +151,7 @@ namespace DPSPanel.UI
             Recalculate();
         }
 
-        #region (Singleplayer weapon bars – not used in MP)
+        #region (Singleplayer weapon bars - not used in MP)
         public void CreateWeaponBarSP(string barName)
         {
             if (!weaponBars.ContainsKey(barName))

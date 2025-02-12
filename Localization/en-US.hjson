@@ -24,24 +24,24 @@ Mods: {
 					Tooltip: Show the boss icon during a boss fight
 				}
 
-				MaxWeaponsDisplayed: {
-					Label: "[i:PlatinumBroadsword] Max Weapons Displayed"
-					Tooltip: The maximum number of weapon bars that can be displayed at one point\nIf more than this number of weapons are added, they will be added to "Unknown" damage.
-				}
-
-				BarWidth: {
-					Label: "[i:TeamBlockRedPlatform] Width"
-					Tooltip: Set the size of the width of the entire display to a fixed value of either 150 or 300
-				}
-
 				ShowOnlyWhenInventoryOpen: {
 					Label: "[i:DeerclopsPetItem] Show Only When Inventory Open"
 					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it\nYou can also right click the toggle button to toggle this option.
 				}
 
-				HighlightButtonWhenHovering: {
-					Label: "[i:LivingIchorBlock] Highlight Button When Hovering"
+				ShowHighlightButtonWhenHovering: {
+					Label: "[i:LivingIchorBlock] Show Highlight Button When Hovering"
 					Tooltip: You can disable this if you find the button highlighting to interfere with boss fights
+				}
+
+				ShowWeaponsPanelDuringBossFight: {
+					Label: "[i:LivingFrostFireBlock] Show Weapons Panel During Boss Fight"
+					Tooltip: You can disable this if you find the weapons panel to interfere with boss fights
+				}
+
+				ShowWeaponsDuringBossFight: {
+					Tooltip: ""
+					Label: Show Weapons During Boss Fight
 				}
 			}
 		}
