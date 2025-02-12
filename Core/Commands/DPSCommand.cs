@@ -42,7 +42,7 @@ namespace DPSPanel.Core.Configs
             else if (target == "clear")
             {
                 sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle("DPSPanel", -1);
+                sys.state.container.panel.SetBossTitle("DPSPanel", -1, -1);
             }
             else if (target == "toggle")
             {

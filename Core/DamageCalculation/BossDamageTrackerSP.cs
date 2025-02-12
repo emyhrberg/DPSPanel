@@ -338,7 +338,7 @@ namespace DPSPanel.Core.DamageCalculation
 
                 var sys = ModContent.GetInstance<MainSystem>();
                 sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle(npc.FullName, npc.GetBossHeadTextureIndex());
+                sys.state.container.panel.SetBossTitle(npc.FullName, npc.whoAmI, npc.GetBossHeadTextureIndex());
                 Log.Info("Boss fight created: " + fight.bossName);
                 // sys.state.container.bossIcon.UpdateBossIcon(npc);
             }

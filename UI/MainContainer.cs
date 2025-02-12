@@ -49,8 +49,8 @@ namespace DPSPanel.UI
             // Append it last, so it draws on top
             Append(toggleButton);
 
-            int invalidBossIdTemp = -1;
-            panel.SetBossTitle("DPSPanel", invalidBossIdTemp);
+            int invalidBossIdEqualsNoBossIconShowing = -1;
+            panel.SetBossTitle("DPSPanel", invalidBossIdEqualsNoBossIconShowing, invalidBossIdEqualsNoBossIconShowing);
         }
 
         public static void UpdateBarWidth(Config config)

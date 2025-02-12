@@ -29,6 +29,7 @@ namespace DPSPanel.UI
         // Dictionary for damage panels.
         private Dictionary<string, PlayerDamagePanel> damagePanels = new Dictionary<string, PlayerDamagePanel>();
 
+        public int CurrentBossWhoAmI;
         public int CurrentBossID;
         public string CurrentBossName;
         private const float bossHeaderHeight = 28f;
@@ -50,8 +51,9 @@ namespace DPSPanel.UI
             SetPadding(PANEL_PADDING);
         }
 
-        public void SetBossTitle(string bossName, int bossID)
+        public void SetBossTitle(string bossName, int bossWhoAmI, int bossID)
         {
+            CurrentBossWhoAmI = bossWhoAmI;
             CurrentBossID = bossID;
             CurrentBossName = bossName;
             UIText bossTitle = new UIText(bossName, 1.0f)
@@ -114,6 +116,7 @@ namespace DPSPanel.UI
         }
 
         // In MP, we update each player's bar and then update its damage panel with weapon data.
+        // Updated UpdatePlayerBars function in MainPanel.cs
         public void UpdatePlayerBars(string playerName, int playerDamage, int playerWhoAmI, List<Weapon> weapons)
         {
             Log.Info($"[MainPanel.UpdatePlayerBars] Called for player '{playerName}' (ID: {playerWhoAmI}): Damage={playerDamage}, WeaponsCount={weapons?.Count ?? 0}");
@@ -124,12 +127,12 @@ namespace DPSPanel.UI
                 CreatePlayerBar(playerName, playerWhoAmI);
             }
 
-            // Update damage
+            // Update damage for the player
             playerBars[playerWhoAmI].PlayerDamage = playerDamage;
 
-            // Sort by playerWhoAmI for consistent ordering (or sort by damage if you prefer)
-            var sortedPlayers = playerBars.OrderBy(p => p.Key).ToList();
-            Log.Info($"[MainPanel.UpdatePlayerBars] Sorted {sortedPlayers.Count} PlayerBars. Keys: {string.Join(", ", sortedPlayers.Select(p => p.Key))}");
+            // Sort players by descending damage so that the highest damage is first.
+            var sortedPlayers = playerBars.OrderByDescending(p => p.Value.PlayerDamage).ToList();
+            Log.Info($"[MainPanel.UpdatePlayerBars] Sorted {sortedPlayers.Count} PlayerBars. Order: {string.Join(", ", sortedPlayers.Select(p => $"{p.Key}:{p.Value.PlayerDamage}"))}");
 
             currentYOffset = bossHeaderHeight;
             int highestDamage = sortedPlayers.First().Value.PlayerDamage;

@@ -96,7 +96,7 @@ namespace DPSPanel.UI
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
                 bool dragging = sys.state.container.dragging;
                 // If either this PlayerBar or its damage panel is hovered, make the damage panel visible.
-                if (IsMouseHovering || playerDamagePanel.IsMouseHovering || dragging)
+                if (IsMouseHovering || playerDamagePanel.IsMouseHovering)
                     playerDamagePanel.IsVisible = true;
                 else
                     playerDamagePanel.IsVisible = false;
