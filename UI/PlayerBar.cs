@@ -29,14 +29,13 @@ namespace DPSPanel.UI
         public int PlayerWhoAmI { get; set; }
 
         // The damage panel is attached as a child of the PlayerBar.
-        private PlayerDamagePanel damagePanel;
+        private PlayerDamagePanel playerDamagePanel;
 
         // Player head element
         private PlayerHead playerHeadElement;
 
         public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
         {
-            Log.Info($"[PlayerBar.Constructor] Creating PlayerBar for '{playerName}' (ID: {playerWhoAmI}) at offset: {currentYOffset}");
             Config c = ModContent.GetInstance<Config>();
             if (c.BarWidth == 150)
             {
@@ -53,7 +52,6 @@ namespace DPSPanel.UI
             Height = new StyleDimension(ItemHeight, 0f);
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f;
-            this.OverflowHidden = false;
 
             PlayerName = playerName;
             PlayerDamage = 0;
@@ -82,16 +80,14 @@ namespace DPSPanel.UI
             }
 
             // Create the damage panel.
-            damagePanel = new PlayerDamagePanel();
-            damagePanel.OwnerBar = this;
-            MainSystem sys = ModContent.GetInstance<MainSystem>();
-            CalculatedStyle panelDims = sys.state.container.panel.GetOuterDimensions();
-            damagePanel.Left.Set(panelDims.X + panelDims.Width - 20, 0f);
-            damagePanel.Top.Set(panelDims.Y, 0f);
-            damagePanel.MaxHeight = new StyleDimension(400f, 0f);
-            Append(damagePanel);
+            playerDamagePanel = new PlayerDamagePanel();
+            playerDamagePanel.MaxHeight = new StyleDimension(500f, 0f);
 
-            Log.Info($"[PlayerBar.Constructor] Finished creating PlayerBar for '{playerName}' (ID: {playerWhoAmI}). Damage panel attached at (Left: {panelDims.X + panelDims.Width - 20}, Top: {panelDims.Y}).");
+            // Offset by one panel size to the right.
+            playerDamagePanel.Left.Set(150f, 0f);
+            Append(playerDamagePanel);
+
+            Log.Info($"[PlayerBar.Constructor] Finished creating PlayerBar for '{playerName}' (ID: {playerWhoAmI}). | Width.Pixels: {Width.Pixels}");
         }
 
         public override void Update(GameTime gameTime)
@@ -99,13 +95,16 @@ namespace DPSPanel.UI
             base.Update(gameTime);
 
             // Only update the damage panel if it has been created.
-            if (damagePanel != null)
+            if (playerDamagePanel != null)
             {
+                // Also check if we are dragging the main container
+                MainSystem sys = ModContent.GetInstance<MainSystem>();
+                bool dragging = sys.state.container.dragging;
                 // If either this PlayerBar or its damage panel is hovered, make the damage panel visible.
-                if (IsMouseHovering || damagePanel.IsMouseHovering)
-                    damagePanel.IsVisible = true;
+                if (IsMouseHovering || playerDamagePanel.IsMouseHovering || dragging)
+                    playerDamagePanel.IsVisible = true;
                 else
-                    damagePanel.IsVisible = false;
+                    playerDamagePanel.IsVisible = false;
             }
         }
 
@@ -115,7 +114,7 @@ namespace DPSPanel.UI
         /// 
         public void UpdateWeaponData(List<Weapon> weapons)
         {
-            damagePanel?.UpdateWeaponBars(weapons);
+            playerDamagePanel?.UpdateWeaponBars(weapons);
         }
 
         public static void UpdateBarWidth(Config config)

@@ -16,24 +16,30 @@ namespace DPSPanel.Core.Networking
         /// <param name="fight">The fight context containing damage and boss info.</param>
         public static void SendPlayerDamagePacket(BossDamageTrackerMP.BossFight fight)
         {
-            if (Main.netMode != NetmodeID.MultiplayerClient) // Return if not multiplayer
+            if (Main.netMode != NetmodeID.MultiplayerClient) // Only send from clients
                 return;
 
-            // Get variables to send.
-            string player = Main.LocalPlayer.name;
-            int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
-
-            // Write packet data.
             ModPacket fightPacket = ModContent.GetInstance<DPSPanel>().GetPacket();
             fightPacket.Write((byte)PacketType.FightPacket);
-            fightPacket.Write(player);
-            fightPacket.Write(damageDone);
+
+            // Write boss fight context
             fightPacket.Write(fight.whoAmI);
             fightPacket.Write(fight.bossName);
             fightPacket.Write(fight.bossHeadId);
-            fightPacket.Write(Main.LocalPlayer.whoAmI);
+            fightPacket.Write(fight.currentLife);
+            fightPacket.Write(fight.initialLife);
+            fightPacket.Write(fight.damageTaken);
 
-            // Send all weapons.
+            // Write player list
+            fightPacket.Write(fight.players.Count);
+            foreach (PlayerFightData player in fight.players)
+            {
+                fightPacket.Write(player.playerName);
+                fightPacket.Write(player.playerDamage);
+                fightPacket.Write(player.playerWhoAmI);
+            }
+
+            // Write weapons
             fightPacket.Write(fight.weapons.Count);
             foreach (Weapon weapon in fight.weapons)
             {
@@ -42,9 +48,8 @@ namespace DPSPanel.Core.Networking
                 fightPacket.Write(weapon.damage);
             }
 
-            Log.Info($"[PacketSender.cs] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
-
-            fightPacket.Send(); // Send the packet to the server.
+            Log.Info($"[PacketSender.cs] Sent boss fight packet with {fight.players.Count} players. Boss: {fight.bossName}, DamageTaken: {fight.damageTaken}");
+            fightPacket.Send(); // Broadcast the packet
         }
     }
 }

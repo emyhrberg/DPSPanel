@@ -9,7 +9,7 @@ namespace DPSPanel.UI
 {
     public class BossHead : UIElement
     {
-        public int bossHeadID;
+        public int _bossHeadID;
 
         public BossHead()
         {
@@ -22,26 +22,26 @@ namespace DPSPanel.UI
         {
             base.DrawSelf(sb);
 
-            if (bossHeadID == -1)
+            if (_bossHeadID == -1)
                 return;
 
             // ensure index is valid!
-            if (bossHeadID >= 0 && bossHeadID <= TextureAssets.NpcHeadBoss.Length && TextureAssets.NpcHead[bossHeadID]?.Value != null)
+            if (_bossHeadID >= 0 && _bossHeadID <= TextureAssets.NpcHeadBoss.Length && TextureAssets.NpcHead[_bossHeadID]?.Value != null)
             {
-                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[bossHeadID]?.Value;
+                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[_bossHeadID]?.Value;
                 CalculatedStyle dims = GetDimensions();
                 Vector2 pos = new(dims.X, dims.Y);
                 sb.Draw(bossHeadTexture, pos, Color.White);
             }
             else
             {
-                Log.Info($"Invalid boss index {bossHeadID}");
+                Log.Info($"Invalid boss index {_bossHeadID}");
             }
         }
 
-        public void UpdateBossIcon(int _headID)
+        public void SetBossHeadID(int bossHeadID)
         {
-            bossHeadID = _headID;
+            _bossHeadID = bossHeadID;
         }
     }
 }

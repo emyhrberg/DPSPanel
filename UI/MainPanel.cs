@@ -77,7 +77,7 @@ namespace DPSPanel.UI
             else if (c.BarWidth == 300)
                 bossIcon.Left.Set(100f, 0f);
 
-            bossIcon.UpdateBossIcon(bossHeadId);
+            bossIcon.SetBossHeadID(bossHeadId);
             Append(bossIcon);
         }
 

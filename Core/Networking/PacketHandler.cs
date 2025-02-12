@@ -36,17 +36,30 @@ namespace DPSPanel.Core.Networking
             }
         }
 
+        // In PacketHandler.cs, replace the existing HandleFightPacket function with the following:
+
         private static void HandleFightPacket(BinaryReader reader)
         {
-            // Read the data from the packet
-            string playerName = reader.ReadString();
-            int damageDone = reader.ReadInt32();
+            // Read boss fight context.
             int bossWhoAmI = reader.ReadInt32();
             string bossName = reader.ReadString();
             int bossHeadId = reader.ReadInt32();
-            int playerWhoAmI = reader.ReadInt32();
+            int currentLife = reader.ReadInt32();
+            int initialLife = reader.ReadInt32();
+            int damageTaken = reader.ReadInt32();
 
-            // Read the weapons
+            // Read player list.
+            int playerCount = reader.ReadInt32();
+            List<(string playerName, int playerDamage, int playerWhoAmI)> players = new List<(string, int, int)>();
+            for (int i = 0; i < playerCount; i++)
+            {
+                string pName = reader.ReadString();
+                int pDamage = reader.ReadInt32();
+                int pWhoAmI = reader.ReadInt32();
+                players.Add((pName, pDamage, pWhoAmI));
+            }
+
+            // Read weapons.
             int weaponCount = reader.ReadInt32();
             List<Weapon> weapons = new List<Weapon>();
             for (int i = 0; i < weaponCount; i++)
@@ -59,52 +72,50 @@ namespace DPSPanel.Core.Networking
 
             if (Main.netMode == NetmodeID.Server)
             {
-                // Server processes the packet and broadcasts it to all clients
-                Log.Info($"[Server] Received FightPacket from {playerName}: {damageDone} damage to {bossName} (bossWhoAmI {bossWhoAmI}) | bossHeadID: {bossHeadId} | playerWhoAmI: {playerWhoAmI}");
+                // Re-broadcast the packet to all clients by writing all the data again.
+                ModPacket packet = ModContent.GetInstance<DPSPanel>().GetPacket();
+                packet.Write((byte)PacketType.FightPacket);
+                packet.Write(bossWhoAmI);
+                packet.Write(bossName);
+                packet.Write(bossHeadId);
+                packet.Write(currentLife);
+                packet.Write(initialLife);
+                packet.Write(damageTaken);
 
-                // Create a new packet to broadcast to clients.
-                // Note: We obtain the mod instance via ModContent.GetInstance<T>().
-                ModPacket fightPacket = ModContent.GetInstance<DPSPanel>().GetPacket();
-                fightPacket.Write((byte)PacketType.FightPacket);
-                fightPacket.Write(playerName);
-                fightPacket.Write(damageDone);
-                fightPacket.Write(bossWhoAmI);
-                fightPacket.Write(bossName);
-                fightPacket.Write(bossHeadId);
-                fightPacket.Write(playerWhoAmI);
-
-                // Write the weapons to the packet
-                fightPacket.Write(weapons.Count);
-                foreach (Weapon weapon in weapons)
+                packet.Write(players.Count);
+                foreach (var p in players)
                 {
-                    fightPacket.Write(weapon.weaponName);
-                    fightPacket.Write(weapon.weaponItemID);
-                    fightPacket.Write(weapon.damage);
+                    packet.Write(p.playerName);
+                    packet.Write(p.playerDamage);
+                    packet.Write(p.playerWhoAmI);
                 }
 
-                fightPacket.Send(); // Broadcast to all clients
+                packet.Write(weapons.Count);
+                foreach (var w in weapons)
+                {
+                    packet.Write(w.weaponName);
+                    packet.Write(w.weaponItemID);
+                    packet.Write(w.damage);
+                }
+
+                packet.Send();
             }
             else if (Main.netMode == NetmodeID.MultiplayerClient)
             {
-                // Client receives the packet and processes it
-                // Client updates its UI with the received data
-                // Log.Info($"[PacketHandler.cs] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
-
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
                 MainPanel panel = sys.state.container.panel;
+                // If a new boss fight is detected, clear & set a new title.
                 if (panel.CurrentBossID != bossWhoAmI)
                 {
-                    // New boss fight: clear panel and set title
-                    // Log.Info($"[PacketHandler.cs] New boss fight detected: {bossName} (whoamI {bossWhoAmI}) | headID: {bossHeadId}");
-
-                    // TODO neccessary to reset panel EVERY time we find a new boss?
-                    // This is called quite frequently.
-                    // Investigate this if statement later.
                     panel.ClearPanelAndAllItems();
                     panel.SetBossTitle(bossName, bossHeadId);
                 }
 
-                panel.UpdatePlayerBars(playerName, damageDone, playerWhoAmI, weapons);
+                // For each player in the packet, update or create that player's bar.
+                foreach (var p in players)
+                {
+                    panel.UpdatePlayerBars(p.playerName, p.playerDamage, p.playerWhoAmI, weapons);
+                }
             }
         }
     }
