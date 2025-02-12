@@ -34,11 +34,9 @@ namespace DPSPanel.UI
         // Player head element
         private PlayerHead playerHeadElement;
 
-        public static PlayerBar Instance;
-
         public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
         {
-            Instance = this;
+            Log.Info($"[PlayerBar.Constructor] Creating PlayerBar for '{playerName}' (ID: {playerWhoAmI}) at offset: {currentYOffset}");
             Config c = ModContent.GetInstance<Config>();
             if (c.BarWidth == 150)
             {
@@ -51,19 +49,16 @@ namespace DPSPanel.UI
                 fullBar = Assets.BarFull300;
             }
 
-            // Set dimensions and alignment.
-            Width = new StyleDimension(0, 1.0f); // Fill parent's width.
-            Height = new StyleDimension(ItemHeight, 0f); // Fixed height.
+            Width = new StyleDimension(0, 1.0f);
+            Height = new StyleDimension(ItemHeight, 0f);
             Top = new StyleDimension(currentYOffset, 0f);
-            HAlign = 0.5f; // Center horizontally.
-            this.OverflowHidden = false; // Allow overflow from e.g weapon bars.
+            HAlign = 0.5f;
+            this.OverflowHidden = false;
 
-            // Initialize player properties.
             PlayerName = playerName;
             PlayerDamage = 0;
             PlayerWhoAmI = playerWhoAmI;
 
-            // Create and center the text element.
             textElement = new UIText("", 0.8f)
             {
                 HAlign = 0.5f,
@@ -71,7 +66,6 @@ namespace DPSPanel.UI
             };
             Append(textElement);
 
-            // Optionally add the player head if enabled.
             if (c.ShowPlayerIcons)
             {
                 if (playerWhoAmI >= 0 && playerWhoAmI < Main.player.Length && Main.player[playerWhoAmI].active)
@@ -79,28 +73,40 @@ namespace DPSPanel.UI
                     Player player = Main.player[playerWhoAmI];
                     playerHeadElement = new PlayerHead(player);
                     Append(playerHeadElement);
+                    Log.Info($"[PlayerBar.Constructor] Added player head for '{playerName}' (ID: {playerWhoAmI}).");
+                }
+                else
+                {
+                    Log.Info($"[PlayerBar.Constructor] Skipped adding player head for '{playerName}' (ID: {playerWhoAmI}) due to invalid ID or inactive player.");
                 }
             }
 
             // Create the damage panel.
             damagePanel = new PlayerDamagePanel();
+            damagePanel.OwnerBar = this;
             MainSystem sys = ModContent.GetInstance<MainSystem>();
             CalculatedStyle panelDims = sys.state.container.panel.GetOuterDimensions();
-
-            // Place to the right of the main panel.
-            damagePanel.Left.Set(panelDims.X + panelDims.Width, 0f);
+            damagePanel.Left.Set(panelDims.X + panelDims.Width - 20, 0f);
             damagePanel.Top.Set(panelDims.Y, 0f);
-            sys.state.Append(damagePanel);
+            damagePanel.MaxHeight = new StyleDimension(400f, 0f);
+            Append(damagePanel);
+
+            Log.Info($"[PlayerBar.Constructor] Finished creating PlayerBar for '{playerName}' (ID: {playerWhoAmI}). Damage panel attached at (Left: {panelDims.X + panelDims.Width - 20}, Top: {panelDims.Y}).");
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            // Optionally toggle visibility on hover.
-            if (IsMouseHovering)
-                damagePanel.IsVisible = true;
-            else
-                damagePanel.IsVisible = false;
+
+            // Only update the damage panel if it has been created.
+            if (damagePanel != null)
+            {
+                // If either this PlayerBar or its damage panel is hovered, make the damage panel visible.
+                if (IsMouseHovering || damagePanel.IsMouseHovering)
+                    damagePanel.IsVisible = true;
+                else
+                    damagePanel.IsVisible = false;
+            }
         }
 
         /// <summary>
@@ -114,18 +120,18 @@ namespace DPSPanel.UI
 
         public static void UpdateBarWidth(Config config)
         {
-            if (Instance == null)
-                return;
-            if (config.BarWidth == 150)
-            {
-                Instance.emptyBar = Assets.BarEmpty150;
-                Instance.fullBar = Assets.BarFull150;
-            }
-            else if (config.BarWidth == 300)
-            {
-                Instance.emptyBar = Assets.BarEmpty300;
-                Instance.fullBar = Assets.BarFull300;
-            }
+            // if (Instance == null)
+            //     return;
+            // if (config.BarWidth == 150)
+            // {
+            //     Instance.emptyBar = Assets.BarEmpty150;
+            //     Instance.fullBar = Assets.BarFull150;
+            // }
+            // else if (config.BarWidth == 300)
+            // {
+            //     Instance.emptyBar = Assets.BarEmpty300;
+            //     Instance.fullBar = Assets.BarFull300;
+            // }
         }
 
         public void UpdatePlayerBar(int percentage, string playerName, int playerDamage, Color fillColor)

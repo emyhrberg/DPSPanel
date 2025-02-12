@@ -24,7 +24,6 @@ namespace DPSPanel.Core.Networking
             int damageDone = fight.players.FirstOrDefault(p => p.playerName == Main.LocalPlayer.name)?.playerDamage ?? 0;
 
             // Write packet data.
-            // Since you only have one packet type, there's no need to write a type identifier.
             ModPacket fightPacket = ModContent.GetInstance<DPSPanel>().GetPacket();
             fightPacket.Write((byte)PacketType.FightPacket);
             fightPacket.Write(player);
@@ -43,7 +42,7 @@ namespace DPSPanel.Core.Networking
                 fightPacket.Write(weapon.damage);
             }
 
-            // Log.Info($"[PacketSender.cs] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
+            Log.Info($"[PacketSender.cs] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
 
             fightPacket.Send(); // Send the packet to the server.
         }
