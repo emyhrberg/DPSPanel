@@ -1,4 +1,6 @@
-﻿using DPSPanel.Core.Configs;
+﻿using System.Collections.Generic;
+using DPSPanel.Core.Configs;
+using DPSPanel.Core.DamageCalculation;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -6,6 +8,7 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
+using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace DPSPanel.UI
@@ -14,16 +17,19 @@ namespace DPSPanel.UI
     {
         private Asset<Texture2D> emptyBar; // Background 
         private Asset<Texture2D> fullBar;  // Foreground fill texture
-        private readonly UIText textElement;        // Text element for displaying player info
-        private const float ItemHeight = 40f;       // Height of each damage bar
+        private readonly UIText textElement; // Text element for displaying player info
+        private const float ItemHeight = 40f; // Height of the player bar
 
-        private Color fillColor;     // Color for the fill
-        private int percentage;      // Progress percentage (0-100)
+        private Color fillColor; // Fill color
+        private int percentage;  // Fill percentage (0-100)
 
         // Properties
         public string PlayerName { get; set; }
         public int PlayerDamage { get; set; }
-        public int PlayerWhoAmI { get; set; } // kinda Unused.
+        public int PlayerWhoAmI { get; set; }
+
+        // The damage panel is attached as a child of the PlayerBar.
+        private PlayerDamagePanel damagePanel;
 
         // Player head element
         private PlayerHead playerHeadElement;
@@ -33,7 +39,6 @@ namespace DPSPanel.UI
         public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
         {
             Instance = this;
-            // Load bar textures
             Config c = ModContent.GetInstance<Config>();
             if (c.BarWidth == 150)
             {
@@ -46,26 +51,26 @@ namespace DPSPanel.UI
                 fullBar = Assets.BarFull300;
             }
 
-            // Set dimensions and alignment
-            Width = new StyleDimension(0, 1.0f); // Fill the width of the parent
-            Height = new StyleDimension(ItemHeight, 0f); // Set fixed height
+            // Set dimensions and alignment.
+            Width = new StyleDimension(0, 1.0f); // Fill parent's width.
+            Height = new StyleDimension(ItemHeight, 0f); // Fixed height.
             Top = new StyleDimension(currentYOffset, 0f);
-            HAlign = 0.5f; // Center horizontally
+            HAlign = 0.5f; // Center horizontally.
 
-            // Initialize player properties
+            // Initialize player properties.
             PlayerName = playerName;
             PlayerDamage = 0;
             PlayerWhoAmI = playerWhoAmI;
 
-            // Create and center the text element
-            textElement = new UIText("", 0.8f) // 80% scale
+            // Create and center the text element.
+            textElement = new UIText("", 0.8f)
             {
                 HAlign = 0.5f,
                 VAlign = 0.5f,
             };
             Append(textElement);
 
-            // Add player head if the player is active
+            // Optionally add the player head if enabled.
             if (c.ShowPlayerIcons)
             {
                 if (playerWhoAmI >= 0 && playerWhoAmI < Main.player.Length && Main.player[playerWhoAmI].active)
@@ -75,14 +80,39 @@ namespace DPSPanel.UI
                     Append(playerHeadElement);
                 }
             }
+
+            // Create the damage panel once.
+            damagePanel = new PlayerDamagePanel();
+            // Position the damage panel relative to this PlayerBar (for example, 10 pixels right and above the bar).
+            damagePanel.Left.Set(10f, 0f);
+            damagePanel.Top.Set(-damagePanel.Height.Pixels - 5f, 0f);
+            Append(damagePanel);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            base.Update(gameTime);
+            // Optionally toggle visibility on hover.
+            if (IsMouseHovering)
+                damagePanel.IsVisible = true;
+            else
+                damagePanel.IsVisible = false;
+        }
+
+        /// <summary>
+        /// Called (from MainPanel) when new weapon data is received.
+        /// </summary>
+        /// 
+        public void UpdateWeaponData(List<Weapon> weapons)
+        {
+            if (damagePanel != null)
+                damagePanel.UpdateWeaponBars(weapons);
         }
 
         public static void UpdateBarWidth(Config config)
         {
             if (Instance == null)
                 return;
-
-            // If you’re updating a particular instance, ensure you have a way to reference it.
             if (config.BarWidth == 150)
             {
                 Instance.emptyBar = Assets.BarEmpty150;
@@ -95,14 +125,12 @@ namespace DPSPanel.UI
             }
         }
 
-        public void UpdateDamageBar(int percentage, string playerName, int playerDamage, Color fillColor)
+        public void UpdatePlayerBar(int percentage, string playerName, int playerDamage, Color fillColor)
         {
             this.percentage = percentage;
             this.fillColor = fillColor;
-
             PlayerName = playerName;
             PlayerDamage = playerDamage;
-
             textElement.SetText($"{playerName} ({playerDamage})");
         }
 
@@ -117,14 +145,11 @@ namespace DPSPanel.UI
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 position = new Vector2(dims.X, dims.Y);
-
-            // Calculate the width of the filled portion based on percentage
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
-                Rectangle sourceRect = new(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
-                Rectangle destRect = new((int)position.X, (int)position.Y, fillWidth, (int)dims.Height);
-
+                Rectangle sourceRect = new Rectangle(0, 0, (int)(fullBar.Width() * (percentage / 100f)), fullBar.Height());
+                Rectangle destRect = new Rectangle((int)position.X, (int)position.Y, fillWidth, (int)dims.Height);
                 spriteBatch.Draw(fullBar.Value, destRect, sourceRect, fillColor);
             }
         }
@@ -132,8 +157,8 @@ namespace DPSPanel.UI
         private void DrawDamageBarOutline(SpriteBatch spriteBatch)
         {
             CalculatedStyle dims = GetDimensions();
-            Vector2 position = new(dims.X, dims.Y);
-            Rectangle rect = new((int)position.X, (int)position.Y, (int)dims.Width, (int)dims.Height);
+            Vector2 position = new Vector2(dims.X, dims.Y);
+            Rectangle rect = new Rectangle((int)position.X, (int)position.Y, (int)dims.Width, (int)dims.Height);
             spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
         }
     }

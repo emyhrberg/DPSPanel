@@ -21,22 +21,22 @@ Mods: {
 
 				ShowBossIcon: {
 					Label: "[i:SlimeCrown] Show Boss Icon"
-					Tooltip: Show the boss icon at the panel title
+					Tooltip: Show the boss icon during a boss fight
 				}
 
 				MaxWeaponsDisplayed: {
 					Label: "[i:PlatinumBroadsword] Max Weapons Displayed"
-					Tooltip: The maximum number of weapon bars that can be displayed at one point
+					Tooltip: The maximum number of weapon bars that can be displayed at one point\nIf more than this number of weapons are added, they will be added to "Unknown" damage.
 				}
 
 				BarWidth: {
-					Label: "[i:TeamBlockRedPlatform] Bar Width"
-					Tooltip: Set the size of the bars to a fixed value of either 150 or 300
+					Label: "[i:TeamBlockRedPlatform] Width"
+					Tooltip: Set the size of the width of the entire display to a fixed value of either 150 or 300
 				}
 
 				ShowOnlyWhenInventoryOpen: {
 					Label: "[i:DeerclopsPetItem] Show Only When Inventory Open"
-					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it
+					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it\nYou can also right click the toggle button to toggle this option.
 				}
 
 				HighlightButtonWhenHovering: {

@@ -1,11 +1,10 @@
+using System.Collections.Generic;
 using System.IO;
+using DPSPanel.Core.DamageCalculation;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
-using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.Chat;
 using Terraria.ID;
-using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Core.Networking
@@ -34,29 +33,6 @@ namespace DPSPanel.Core.Networking
                 case PacketType.FightPacket:
                     HandleFightPacket(reader);
                     break;
-                case PacketType.OnConsumeItemPacket:
-                    HandleOnConsumeItemPacket(reader);
-                    break;
-            }
-        }
-
-        // In PacketHandler.cs - in HandleOnConsumeItemPacket:
-        private static void HandleOnConsumeItemPacket(BinaryReader reader)
-        {
-            long availableBefore = reader.BaseStream.Length - reader.BaseStream.Position;
-            Log.Info($"Available bytes before reading: {availableBefore}");
-            string playerName = reader.ReadString();
-            string itemName = reader.ReadString();
-            long availableAfter = reader.BaseStream.Length - reader.BaseStream.Position;
-            Log.Info($"Available bytes after reading: {availableAfter}");
-
-            if (Main.netMode == NetmodeID.Server)
-            {
-                ChatHelper.BroadcastChatMessage(
-                    NetworkText.FromLiteral($"{playerName} used {itemName}!"),
-                    Color.White
-                );
-                Log.Info($"[Server] Received OnConsumeItemPacket from {playerName}: {itemName}");
             }
         }
 
@@ -69,6 +45,17 @@ namespace DPSPanel.Core.Networking
             string bossName = reader.ReadString();
             int bossHeadId = reader.ReadInt32();
             int playerWhoAmI = reader.ReadInt32();
+
+            // Read the weapons
+            int weaponCount = reader.ReadInt32();
+            List<Weapon> weapons = new List<Weapon>();
+            for (int i = 0; i < weaponCount; i++)
+            {
+                string wpnName = reader.ReadString();
+                int wpnItemID = reader.ReadInt32();
+                int wpnDamage = reader.ReadInt32();
+                weapons.Add(new Weapon(wpnItemID, wpnName, wpnDamage));
+            }
 
             if (Main.netMode == NetmodeID.Server)
             {
@@ -85,25 +72,39 @@ namespace DPSPanel.Core.Networking
                 fightPacket.Write(bossName);
                 fightPacket.Write(bossHeadId);
                 fightPacket.Write(playerWhoAmI);
+
+                // Write the weapons to the packet
+                fightPacket.Write(weapons.Count);
+                foreach (Weapon weapon in weapons)
+                {
+                    fightPacket.Write(weapon.weaponName);
+                    fightPacket.Write(weapon.weaponItemID);
+                    fightPacket.Write(weapon.damage);
+                }
+
                 fightPacket.Send(); // Broadcast to all clients
             }
             else if (Main.netMode == NetmodeID.MultiplayerClient)
             {
                 // Client receives the packet and processes it
                 // Client updates its UI with the received data
-                Log.Info($"[Client] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
+                Log.Info($"[PacketHandler.cs] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
 
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
-                Panel panel = sys.state.container.panel;
+                MainPanel panel = sys.state.container.panel;
                 if (panel.CurrentBossID != bossWhoAmI)
                 {
                     // New boss fight: clear panel and set title
-                    Log.Info($"[Client] New boss fight detected: {bossName} (whoamI {bossWhoAmI}) | headID: {bossHeadId}");
+                    // Log.Info($"[PacketHandler.cs] New boss fight detected: {bossName} (whoamI {bossWhoAmI}) | headID: {bossHeadId}");
+
+                    // TODO neccessary to reset panel EVERY time we find a new boss?
+                    // This is called quite frequently.
+                    // Investigate this if statement later.
                     panel.ClearPanelAndAllItems();
                     panel.SetBossTitle(bossName, bossHeadId);
                 }
 
-                panel.UpdateDamageBars(playerName, damageDone, playerWhoAmI);
+                panel.UpdatePlayerBars(playerName, damageDone, playerWhoAmI, weapons);
             }
         }
     }

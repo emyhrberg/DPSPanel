@@ -28,7 +28,7 @@ namespace DPSPanel.UI
                 return;
 
             CalculatedStyle dims = GetDimensions();
-            int xOffset = 10;
+            int xOffset = 0;
             int yOffset = 16;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
@@ -37,7 +37,8 @@ namespace DPSPanel.UI
                 // you can do something here, but when dead the player disappears and is undrawable so you have to make a clone before death or something
             }
 
-            // make a clone and have it always face right
+            // assign the shouldFlipHeadDraw flag to the direction of the player,
+            // meaning the head will be flipped if the player is facing left
             PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
 
             Main.MapPlayerRenderer.DrawPlayerHead(

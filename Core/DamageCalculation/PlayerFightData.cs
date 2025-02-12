@@ -1,9 +1,9 @@
 namespace DPSPanel.Core.DamageCalculation
 {
-    public class PlayerFightData
+    public class PlayerFightData(int playerID, string playerName, int playerDamage)
     {
-        public int playerID;
-        public string playerName;
-        public int playerDamage;
+        public int playerID = playerID;
+        public string playerName = playerName;
+        public int playerDamage = playerDamage;
     }
 }

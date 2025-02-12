@@ -34,7 +34,16 @@ namespace DPSPanel.Core.Networking
             fightPacket.Write(fight.bossHeadId);
             fightPacket.Write(Main.LocalPlayer.whoAmI);
 
-            Log.Info($"[Client] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
+            // Send all weapons.
+            fightPacket.Write(fight.weapons.Count);
+            foreach (Weapon weapon in fight.weapons)
+            {
+                fightPacket.Write(weapon.weaponName);
+                fightPacket.Write(weapon.weaponItemID);
+                fightPacket.Write(weapon.damage);
+            }
+
+            Log.Info($"[PacketSender.cs] Sent player: {player} | dmg: {damageDone} | BossWhoAmI: {fight.whoAmI} | BossName: {fight.bossName} | BossHeadID: {fight.bossHeadId} | LocalPlayerWhoAmI: {Main.LocalPlayer.whoAmI}");
 
             fightPacket.Send(); // Send the packet to the server.
         }

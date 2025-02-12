@@ -57,7 +57,7 @@ namespace DPSPanel.Core.Configs
         {
             MainContainer.UpdateBarWidth(c);
             PlayerBar.UpdateBarWidth(c);
-            Panel.UpdateBarWidth(c);
+            MainPanel.UpdateBarWidth(c);
             WeaponBar.UpdateBarWidth(c);
         }
     }

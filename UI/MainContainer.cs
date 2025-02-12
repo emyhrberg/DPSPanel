@@ -23,7 +23,7 @@ namespace DPSPanel.UI
 
         // elements
         public ToggleButton toggleButton;
-        public Panel panel;
+        public MainPanel panel;
         public bool panelVisible = true;
         public static MainContainer Instance;
 
@@ -41,7 +41,7 @@ namespace DPSPanel.UI
             HAlign = 0.5f;  // center horizontally
 
             // 1) Create the panel
-            panel = new Panel();
+            panel = new MainPanel();
             Append(panel);
 
             // 2) Create the button

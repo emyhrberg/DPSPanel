@@ -2,8 +2,11 @@ using System.Collections.Generic;
 using System.IO;
 using DPSPanel.Helpers;
 using log4net.Repository.Hierarchy;
+using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.Chat;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 using static DPSPanel.Core.Networking.PacketHandler;
 
@@ -53,6 +56,9 @@ namespace DPSPanel.Core.Items
         {
             Log.Info("UseItem called. item.Name: " + item.Name);
 
+            base.OnConsumeItem(item, player);
+            return;
+
             // add calamity boss summoning items
             Mod calamity = ModLoader.GetMod("CalamityMod");
             if (calamity == null)
@@ -73,7 +79,7 @@ namespace DPSPanel.Core.Items
             // Check if the item used is a boss summoning item.
             if (bossSummoningItems.Contains(item.type))
             {
-                Main.NewText($"[Client] Used boss summoning item: {item.Name}");
+                Main.NewText($"[ItemUseTracker.cs] Used boss summoning item: {item.Name}");
                 ModPacket onConsumeItemPacket = ModContent.GetInstance<DPSPanel>().GetPacket();
                 onConsumeItemPacket.Write((byte)PacketType.OnConsumeItemPacket);
                 onConsumeItemPacket.Write(player.name);
@@ -84,6 +90,26 @@ namespace DPSPanel.Core.Items
 
             // Return base.UseItem to preserve the original behavior.
             base.OnConsumeItem(item, player);
+        }
+
+        // In PacketHandler.cs - in HandleOnConsumeItemPacket:
+        private static void HandleOnConsumeItemPacket(BinaryReader reader)
+        {
+            long availableBefore = reader.BaseStream.Length - reader.BaseStream.Position;
+            Log.Info($"Available bytes before reading: {availableBefore}");
+            string playerName = reader.ReadString();
+            string itemName = reader.ReadString();
+            long availableAfter = reader.BaseStream.Length - reader.BaseStream.Position;
+            Log.Info($"Available bytes after reading: {availableAfter}");
+
+            if (Main.netMode == NetmodeID.Server)
+            {
+                ChatHelper.BroadcastChatMessage(
+                    NetworkText.FromLiteral($"{playerName} used {itemName}!"),
+                    Color.White
+                );
+                Log.Info($"[Server] Received OnConsumeItemPacket from {playerName}: {itemName}");
+            }
         }
     }
 }

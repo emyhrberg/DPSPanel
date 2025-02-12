@@ -3,10 +3,10 @@ using System.Linq;
 using DPSPanel.Core.Configs;
 using DPSPanel.Core.Networking;
 using DPSPanel.Helpers;
+using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static DPSPanel.DPSPanel;
 
 namespace DPSPanel.Core.DamageCalculation
 {
@@ -14,28 +14,64 @@ namespace DPSPanel.Core.DamageCalculation
     public class BossDamageTrackerMP : ModPlayer
     {
         #region Classes
-        public class BossFight
+        public class BossFight(int bossHeadId, int currentLife, int whoAmI, int initialLife, string bossName, int damageTaken, bool isAlive, List<PlayerFightData> players, List<Weapon> weapons)
         {
-            public int bossHeadId = -1;
-            public int currentLife;
-            public int whoAmI;
-            public int initialLife;
-            public string bossName;
-            public int damageTaken;
-            public bool isAlive = false;
-            public List<PlayerFightData> players;
-            public List<Weapon> weapons = [];
+            public int bossHeadId = bossHeadId;
+            public int currentLife = currentLife;
+            public int whoAmI = whoAmI;
+            public int initialLife = initialLife;
+            public string bossName = bossName;
+            public int damageTaken = damageTaken;
+            public bool isAlive = isAlive;
+            public List<PlayerFightData> players = players;
+            public List<Weapon> weapons = weapons;
+
+            public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
+            {
+                // Check if the weapon already exists
+                Weapon weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
+                if (weapon == null)
+                {
+                    // Check if we already reach max cap of weapons
+                    Config c = ModContent.GetInstance<Config>();
+                    if (weapons.Count >= c.MaxWeaponsDisplayed)
+                    {
+                        // Add to unknown weapon
+                        Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
+                        if (unknownWeapon != null)
+                        {
+                            unknownWeapon.damage += damageDone;
+                        }
+                        else
+                        {
+                            unknownWeapon = new Weapon(-1, "Unknown", damageDone);
+                            weapons.Add(unknownWeapon);
+                            weapons = weapons.OrderByDescending(w => w.damage).ToList();
+                        }
+                        return;
+                    }
+
+                    // Add a new weapon to the fight
+                    weapon = new Weapon(weaponID, weaponName, damageDone);
+                    weapons.Add(weapon);
+                    weapons = weapons.OrderByDescending(w => w.damage).ToList();
+                }
+                else
+                {
+                    // Update existing weapon's damage
+                    weapon.damage += damageDone;
+                }
+
+                // send packet after updating weapon
+                PacketSender.SendPlayerDamagePacket(this);
+            }
 
             public void UpdatePlayerDamage(string playerName, int damageDone)
             {
                 PlayerFightData player = players.FirstOrDefault(p => p.playerName == playerName);
                 if (player == null)
                 {
-                    player = new PlayerFightData
-                    {
-                        playerName = playerName,
-                        playerDamage = damageDone
-                    };
+                    player = new PlayerFightData(Main.LocalPlayer.whoAmI, playerName, damageDone);
                     players.Add(player);
                 }
                 else
@@ -85,8 +121,6 @@ namespace DPSPanel.Core.DamageCalculation
                         NPC npc = Main.npc[i];
                         if (IsValidBoss(npc) && npc.life > 0)
                         {
-                            if (IgnoreGolem(npc))
-                                continue;
                             detectedBoss = npc;
                             break; // Found a valid boss, no need to check further
                         }
@@ -106,9 +140,6 @@ namespace DPSPanel.Core.DamageCalculation
             if (Main.netMode != NetmodeID.MultiplayerClient)
                 return;
 
-            if (IgnoreGolem(target))
-                return;
-
             // Pass the actual item type (ID) explicitly for melee
             int actualItemID = item?.type ?? -1;
             string actualItemName = item?.Name ?? "unknownitem";
@@ -118,9 +149,6 @@ namespace DPSPanel.Core.DamageCalculation
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (Main.netMode != NetmodeID.MultiplayerClient)
-                return;
-
-            if (IgnoreGolem(target))
                 return;
 
             string weaponName = GetSourceWeaponName();
@@ -135,14 +163,11 @@ namespace DPSPanel.Core.DamageCalculation
             Config c = ModContent.GetInstance<Config>();
 
             // Debug log: report the call details.
-            Log.Info($"[BossFight] TrackBossDamage called with weaponID: {weaponID}, weaponName: {weaponName}, damageDone: {damageDone}, NPC: {npc.FullName}, boss flag: {npc.boss}, current life: {npc.life}");
+            // Log.Info($"[BossFight] TrackBossDamage called with weaponID: {weaponID}, weaponName: {weaponName}, damageDone: {damageDone}, NPC: {npc.FullName}, boss flag: {npc.boss}, current life: {npc.life}");
 
             // No active fight? Then nothing to do.
             if (fight == null)
-            {
-                Log.Info("[BossFight] No active fight detected. Exiting method.");
                 return;
-            }
 
             // Determine whether this NPC is the designated boss.
             bool isDesignatedBoss = npc.boss && npc.FullName == fight.bossName;
@@ -150,12 +175,10 @@ namespace DPSPanel.Core.DamageCalculation
             // If config is set to track all entities during a boss fight...
             if (c.TrackAllEntities)
             {
-                Log.Info("[BossFight] Config: TrackAllEntities is enabled. Tracking damage for all Log.Info during this boss fight.");
-
                 // If this is the designated boss and it has died, end the fight.
                 if (isDesignatedBoss && npc.life <= 0)
                 {
-                    Log.Info("[BossFight] Designated boss has died. Ending fight.");
+                    // Log.Info("[BossFight] Designated boss has died. Ending fight.");
                     fight.isAlive = false;
                     PacketSender.SendPlayerDamagePacket(fight);
                     fight = null;
@@ -164,35 +187,30 @@ namespace DPSPanel.Core.DamageCalculation
 
                 // Regardless of NPC type, add the damage.
                 fight.damageTaken += damageDone;
-                Log.Info($"[BossFight] Added {damageDone} damage. Total damage is now {fight.damageTaken}.");
+                // Log.Info($"[BossFight] Added {damageDone} damage. Total damage is now {fight.damageTaken}.");
 
                 // Only update the boss’s current life if this NPC is the designated boss.
                 if (isDesignatedBoss)
                 {
                     fight.currentLife = npc.life;
-                    Log.Info($"[BossFight] Updated designated boss's current life to {npc.life}.");
+                    // Log.Info($"[BossFight] Updated designated boss's current life to {npc.life}.");
                 }
 
                 // Update the player damage record and send out an update packet.
                 fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
+                fight.UpdateWeapon(weaponID, weaponName, damageDone);
                 PacketSender.SendPlayerDamagePacket(fight);
             }
             // Else, only track damage for the designated boss.
             else
             {
-                Log.Info("[BossFight] Config: Tracking only the designated boss.");
-
                 // Ignore damage if this is not the designated boss.
                 if (!isDesignatedBoss)
-                {
-                    Log.Info("[BossFight] NPC is not the designated boss. Ignoring damage.");
                     return;
-                }
 
                 // If the designated boss dies, end the fight.
                 if (npc.life <= 0)
                 {
-                    Log.Info("[BossFight] Designated boss has died. Ending fight.");
                     fight.isAlive = false;
                     PacketSender.SendPlayerDamagePacket(fight);
                     fight = null;
@@ -205,12 +223,9 @@ namespace DPSPanel.Core.DamageCalculation
                     fight.damageTaken += damageDone;
                     fight.currentLife = npc.life;
                     fight.UpdatePlayerDamage(Main.LocalPlayer.name, damageDone);
-                    Log.Info($"[BossFight] Added {damageDone} damage to designated boss. Total damage is now {fight.damageTaken}.");
+                    fight.UpdateWeapon(weaponID, weaponName, damageDone);
+                    // Log.Info($"[BossFight] Added {damageDone} damage to designated boss. Total damage is now {fight.damageTaken}.");
                     PacketSender.SendPlayerDamagePacket(fight);
-                }
-                else
-                {
-                    Log.Info("[BossFight] The NPC hit does not match the tracked designated boss. Ignoring damage.");
                 }
             }
         }
@@ -219,17 +234,17 @@ namespace DPSPanel.Core.DamageCalculation
         {
             if (fight == null)
             {
-                fight = new BossFight
-                {
-                    bossHeadId = npc.GetBossHeadTextureIndex(),
-                    whoAmI = npc.whoAmI,
-                    currentLife = npc.life,
-                    initialLife = npc.lifeMax,
-                    bossName = npc.FullName,
-                    damageTaken = 0,
-                    players = [],
-                    isAlive = true
-                };
+                fight = new BossFight(
+                    npc.GetBossHeadTextureIndex(),
+                    npc.life,
+                    npc.whoAmI,
+                    npc.lifeMax,
+                    npc.FullName,
+                    0,
+                    true,
+                    new List<PlayerFightData>(),
+                    new List<Weapon>()
+                );
                 Mod.Logger.Info("(MP) New boss fight created: " + fight.bossName);
 
                 PacketSender.SendPlayerDamagePacket(fight);

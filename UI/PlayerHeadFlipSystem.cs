@@ -1,4 +1,5 @@
 using System;
+using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Terraria.Graphics.Renderers;
@@ -19,7 +20,7 @@ namespace DPSPanel.UI
         {
             try
             {
-                ILCursor c = new ILCursor(il);
+                ILCursor c = new(il);
 
                 // extra code
                 c.GotoNext(MoveType.Before, i => i.MatchLdcR4(2));
@@ -31,7 +32,8 @@ namespace DPSPanel.UI
                 c.EmitBrfalse(skipCentering);
                 c.EmitDelegate<Func<Vector2, Vector2>>(inCenter =>
                 {
-                    return new Vector2(inCenter.X * 0.8f, inCenter.Y);
+                    // return new Vector2(inCenter.X * 0.8f, inCenter.Y); // original, almost works but 0.1f offset. should go more left than this.
+                    return new Vector2(inCenter.X - 8f, inCenter.Y); // orig
                 });
                 c.MarkLabel(skipCentering);
 

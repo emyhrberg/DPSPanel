@@ -6,9 +6,7 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 
 namespace DPSPanel.UI
@@ -17,24 +15,22 @@ namespace DPSPanel.UI
     {
         private Asset<Texture2D> emptyBar; // Background 
         private Asset<Texture2D> fullBar;  // Foreground fill texture
-        private readonly UIText textElement;          // Text element for 
-        private const float ItemHeight = 40f; // size of each item
+        private readonly UIText textElement; // Text element for display
+        private const float ItemHeight = 40f; // Height of the bar
 
-        private Color fillColor;             // Color for the fill
-        private int percentage;              // Progress percentage (0-100)
+        private Color fillColor; // Fill color
+        private int percentage;  // Fill percentage
 
-        // Weapon icon
+        // Weapon info
         private int weaponItemID;
-        private string weaponName;           // Weapon name
+        private string weaponName;
 
         public static WeaponBar Instance;
 
         public WeaponBar(float currentYOffset)
         {
             Instance = this;
-            // check config settings for theme
             Config c = ModContent.GetInstance<Config>();
-
             if (c.BarWidth == 150)
             {
                 emptyBar = Assets.BarEmpty150;
@@ -46,13 +42,12 @@ namespace DPSPanel.UI
                 fullBar = Assets.BarFull300;
             }
 
-            Width = new StyleDimension(0, 1.0f); // Fill the width of the panel
-            Height = new StyleDimension(ItemHeight, 0f); // Set height
+            Width = new StyleDimension(0, 1.0f);
+            Height = new StyleDimension(ItemHeight, 0f);
             Top = new StyleDimension(currentYOffset, 0f);
-            HAlign = 0.5f; // Center horizontally
+            HAlign = 0.5f;
 
-            // Create the text element centered on the bar.
-            textElement = new UIText("", 0.8f) // 80% size
+            textElement = new UIText("", 0.8f)
             {
                 HAlign = 0.5f,
                 VAlign = 0.5f,
@@ -64,7 +59,7 @@ namespace DPSPanel.UI
         {
             if (Instance == null)
             {
-                Log.Warn("Instance is null in WeaponDamageBarElement");
+                Log.Warn("Instance is null in WeaponBar");
                 return;
             }
             if (c.BarWidth == 150)
@@ -79,12 +74,12 @@ namespace DPSPanel.UI
             }
         }
 
-        public void UpdateDamageBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
+        public void UpdateWeaponBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
         {
             percentage = _percentage;
             weaponItemID = weaponID;
             fillColor = _fillColor;
-            weaponName = _weaponName; // used for debugging only
+            weaponName = _weaponName;
             textElement.SetText($"{_weaponName} ({weaponDamage})");
         }
 
@@ -100,9 +95,6 @@ namespace DPSPanel.UI
         {
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new Vector2(dims.X, dims.Y);
-            // Rectangle rect = new Rectangle((int)pos.X, (int)pos.Y, (int)dims.Width, (int)dims.Height);
-
-            // Draw filled portion based on percentage.
             int fillWidth = (int)(dims.Width * (percentage / 100f));
             if (fillWidth > 0)
             {
@@ -121,61 +113,24 @@ namespace DPSPanel.UI
 
         private void DrawWeaponIcon(SpriteBatch sb)
         {
-            // Check if the weapon icon display is enabled in the config
-            // Config c = ModContent.GetInstance<Config>();
-            // if (!c.ShowWeaponIcon)
-            // return;
-
-            // Load the appropriate texture based on the weaponItemID
             Texture2D texture;
-            if (weaponItemID == -1 && TextureAssets.NpcHead[0].Value != null)
-                // texture = TextureAssets.Buff[BuffID.Confused].Value; // Example: Confused debuff as placeholder
-                // Use NPCHEAD[0] as placeholder (a question mark)
-                texture = TextureAssets.NpcHead[0].Value;
+            if (weaponItemID == -1)
+                texture = TextureAssets.NpcHead[0].Value; // Placeholder texture.
             else
                 texture = TextureAssets.Item[weaponItemID].Value;
 
-            // Get the dimensions of the current UI element
             CalculatedStyle dims = GetDimensions();
-
-            // Define the desired maximum icon height
             const int maxIconHeight = 32;
-            const int paddingLeft = 5; // Padding from the left edge
-
-            // Get original texture size
+            const int paddingLeft = 5;
             int originalWidth = texture.Width;
             int originalHeight = texture.Height;
-
-            float scale;
-
-            // Determine scaling factor based on original height
-            if (originalHeight > maxIconHeight)
-            {
-                // Scale down to have a height of 32 pixels
-                scale = (float)maxIconHeight / originalHeight;
-            }
-            else
-            {
-                // Use original size (no scaling)
-                scale = 1f;
-            }
-
-            // Calculate scaled width and height while maintaining aspect ratio
+            float scale = originalHeight > maxIconHeight ? (float)maxIconHeight / originalHeight : 1f;
             int scaledWidth = (int)(originalWidth * scale);
             int scaledHeight = (int)(originalHeight * scale);
-
-            // Calculate position:
-            // - X: padding from the left
-            // - Y: vertically centered within the DamageBarElement
             int iconX = (int)dims.X + paddingLeft;
             int iconY = (int)(dims.Y + (dims.Height - scaledHeight) / 2f);
-
-            // Define the destination rectangle with the calculated size and position
-            Rectangle destRect = new(iconX, iconY, scaledWidth, scaledHeight);
-
-            // Draw the texture scaled to fit the destination rectangle
+            Rectangle destRect = new Rectangle(iconX, iconY, scaledWidth, scaledHeight);
             sb.Draw(texture, destRect, Color.White);
         }
-
     }
 }

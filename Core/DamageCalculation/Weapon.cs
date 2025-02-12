@@ -1,9 +1,9 @@
 namespace DPSPanel.Core.DamageCalculation
 {
-    public class Weapon
+    public class Weapon(int weaponItemID, string weaponName, int damage)
     {
-        public int weaponItemID;
-        public string weaponName;
-        public int damage;
+        public int weaponItemID = weaponItemID;
+        public string weaponName = weaponName;
+        public int damage = damage;
     }
 }
