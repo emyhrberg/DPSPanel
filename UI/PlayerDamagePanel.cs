@@ -2,6 +2,7 @@
 using System.Linq;
 using DPSPanel.Core.Configs;
 using DPSPanel.Core.DamageCalculation;
+using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;
@@ -31,9 +32,10 @@ namespace DPSPanel.UI
                 Width.Set(300, 0f);
 
             // Start with a minimal height (will be updated).
-            Height.Set(40f, 0f);
+            Height.Set(300f, 0f);
             BackgroundColor = new Color(27, 29, 85); // Dark blue background.
             SetPadding(PANEL_PADDING);
+            OverflowHidden = false; // Allow overflow from weapon bars.
         }
 
         public void CreateWeaponBar(string weaponName)
@@ -46,30 +48,32 @@ namespace DPSPanel.UI
 
         public void UpdateWeaponBars(List<Weapon> weapons)
         {
-            // Reset the Y offset.
-            currentYOffset = 0f;
-            // Determine the highest damage among the weapons.
-            int highestDamage = weapons.Count > 0 ? weapons.Max(w => w.damage) : 1;
+            // Sort weapons by descending damage.
+            var sortedWeapons = weapons.OrderByDescending(w => w.damage).ToList();
+
+            // Determine the highest damage.
+            int highestDamage = sortedWeapons.Count > 0 ? sortedWeapons.First().damage : 1;
             if (highestDamage == 0)
                 highestDamage = 1;
 
-            // Loop through each weapon in the list.
-            foreach (var wpn in weapons)
+            // Loop over each weapon in sorted order.
+            for (int i = 0; i < sortedWeapons.Count; i++)
             {
-                // If a bar for this weapon doesn't exist yet, create it.
+                var wpn = sortedWeapons[i];
                 if (!damageBars.ContainsKey(wpn.weaponName))
                     CreateWeaponBar(wpn.weaponName);
 
-                // Retrieve and update the corresponding weapon bar.
                 WeaponBar bar = damageBars[wpn.weaponName];
                 int percent = (int)((float)wpn.damage / highestDamage * 100);
-                bar.UpdateWeaponBar(percent, wpn.weaponName, wpn.damage, wpn.weaponItemID, Color.White);
-                // Position this bar vertically.
+                // Use the sorted index to assign a color.
+                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+                bar.UpdateWeaponBar(percent, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
                 bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + ITEM_PADDING;
             }
-            // Update the panel's height to fit all weapon bars.
+            // Update this panel's height to fit all weapon bars.
             Height.Set(currentYOffset + ITEM_PADDING, 0f);
+            Log.Info($"Updated player damage panel height to {currentYOffset + ITEM_PADDING}");
             Recalculate();
         }
 

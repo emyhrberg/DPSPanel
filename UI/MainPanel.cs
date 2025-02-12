@@ -103,7 +103,7 @@ namespace DPSPanel.UI
             PlayerBar bar = new PlayerBar(currentYOffset, playerName, playerWhoAmI);
             Append(bar);
             playerBars[playerName] = bar;
-            Log.Info($"[MainPanel] Creating player bar for {playerName}");
+            // Log.Info($"[MainPanel] Creating player bar for {playerName}");
             currentYOffset += ItemHeight + ITEM_PADDING * 2;
             ResizePanelHeight();
         }
@@ -111,23 +111,46 @@ namespace DPSPanel.UI
         // In MP, we update each player's bar and then update its damage panel with weapon data.
         public void UpdatePlayerBars(string playerName, int playerDamage, int playerWhoAmI, List<Weapon> weapons)
         {
+            // Create a new player bar if needed.
             if (!playerBars.ContainsKey(playerName))
                 CreatePlayerBar(playerName, playerWhoAmI);
 
-            // Log weapon list information.
-            Log.Info($"[MainPanel] Updating player bars for {playerName} with {weapons.Count} weapons | {string.Join(", ", weapons.Select(w => w.weaponName))}");
+            // Update the player's damage.
+            playerBars[playerName].PlayerDamage = playerDamage;
 
-            // Update the player's damage in the PlayerBar.
-            var bar = playerBars[playerName];
-            bar.PlayerDamage = playerDamage;
+            // Re-sort all player bars by descending damage.
+            var sortedPlayers = playerBars.OrderByDescending(p => p.Value.PlayerDamage).ToList();
 
-            // (Optional sorting code omitted for brevity.)
+            // Reset Y offset for all bars.
+            currentYOffset = bossHeaderHeight;
+            // Get the highest damage for fill percentage calculations.
+            int highestDamage = sortedPlayers.First().Value.PlayerDamage;
 
-            // Update the bar's text.
-            bar.UpdatePlayerBar(0, playerName, playerDamage, PanelColors.colors[0]);
+            // Update each player's bar: reposition and update fill percentage/color.
+            for (int i = 0; i < sortedPlayers.Count; i++)
+            {
+                string currentPlayerName = sortedPlayers[i].Key;
+                PlayerBar currentBar = sortedPlayers[i].Value;
 
-            // **Update the weapon data for this player's damage panel.**
-            bar.UpdateWeaponData(weapons);
+                // Set the vertical position.
+                currentBar.Top.Set(currentYOffset, 0f);
+                currentYOffset += ItemHeight + ITEM_PADDING * 2;
+
+                // Calculate fill percentage (safely, using highest damage).
+                int percentageToFill = highestDamage > 0
+                    ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100)
+                    : 0;
+
+                // Assign a color based on sorted order.
+                Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
+
+                // Update the player bar's own drawing (text and fill).
+                currentBar.UpdatePlayerBar(percentageToFill, currentPlayerName, currentBar.PlayerDamage, barColor);
+            }
+
+            // Finally, update the weapon data for the specified player's damage panel.
+            // (Each PlayerBar has its own damage panel; that panel will update all its weapon bars.)
+            playerBars[playerName].UpdateWeaponData(weapons);
 
             ResizePanelHeight();
         }

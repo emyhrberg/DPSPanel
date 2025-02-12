@@ -88,7 +88,7 @@ namespace DPSPanel.Core.Networking
             {
                 // Client receives the packet and processes it
                 // Client updates its UI with the received data
-                Log.Info($"[PacketHandler.cs] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
+                // Log.Info($"[PacketHandler.cs] Updating UI for {playerName}: {damageDone} damage to {bossName} (whoAmI {bossWhoAmI} | headID: {bossHeadId}) | playerWHOAMI: {playerWhoAmI}");
 
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
                 MainPanel panel = sys.state.container.panel;

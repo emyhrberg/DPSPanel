@@ -56,6 +56,7 @@ namespace DPSPanel.UI
             Height = new StyleDimension(ItemHeight, 0f); // Fixed height.
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f; // Center horizontally.
+            this.OverflowHidden = false; // Allow overflow from e.g weapon bars.
 
             // Initialize player properties.
             PlayerName = playerName;
@@ -83,10 +84,11 @@ namespace DPSPanel.UI
 
             // Create the damage panel once.
             damagePanel = new PlayerDamagePanel();
-            // Position the damage panel relative to this PlayerBar (for example, 10 pixels right and above the bar).
-            damagePanel.Left.Set(10f, 0f);
-            damagePanel.Top.Set(-damagePanel.Height.Pixels - 5f, 0f);
+            MainSystem sys = ModContent.GetInstance<MainSystem>();
+            CalculatedStyle dims = sys.state.container.panel.GetOuterDimensions();
+            damagePanel.Left.Set(100f, 0f);
             Append(damagePanel);
+            Recalculate();
         }
 
         public override void Update(GameTime gameTime)
@@ -105,8 +107,7 @@ namespace DPSPanel.UI
         /// 
         public void UpdateWeaponData(List<Weapon> weapons)
         {
-            if (damagePanel != null)
-                damagePanel.UpdateWeaponBars(weapons);
+            damagePanel?.UpdateWeaponBars(weapons);
         }
 
         public static void UpdateBarWidth(Config config)

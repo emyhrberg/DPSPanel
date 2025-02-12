@@ -17,9 +17,9 @@ namespace DPSPanel.Core.DamageCalculation
         {
             int playerHeadIndex = 0; // 0 is local player
             var sys = ModContent.GetInstance<MainSystem>();
-            sys.state.container.panel.UpdatePlayerBars("Name1", Main.rand.Next(100, 2000), playerHeadIndex, []);
-            sys.state.container.panel.UpdatePlayerBars("Name2", Main.rand.Next(100, 2000), playerHeadIndex, []);
-            sys.state.container.panel.UpdatePlayerBars("Name3", Main.rand.Next(100, 2000), playerHeadIndex, []);
+            // sys.state.container.panel.UpdatePlayerBars("Name1", Main.rand.Next(100, 2000), playerHeadIndex, []);
+            // sys.state.container.panel.UpdatePlayerBars("Name2", Main.rand.Next(100, 2000), playerHeadIndex, []);
+            // sys.state.container.panel.UpdatePlayerBars("Name3", Main.rand.Next(100, 2000), playerHeadIndex, []);
         }
 
         #endregion
