@@ -103,7 +103,6 @@ namespace DPSPanel.UI
             PlayerBar bar = new PlayerBar(currentYOffset, playerName, playerWhoAmI);
             Append(bar);
             playerBars[playerName] = bar;
-            // Log.Info($"[MainPanel] Creating player bar for {playerName}");
             currentYOffset += ItemHeight + ITEM_PADDING * 2;
             ResizePanelHeight();
         }
@@ -175,7 +174,7 @@ namespace DPSPanel.UI
         }
 
         #region (Singleplayer weapon bars – not used in MP)
-        public void CreateWeaponBar(string barName)
+        public void CreateWeaponBarSP(string barName)
         {
             if (!weaponBars.ContainsKey(barName))
             {
@@ -186,7 +185,7 @@ namespace DPSPanel.UI
             }
         }
 
-        public void UpdateAllWeaponBars(List<Weapon> weapons)
+        public void UpdateAllWeaponBarsSP(List<Weapon> weapons)
         {
             currentYOffset = bossHeaderHeight + (playerBars.Count * (ItemHeight + ITEM_PADDING * 2));
             if (weapons == null || weapons.Count == 0)
@@ -200,7 +199,7 @@ namespace DPSPanel.UI
                 var wpn = weapons[i];
                 if (!weaponBars.ContainsKey(wpn.weaponName))
                 {
-                    CreateWeaponBar(wpn.weaponName);
+                    CreateWeaponBarSP(wpn.weaponName);
                 }
                 WeaponBar bar = weaponBars[wpn.weaponName];
                 int percentageToFill = (int)(wpn.damage / (float)highest * 100);

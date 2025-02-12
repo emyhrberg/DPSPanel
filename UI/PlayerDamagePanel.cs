@@ -13,7 +13,7 @@ namespace DPSPanel.UI
     public class PlayerDamagePanel : UIPanel
     {
         private readonly float PANEL_PADDING = 5f; // Padding inside the panel
-        private readonly float ITEM_PADDING = 10f;   // Vertical spacing between weapon bars
+        private readonly float ITEM_PADDING = 5f;   // Vertical spacing between weapon bars
         private float currentYOffset = 0f;           // Y offset for each new weapon bar
         private const float ItemHeight = 40f;        // Height of each weapon bar
 
@@ -32,10 +32,9 @@ namespace DPSPanel.UI
                 Width.Set(300, 0f);
 
             // Start with a minimal height (will be updated).
-            Height.Set(300f, 0f);
+            Height.Set(40f, 0f);
             BackgroundColor = new Color(27, 29, 85); // Dark blue background.
             SetPadding(PANEL_PADDING);
-            OverflowHidden = false; // Allow overflow from weapon bars.
         }
 
         public void CreateWeaponBar(string weaponName)
@@ -71,9 +70,8 @@ namespace DPSPanel.UI
                 bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + ITEM_PADDING;
             }
-            // Update this panel's height to fit all weapon bars.
-            Height.Set(currentYOffset + ITEM_PADDING, 0f);
-            Log.Info($"Updated player damage panel height to {currentYOffset + ITEM_PADDING}");
+            // Update the panel's height to fit all weapon bars.
+            Height.Set(currentYOffset, 0f);
             Recalculate();
         }
 

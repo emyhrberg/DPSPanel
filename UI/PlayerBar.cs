@@ -82,13 +82,15 @@ namespace DPSPanel.UI
                 }
             }
 
-            // Create the damage panel once.
+            // Create the damage panel.
             damagePanel = new PlayerDamagePanel();
             MainSystem sys = ModContent.GetInstance<MainSystem>();
-            CalculatedStyle dims = sys.state.container.panel.GetOuterDimensions();
-            damagePanel.Left.Set(100f, 0f);
-            Append(damagePanel);
-            Recalculate();
+            CalculatedStyle panelDims = sys.state.container.panel.GetOuterDimensions();
+
+            // Place to the right of the main panel.
+            damagePanel.Left.Set(panelDims.X + panelDims.Width, 0f);
+            damagePanel.Top.Set(panelDims.Y, 0f);
+            sys.state.Append(damagePanel);
         }
 
         public override void Update(GameTime gameTime)

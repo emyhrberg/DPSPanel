@@ -62,7 +62,7 @@ namespace DPSPanel.Core.DamageCalculation
                             weapons.Add(unknownWeapon);
                             weapons = weapons.OrderByDescending(w => w.damage).ToList();
                             MainSystem sys2 = ModContent.GetInstance<MainSystem>();
-                            sys2.state.container.panel.CreateWeaponBar("Unknown");
+                            sys2.state.container.panel.CreateWeaponBarSP("Unknown");
                         }
                         return;
                     }
@@ -72,7 +72,7 @@ namespace DPSPanel.Core.DamageCalculation
                     weapons.Add(weapon);
                     weapons = weapons.OrderByDescending(w => w.damage).ToList();
                     MainSystem sys = ModContent.GetInstance<MainSystem>();
-                    sys.state.container.panel.CreateWeaponBar(weaponName);
+                    sys.state.container.panel.CreateWeaponBarSP(weaponName);
                 }
                 else
                 {
@@ -113,7 +113,7 @@ namespace DPSPanel.Core.DamageCalculation
                             // Ensure the list is re-sorted and update the UI accordingly
                             weapons = weapons.OrderByDescending(w => w.damage).ToList();
                             MainSystem sys = ModContent.GetInstance<MainSystem>();
-                            sys.state.container.panel.CreateWeaponBar("Unknown");
+                            sys.state.container.panel.CreateWeaponBarSP("Unknown");
                         }
                     }
                     else
@@ -134,7 +134,7 @@ namespace DPSPanel.Core.DamageCalculation
             {
                 weapons = weapons.OrderByDescending(w => w.damage).ToList();
                 MainSystem sys = ModContent.GetInstance<MainSystem>();
-                sys.state.container.panel.UpdateAllWeaponBars(weapons);
+                sys.state.container.panel.UpdateAllWeaponBarsSP(weapons);
             }
 
             public void PrintFightData(Mod mod)
@@ -239,7 +239,7 @@ namespace DPSPanel.Core.DamageCalculation
 
                                 // Create damage bar for "Unknown" in the UI
                                 MainSystem sys = ModContent.GetInstance<MainSystem>();
-                                sys.state.container.panel.CreateWeaponBar("Unknown");
+                                sys.state.container.panel.CreateWeaponBarSP("Unknown");
                             }
                             else
                             {
