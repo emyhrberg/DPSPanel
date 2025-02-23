@@ -21,8 +21,8 @@
   </p>
 </div>
 
+## How to use
+Subscribe to the mod on the [workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3408391079)
+
 ## Demo
 ![download](https://github.com/user-attachments/assets/cc74f150-528b-4840-8850-6a7b94086046)
-
-## Old version (unused)
-![952823cea79e96c37f5f14e1de1abcbe](https://github.com/user-attachments/assets/8f27fd9f-7a07-4b9e-8092-c31ed78c6997)
