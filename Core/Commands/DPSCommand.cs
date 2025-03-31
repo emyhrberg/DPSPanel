@@ -37,7 +37,7 @@ namespace DPSPanel.Core.Configs
                 if (i >= players.Length)
                     i = Main.rand.Next(0, players.Length);
                 string randomName = players[i];
-                randomName = "LongName18Characts";
+                // randomName = "LongName18Characts";
                 sys.state.container.panel.UpdatePlayerBars(randomName, damage, playerHeadIndex, []);
             }
             else if (target == "clear")

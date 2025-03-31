@@ -88,7 +88,7 @@ namespace DPSPanel.UI
                 Config c = ModContent.GetInstance<Config>();
                 bool showOnHover = c.ShowWeaponsDuringBossFight;
                 bool isBossAlive = sys.state.container.panel.CurrentBossAlive;
-                Log.Info("ShowOnHover: " + showOnHover + " IsBossAlive: " + isBossAlive);
+                // Log.Info("ShowOnHover: " + showOnHover + " IsBossAlive: " + isBossAlive);
 
                 if (!showOnHover && isBossAlive)
                 {

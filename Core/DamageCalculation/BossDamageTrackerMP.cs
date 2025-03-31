@@ -114,7 +114,7 @@ namespace DPSPanel.Core.DamageCalculation
                     if (detectedBoss != null)
                     {
                         CreateNewBossFight(detectedBoss);
-                        Mod.Logger.Info($"Boss {fight.bossName} created!");
+                        Mod.Logger.Info($"Boss fight {fight.bossName} created!");
                     }
                 }
             }
@@ -223,7 +223,6 @@ namespace DPSPanel.Core.DamageCalculation
                     new List<PlayerFightData>(),
                     new List<Weapon>()
                 );
-                Mod.Logger.Info("(MP) New boss fight created: " + fight.bossName);
 
                 PacketSender.SendPlayerDamagePacket(fight);
             }
