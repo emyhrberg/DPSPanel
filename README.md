@@ -3,30 +3,17 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="https://github.com/user-attachments/assets/60d67299-cbf9-47c7-a94b-21db788a14dd" alt="Logo" width="80" height="80">
+  <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3408391079">
+    <img src="icon_workshop.png" alt="Logo" width="150">
   </a>
 
   <h3 align="center">DPSPanel</h3>
 
-  <p align="center">
-    An awesome terraria mod!
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/othneildrew/Best-README-Template">View Demo</a>
-    &middot;
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    &middot;
-    <a href="https://github.com/othneildrew/Best-README-Template/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
-  </p>
+  The ultimate Terraria DPS Mod, displaying damage calculation per player and per weapon!
 </div>
 
-## Note
-
-Work in progress
+## How to use
+Subscribe to the mod on the [tModLoader Workshop!](https://steamcommunity.com/sharedfiles/filedetails/?id=3408391079)
 
 ## Demo
-
-![952823cea79e96c37f5f14e1de1abcbe](https://github.com/user-attachments/assets/8f27fd9f-7a07-4b9e-8092-c31ed78c6997)
+![download](https://github.com/user-attachments/assets/cc74f150-528b-4840-8850-6a7b94086046)
