@@ -17,3 +17,6 @@ Subscribe to the mod on the [tModLoader Workshop!](https://steamcommunity.com/sh
 
 ## Demo
 ![download](https://github.com/user-attachments/assets/cc74f150-528b-4840-8850-6a7b94086046)
+
+https://github.com/user-attachments/assets/5dd5e5a1-32c4-4677-973d-0dec368fef44
+
