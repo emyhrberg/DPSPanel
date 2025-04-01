@@ -24,11 +24,6 @@ Mods: {
 					Tooltip: Show the boss icon during a boss fight
 				}
 
-				ShowOnlyWhenInventoryOpen: {
-					Label: "[i:DeerclopsPetItem] Show Only When Inventory Open"
-					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it\nAlso right click the toggle button to toggle this option.
-				}
-
 				ShowHighlightButtonWhenHovering: {
 					Label: "[i:LivingIchorBlock] Show Highlight Button When Hovering"
 					Tooltip: Disable this if you find the button highlighting to interfere with boss fights
@@ -43,9 +38,21 @@ Mods: {
 					Tooltip: If you want to place the panel at a permanent position, uncheck this option
 					Label: "[i:5126] Make Panel Draggable"
 				}
+
+				TrackUnknownDamage: {
+					Label: "[i:DPSPanel/ConfigUnknownItem] Track Unknown Damage"
+					Tooltip: Some projectiles have an unknown damage source. If on, the tracker will track this damage as 'Unknown'. If off, the tracker will ignore this damage completely.
+				}
 			}
 		}
 
 		Keybinds.ToggleDPSPanel.DisplayName: Toggle DPS Panel
+
+		Items: {
+			ConfigUnknownItem: {
+				DisplayName: Config//Unknown
+				Tooltip: ""
+			}
+		}
 	}
 }

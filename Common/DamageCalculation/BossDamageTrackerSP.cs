@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Common.Configs;
+using DPSPanel.Helpers;
 using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.Common.DamageCalculation
 {
@@ -423,6 +425,13 @@ namespace DPSPanel.Common.DamageCalculation
             {
                 weaponID = gProj.sourceWeapon.type;
                 weaponName = gProj.sourceWeapon.Name;
+            }
+
+            // Config option to ignore unknown projectiles
+            if (weaponName == "Unknown" && !Conf.C.TrackUnknownDamage)
+            {
+                Log.Info("[SP] Ignoring unknown proj with name: " + proj.Name + ", damage: " + damageDone);
+                return;
             }
 
             TrackBossDamage(weaponID, weaponName, damageDone, target);

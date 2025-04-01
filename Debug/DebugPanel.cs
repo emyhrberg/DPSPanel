@@ -111,14 +111,14 @@ namespace DPSPanel.Debug
 
         private void ToggleEnemySpawns()
         {
-            SpawnRateNPC.DisableSpawns = !SpawnRateNPC.DisableSpawns;
-            Main.NewText($"Disable spawn and kill all NPCs is now {(SpawnRateNPC.DisableSpawns ? "enabled" : "disabled")}.");
+            DebugSpawnRater.DisableSpawns = !DebugSpawnRater.DisableSpawns;
+            Main.NewText($"Disable spawn and kill all NPCs is now {(DebugSpawnRater.DisableSpawns ? "enabled" : "disabled")}.");
         }
 
         private void ToggleGod()
         {
-            God.GodEnabled = !God.GodEnabled;
-            Main.NewText($"God mode is now {(God.GodEnabled ? "enabled" : "disabled")}.");
+            DebugGod.GodEnabled = !DebugGod.GodEnabled;
+            Main.NewText($"God mode is now {(DebugGod.GodEnabled ? "enabled" : "disabled")}.");
         }
 
         private void AddPlayer()

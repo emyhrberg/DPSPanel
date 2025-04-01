@@ -16,7 +16,7 @@ namespace DPSPanel.Debug.DebugMisc
 
         public override void OnWorldLoad()
         {
-            if (!DebugConfig.DEBUG_PANEL)
+            if (!DebugConfig.IS_DEBUG_ENABLED)
             {
                 return;
             }
@@ -30,7 +30,7 @@ namespace DPSPanel.Debug.DebugMisc
 
         public override void UpdateUI(GameTime gameTime)
         {
-            if (!DebugConfig.DEBUG_PANEL)
+            if (!DebugConfig.IS_DEBUG_ENABLED)
             {
                 return;
             }
@@ -40,7 +40,7 @@ namespace DPSPanel.Debug.DebugMisc
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            if (!DebugConfig.DEBUG_PANEL)
+            if (!DebugConfig.IS_DEBUG_ENABLED)
             {
                 return;
             }

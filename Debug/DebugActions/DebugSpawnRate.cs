@@ -3,7 +3,7 @@ using Terraria.ModLoader;
 
 namespace DPSPanel.Debug.DebugActions
 {
-    public class SpawnRateNPC : GlobalNPC
+    public class DebugSpawnRater : GlobalNPC
     {
         public static bool DisableSpawns = false;
 

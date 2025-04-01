@@ -1,16 +1,22 @@
+using DPSPanel.Debug.DebugMisc;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Debug.DebugActions
 {
-    public class God : ModPlayer
+    public class DebugGod : ModPlayer
     {
         public static bool GodEnabled = false;
 
         public override void OnEnterWorld()
         {
             base.OnEnterWorld();
+
+            if (!DebugConfig.IS_DEBUG_ENABLED)
+            {
+                return;
+            }
 
             GodEnabled = true;
             Main.NewText("God mode enabled on enter world!", 255, 255, 0); // Yellow text

@@ -5,7 +5,7 @@ using MonoMod.Cil;
 using Terraria.Graphics.Renderers;
 using Terraria.ModLoader;
 
-namespace DPSPanel.UI
+namespace DPSPanel.Common.Systems
 {
     public class PlayerHeadFlipSystem : ModSystem
     {
@@ -56,6 +56,7 @@ namespace DPSPanel.UI
             }
             catch (Exception e)
             {
+                Log.Info("Error in IL_MapHeadRenderer_DrawPlayerHead: " + e.Message);
                 // oop!
                 // MonoModHooks.DumpIL(ModContent.GetInstance<XGWorld>(), il);
             }

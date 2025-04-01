@@ -14,6 +14,10 @@ namespace DPSPanel.Common.Configs
         [DefaultValue(true)]
         public bool TrackAllEntities { get; set; } = true;
 
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(true)]
+        public bool TrackUnknownDamage { get; set; } = true;
+
         [Header("PanelSettings")]
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
@@ -22,10 +26,6 @@ namespace DPSPanel.Common.Configs
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
         public bool ShowBossIcon { get; set; } = true;
-
-        [BackgroundColor(192, 54, 64)] // Calamity Red
-        [DefaultValue(true)]
-        public bool ShowOnlyWhenInventoryOpen { get; set; } = true;
 
         [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]

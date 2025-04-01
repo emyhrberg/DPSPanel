@@ -7,6 +7,7 @@ using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.Common.DamageCalculation
 {
@@ -377,11 +378,18 @@ namespace DPSPanel.Common.DamageCalculation
             // If your GlobalProjectile stored the original weapon:
             GlobalProj gProj = proj.GetGlobalProjectile<GlobalProj>();
             int weaponID = -1;
-            string weaponName = "UnknownProj";
+            string weaponName = "Unknown";
             if (gProj != null && gProj.sourceWeapon != null)
             {
                 weaponID = gProj.sourceWeapon.type;
                 weaponName = gProj.sourceWeapon.Name;
+            }
+
+            // Config option to ignore unknown projectiles
+            if (weaponName == "Unknown" && !Conf.C.TrackUnknownDamage)
+            {
+                Log.Info("[MP] Ignoring unknown projectile damage from proj: " + proj.Name);
+                return;
             }
 
             TrackBossDamage(weaponID, weaponName, damageDone, target);
