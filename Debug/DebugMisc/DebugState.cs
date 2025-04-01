@@ -1,6 +1,6 @@
 using Terraria.UI;
 
-namespace DPSPanel.Debug
+namespace DPSPanel.Debug.DebugMisc
 {
     public class DebugState : UIState
     {

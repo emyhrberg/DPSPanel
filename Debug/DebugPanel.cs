@@ -3,12 +3,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DPSPanel.DebugActions;
+using DPSPanel.Debug.DebugActions;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
 using log4net;
 using log4net.Appender;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
@@ -177,6 +178,8 @@ namespace DPSPanel.Debug
         }
         public override void Update(GameTime gameTime)
         {
+
+
             if (ContainsPoint(Main.MouseScreen))
             {
                 Main.LocalPlayer.mouseInterface = true; // disable item use on clicking this panel
@@ -192,6 +195,26 @@ namespace DPSPanel.Debug
             return;
 
         }
+        #endregion
+
+        #region Right click hide
+        private bool Active = true;
+        public override void RightClick(UIMouseEvent evt)
+        {
+            // base.RightClick(evt);
+            Active = !Active;
+        }
+
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            if (!Active)
+            {
+                return;
+            }
+
+            base.Draw(spriteBatch);
+        }
+
         #endregion
     }
 }

@@ -16,7 +16,7 @@ namespace DPSPanel.Common.DamageCalculation
         public class BossFight
         {
             public int currentLife;
-            public int bossId;
+            public int whoAmI;
             public int initialLife;
             public string bossName;
             public int damageTaken;
@@ -129,13 +129,6 @@ namespace DPSPanel.Common.DamageCalculation
             // Check once per second
             if (Main.time % 60 == 0)
             {
-                // 1) If there's an active fight and the boss is no longer alive or present, stop tracking
-                if (fight != null && !Main.npc.Any(npc => npc.active && npc.boss && npc.FullName == fight.bossName))
-                {
-                    // Log.Info($"Boss {fight.bossName} was killed or despawned!");
-                    fight = null; // stop tracking
-                }
-
                 // 2) If no fight exists, check for an active boss to start tracking
                 if (fight == null)
                 {
@@ -144,6 +137,16 @@ namespace DPSPanel.Common.DamageCalculation
                     for (int i = 0; i < Main.npc.Length; i++)
                     {
                         NPC npc = Main.npc[i];
+
+                        // Detect worm bosses (e.g., Eater of Worlds, Destroyer)
+                        if (npc.active && npc.type == NPCID.EaterofWorldsHead)
+                        {
+                            detectedBoss = npc;
+                            Log.Info("Eater of Worlds detected with real life and whoAmI: " + npc.whoAmI + ", " + npc.realLife);
+                            break; // Found a valid boss, no need to check further
+                        }
+
+                        // Detect regular non-worm bosses.
                         if (IsValidBoss(npc) && npc.life > 0)
                         {
                             detectedBoss = npc;
@@ -273,11 +276,11 @@ namespace DPSPanel.Common.DamageCalculation
             if (fight != null && !npc.friendly)
             {
                 // If not tracking all entities and the NPC is not the boss, return
-                if (!c.TrackAllEntities && !(npc.boss && npc.FullName == fight.bossName))
+                if (!c.TrackAllEntities && !(npc.boss && npc.whoAmI == fight.whoAmI))
                     return;
 
                 // If the NPC is the actual boss.
-                if (npc.boss && npc.FullName == fight.bossName)
+                if (npc.whoAmI == fight.whoAmI)
                 {
                     // If the boss died, handle final blow then end fight
                     Weapon currentWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
@@ -308,7 +311,7 @@ namespace DPSPanel.Common.DamageCalculation
             {
                 fight = new BossFight
                 {
-                    // bossId = fightId,
+                    whoAmI = npc.whoAmI,
                     currentLife = npc.life,
                     initialLife = npc.lifeMax,
                     bossName = npc.FullName,
@@ -316,13 +319,9 @@ namespace DPSPanel.Common.DamageCalculation
                     weapons = [],
                     isAlive = true
                 };
-                // Log.info("New boss fight created: " + fight.bossName);
-
                 var sys = ModContent.GetInstance<MainSystem>();
                 sys.state.container.panel.ClearPanelAndAllItems();
                 sys.state.container.panel.SetBossTitle(npc.FullName, npc.whoAmI, npc.GetBossHeadTextureIndex());
-                // Log.Info("Boss fight created: " + fight.bossName);
-                // sys.state.container.bossIcon.UpdateBossIcon(npc);
             }
         }
 

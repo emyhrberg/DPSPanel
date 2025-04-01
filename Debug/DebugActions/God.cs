@@ -2,7 +2,7 @@ using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace DPSPanel.DebugActions
+namespace DPSPanel.Debug.DebugActions
 {
     public class God : ModPlayer
     {

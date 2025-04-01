@@ -1,4 +1,4 @@
-namespace DPSPanel.Debug
+namespace DPSPanel.Debug.DebugMisc
 {
     public static class DebugConfig
     {

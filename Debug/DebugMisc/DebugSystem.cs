@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 
 
-namespace DPSPanel.Debug
+namespace DPSPanel.Debug.DebugMisc
 {
     [Autoload(Side = ModSide.Client)]
     public class DebugSystem : ModSystem

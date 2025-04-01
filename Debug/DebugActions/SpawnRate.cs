@@ -1,7 +1,7 @@
 using Terraria;
 using Terraria.ModLoader;
 
-namespace DPSPanel.DebugActions
+namespace DPSPanel.Debug.DebugActions
 {
     public class SpawnRateNPC : GlobalNPC
     {
