@@ -1,5 +1,5 @@
 using System.IO;
-using DPSPanel.Core.Networking;
+using DPSPanel.Networking;
 using Terraria.ModLoader;
 
 namespace DPSPanel

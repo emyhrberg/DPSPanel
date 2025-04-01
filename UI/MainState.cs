@@ -14,9 +14,7 @@ namespace DPSPanel.UI
             container = new MainContainer();
             Append(container);
 
-            Log.Info("MainState initialized!");
-
-
+            // Log.Info("MainState initialized!");
         }
     }
 }

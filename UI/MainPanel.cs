@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DPSPanel.Core.Configs;
-using DPSPanel.Core.DamageCalculation;
+using DPSPanel.Common.Configs;
+using DPSPanel.Common.DamageCalculation;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -100,11 +100,11 @@ namespace DPSPanel.UI
         // Updated UpdatePlayerBars function in MainPanel.cs
         public void UpdatePlayerBars(string playerName, int playerDamage, int playerWhoAmI, List<Weapon> weapons)
         {
-            // Log.Info($"[MainPanel.UpdatePlayerBars] Called for player '{playerName}' (ID: {playerWhoAmI}): Damage={playerDamage}, WeaponsCount={weapons?.Count ?? 0}");
+            // // Log.Info($"[MainPanel.UpdatePlayerBars] Called for player '{playerName}' (ID: {playerWhoAmI}): Damage={playerDamage}, WeaponsCount={weapons?.Count ?? 0}");
 
             if (!playerBars.ContainsKey(playerWhoAmI))
             {
-                // Log.Info($"[MainPanel.UpdatePlayerBars] No PlayerBar for '{playerName}' (ID: {playerWhoAmI}) found. Creating one.");
+                // // Log.Info($"[MainPanel.UpdatePlayerBars] No PlayerBar for '{playerName}' (ID: {playerWhoAmI}) found. Creating one.");
                 CreatePlayerBar(playerName, playerWhoAmI);
             }
 
@@ -159,7 +159,7 @@ namespace DPSPanel.UI
                 WeaponBar bar = new WeaponBar(currentYOffset);
                 Append(bar);
                 weaponBars[barName] = bar;
-                Log.Info($"Creating weapon bar for {barName}");
+                // Log.Info($"Creating weapon bar for {barName}");
             }
         }
 

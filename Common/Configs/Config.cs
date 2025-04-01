@@ -1,9 +1,8 @@
 ﻿using System.ComponentModel;
-using DPSPanel.UI;
 using Terraria.ModLoader;
 using Terraria.ModLoader.Config;
 
-namespace DPSPanel.Core.Configs
+namespace DPSPanel.Common.Configs
 {
     public class Config : ModConfig
     {
@@ -42,6 +41,13 @@ namespace DPSPanel.Core.Configs
             if (c == null) return;
 
             // update stuff after config changes
+        }
+
+        public static class Conf
+        {
+            // C = instance
+            // Example usage: Conf.C.ShowPlayerIcons...
+            public static Config C => ModContent.GetInstance<Config>();
         }
     }
 }

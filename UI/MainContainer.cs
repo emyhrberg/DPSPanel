@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using DPSPanel.Core.Configs;
+using DPSPanel.Common.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
@@ -104,7 +104,7 @@ namespace DPSPanel.UI
             // Main.LocalPlayer.mouseInterface = true;
 
             // log state of clickstartinsidepanel
-            // Log.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
+            // // Log.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
 
             if (dragging)
             {

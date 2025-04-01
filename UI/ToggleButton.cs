@@ -1,4 +1,4 @@
-﻿using DPSPanel.Core.Configs;
+﻿using DPSPanel.Common.Configs;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

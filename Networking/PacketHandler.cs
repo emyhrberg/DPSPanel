@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using System.IO;
-using DPSPanel.Core.DamageCalculation;
-using DPSPanel.Helpers;
+using DPSPanel.Common.DamageCalculation;
 using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Core.Networking
+namespace DPSPanel.Networking
 {
     /// <summary>
     /// This class handles receiving packets from the server and clients.
@@ -19,7 +18,6 @@ namespace DPSPanel.Core.Networking
         public enum PacketType
         {
             FightPacket,
-            OnConsumeItemPacket
         }
 
         public static void Handle(BinaryReader reader)

@@ -1,12 +1,10 @@
-using System.Linq;
-using DPSPanel.Core.DamageCalculation;
-using DPSPanel.Helpers;
+using DPSPanel.Common.DamageCalculation;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
-using static DPSPanel.Core.Networking.PacketHandler;
+using static DPSPanel.Networking.PacketHandler;
 
-namespace DPSPanel.Core.Networking
+namespace DPSPanel.Networking
 {
     public static class PacketSender
     {
@@ -48,7 +46,7 @@ namespace DPSPanel.Core.Networking
                 fightPacket.Write(weapon.damage);
             }
 
-            // Log.Info($"[PacketSender.cs] Sent boss fight packet with {fight.players.Count} players. Boss: {fight.bossName}, DamageTaken: {fight.damageTaken}");
+            // // Log.Info($"[PacketSender.cs] Sent boss fight packet with {fight.players.Count} players. Boss: {fight.bossName}, DamageTaken: {fight.damageTaken}");
             fightPacket.Send(); // Broadcast the packet
         }
     }

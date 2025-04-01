@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using DPSPanel.Core.Configs;
-using DPSPanel.Core.DamageCalculation;
+using DPSPanel.Common.Configs;
+using DPSPanel.Common.DamageCalculation;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -88,7 +88,7 @@ namespace DPSPanel.UI
                 Config c = ModContent.GetInstance<Config>();
                 bool showOnHover = c.ShowWeaponsDuringBossFight;
                 bool isBossAlive = sys.state.container.panel.CurrentBossAlive;
-                // Log.Info("ShowOnHover: " + showOnHover + " IsBossAlive: " + isBossAlive);
+                // // Log.Info("ShowOnHover: " + showOnHover + " IsBossAlive: " + isBossAlive);
 
                 if (!showOnHover && isBossAlive)
                 {

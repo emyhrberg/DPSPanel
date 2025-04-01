@@ -20,5 +20,14 @@ namespace DPSPanel.Helpers
         {
             ModInstance.Logger.Error(message);
         }
+
+        public static void SlowInfo(string message, float delay = 0.5f)
+        {
+            if (TimeHelper.ToSeconds(delay).TotalSeconds > 0.5f)
+            {
+                ModInstance.Logger.Info($"[SlowInfo] {message}");
+                return;
+            }
+        }
     }
 }

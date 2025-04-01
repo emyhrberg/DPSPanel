@@ -35,7 +35,7 @@ namespace DPSPanel.UI
             }
             else
             {
-                Log.Info($"Invalid boss index {_bossHeadID}");
+                // Log.Info($"Invalid boss index {_bossHeadID}");
             }
         }
 
