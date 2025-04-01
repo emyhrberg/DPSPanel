@@ -4,6 +4,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
 
+
 namespace DPSPanel.Debug
 {
     [Autoload(Side = ModSide.Client)]
@@ -15,6 +16,11 @@ namespace DPSPanel.Debug
 
         public override void OnWorldLoad()
         {
+            if (!DebugConfig.DEBUG_PANEL)
+            {
+                return;
+            }
+
             state = new DebugState();
             ui = new UserInterface();
 
@@ -24,11 +30,21 @@ namespace DPSPanel.Debug
 
         public override void UpdateUI(GameTime gameTime)
         {
+            if (!DebugConfig.DEBUG_PANEL)
+            {
+                return;
+            }
+
             ui?.Update(gameTime);
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
+            if (!DebugConfig.DEBUG_PANEL)
+            {
+                return;
+            }
+
             int mouseTextIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Mouse Text"));
             if (mouseTextIndex != -1)
             {

@@ -35,6 +35,10 @@ namespace DPSPanel.Common.Configs
         [DefaultValue(true)]
         public bool ShowWeaponsDuringBossFight { get; set; } = true;
 
+        [BackgroundColor(192, 54, 64)] // Calamity Red
+        [DefaultValue(true)]
+        public bool MakePanelDraggable { get; set; } = true;
+
         public override void OnChanged()
         {
             Config c = ModContent.GetInstance<Config>();

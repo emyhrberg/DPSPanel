@@ -50,7 +50,11 @@ namespace DPSPanel.UI
             CurrentBossWhoAmI = bossWhoAmI;
             CurrentBossID = bossID;
             CurrentBossName = bossName;
-            UIText bossTitle = new(bossName, 1.0f);
+
+            // Change the text size based on the boss name length.
+            float textSize = bossName.Length > 14 ? 0.75f : 1.0f;
+
+            UIText bossTitle = new(bossName, textSize);
             bossTitle.HAlign = 0.52f;
             bossTitle.Top.Set(6f, 0f);
             Append(bossTitle);

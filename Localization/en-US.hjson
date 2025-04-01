@@ -26,17 +26,22 @@ Mods: {
 
 				ShowOnlyWhenInventoryOpen: {
 					Label: "[i:DeerclopsPetItem] Show Only When Inventory Open"
-					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it\nYou can also right click the toggle button to toggle this option.
+					Tooltip: Show only the toggle button when the player inventory is open, otherwise hide it\nAlso right click the toggle button to toggle this option.
 				}
 
 				ShowHighlightButtonWhenHovering: {
 					Label: "[i:LivingIchorBlock] Show Highlight Button When Hovering"
-					Tooltip: You can disable this if you find the button highlighting to interfere with boss fights
+					Tooltip: Disable this if you find the button highlighting to interfere with boss fights
 				}
 
 				ShowWeaponsDuringBossFight: {
 					Label: "[i:LivingFrostFireBlock] Show Weapons Panel During Boss Fight"
-					Tooltip: You can disable this if you find the weapons panel to interfere with boss fights
+					Tooltip: Disable this if you find the weapons panel to interfere with boss fights
+				}
+
+				MakePanelDraggable: {
+					Tooltip: If you want to place the panel at a permanent position, uncheck this option
+					Label: "[i:5126] Make Panel Draggable"
 				}
 			}
 		}

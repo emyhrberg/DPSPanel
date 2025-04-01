@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
-using DPSPanel.Common.Configs;
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.ModLoader;
 using Terraria.UI;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
@@ -49,6 +48,12 @@ namespace DPSPanel.UI
         public override void LeftMouseDown(UIMouseEvent evt)
         {
             base.LeftMouseDown(evt);
+
+            if (!Conf.C.MakePanelDraggable)
+            {
+                return;
+            }
+
             if (ContainsPoint(evt.MousePosition))
             {
                 clickStartInsidePanel = true;

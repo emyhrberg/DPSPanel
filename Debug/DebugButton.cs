@@ -10,7 +10,7 @@ namespace DPSPanel.Debug
 {
     public class DebugButton : UIText
     {
-        private Action onClick;
+        private readonly Action onClick;
 
         public DebugButton(string text, Action action = null) : base(text)
         {
@@ -42,11 +42,6 @@ namespace DPSPanel.Debug
 
         public override void Update(GameTime gameTime)
         {
-            if (IsMouseHovering)
-            {
-                Main.LocalPlayer.mouseInterface = true; // Prevents other UI elements from being used
-            }
-
             base.Update(gameTime);
         }
 

@@ -1,0 +1,2 @@
+[0.4.1]
+- Fixed issue where weapon calculation where previous minions and sentries spawned would only count towards the newest damage source.

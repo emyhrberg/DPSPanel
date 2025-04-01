@@ -34,18 +34,26 @@ namespace DPSPanel.Debug
             HAlign = 0.02f; // bottom left corner
 
             // Add action texts
-            AddButton("Helper", () => Main.NewText("Info: This is a helper panel with some debug options."));
             AddButton("Open Config", OpenConfig);
-            AddButton("Clear", ClearPlayers);
+            AddButton("Clear Panel", ClearPlayers);
             AddButton("Add Player", AddPlayer);
             AddButton("God", ToggleGod);
             AddButton("Disable enemy spawn", ToggleEnemySpawns);
             AddButton("Open client log", OpenClientLog);
             AddButton("Clear client log", ClearClientLog);
             AddButton("Spawn King Slime", SpawnKingSlimeSP);
+            AddButton("Set Spawn Point", SetSpawnPoint);
         }
 
         #region Actions
+
+        private void SetSpawnPoint()
+        {
+            // Set spawn point to the current position of the player
+            Main.spawnTileX = (int)(Main.LocalPlayer.position.X / 16f);
+            Main.spawnTileY = (int)(Main.LocalPlayer.position.Y / 16f);
+            Main.NewText("Spawn point set to current position.");
+        }
 
         private void ClearClientLog()
         {
