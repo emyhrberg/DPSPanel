@@ -12,7 +12,7 @@ namespace DPSPanel.Networking
         /// Sends a packet containing the player’s damage info to the server.
         /// </summary>
         /// <param name="fight">The fight context containing damage and boss info.</param>
-        public static void SendPlayerDamagePacket(BossDamageTrackerMP.BossFight fight)
+        public static void SendPlayerDamagePacket(BossDamageTrackerMP.NormalBossFightMP fight)
         {
             if (Main.netMode != NetmodeID.MultiplayerClient) // Only send from clients
                 return;
@@ -48,6 +48,79 @@ namespace DPSPanel.Networking
 
             // // Log.Info($"[PacketSender.cs] Sent boss fight packet with {fight.players.Count} players. Boss: {fight.bossName}, DamageTaken: {fight.damageTaken}");
             fightPacket.Send(); // Broadcast the packet
+        }
+
+        public static void SendPlayerDamagePacket(BossDamageTrackerMP.WormBossFightMP fight)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
+            ModPacket fightPacket = ModContent.GetInstance<DPSPanel>().GetPacket();
+            fightPacket.Write((byte)PacketType.FightPacketWorm);
+
+            // Write worm-specific fields
+            fightPacket.Write(fight.isAlive);
+            fightPacket.Write(fight.headIndex);
+            fightPacket.Write(fight.bossName);
+            fightPacket.Write(fight.bossHeadId);
+            fightPacket.Write(fight.damageTaken);
+            fightPacket.Write(fight.totalLife);
+            fightPacket.Write(fight.totalLifeMax);
+
+            // Then the players & weapons
+            fightPacket.Write(fight.players.Count);
+            foreach (var player in fight.players)
+            {
+                fightPacket.Write(player.playerName);
+                fightPacket.Write(player.playerDamage);
+                fightPacket.Write(player.playerWhoAmI);
+            }
+
+            fightPacket.Write(fight.weapons.Count);
+            foreach (var weapon in fight.weapons)
+            {
+                fightPacket.Write(weapon.weaponName);
+                fightPacket.Write(weapon.weaponItemID);
+                fightPacket.Write(weapon.damage);
+            }
+
+            fightPacket.Send();
+        }
+
+        public static void SendPlayerDamagePacket(BossDamageTrackerMP.EoWFightMP fight)
+        {
+            if (Main.netMode != NetmodeID.MultiplayerClient)
+                return;
+
+            ModPacket fightPacket = ModContent.GetInstance<DPSPanel>().GetPacket();
+            fightPacket.Write((byte)PacketType.FightPacketEoW);
+
+            // Write EoW-specific fields
+            fightPacket.Write(fight.isAlive);
+            fightPacket.Write(fight.bossName);
+            fightPacket.Write(fight.bossHeadId);
+            fightPacket.Write(fight.damageTaken);
+            fightPacket.Write(fight.totalLife);
+            fightPacket.Write(fight.totalLifeMax);
+
+            // Then write player damage, weapons, etc., just like with NormalBossFightMP:
+            fightPacket.Write(fight.players.Count);
+            foreach (var player in fight.players)
+            {
+                fightPacket.Write(player.playerName);
+                fightPacket.Write(player.playerDamage);
+                fightPacket.Write(player.playerWhoAmI);
+            }
+
+            fightPacket.Write(fight.weapons.Count);
+            foreach (var weapon in fight.weapons)
+            {
+                fightPacket.Write(weapon.weaponName);
+                fightPacket.Write(weapon.weaponItemID);
+                fightPacket.Write(weapon.damage);
+            }
+
+            fightPacket.Send();
         }
     }
 }

@@ -32,7 +32,7 @@ namespace DPSPanel.Common.DamageCalculation
                 {
                     var newWeapon = new Weapon(weaponID, weaponName, damageDone);
                     weapons.Add(newWeapon);
-                    // We create the weapon bar once
+                    // Create the weapon bar once
                     ModContent.GetInstance<MainSystem>().state.container.panel.CreateWeaponBarSP(weaponName);
                 }
                 else
@@ -55,7 +55,7 @@ namespace DPSPanel.Common.DamageCalculation
         /// <summary>
         /// Represents an Eater of Worlds fight, which is multi‐segment.
         /// We do not store whoAmI, because the worm has multiple NPCs.
-        /// Instead, we sum them up each time.
+        /// Instead, we sum them up each time from the known EoW segment types.
         /// </summary>
         public class EoWFight
         {
@@ -63,7 +63,7 @@ namespace DPSPanel.Common.DamageCalculation
             public int totalLife;       // Current sum of all EoW segments
             public int totalLifeMax;    // Max sum of all EoW segments
 
-            public List<Weapon> weapons = [];
+            public List<Weapon> weapons = new List<Weapon>();
 
             public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
             {
@@ -72,7 +72,53 @@ namespace DPSPanel.Common.DamageCalculation
                 {
                     var newWeapon = new Weapon(weaponID, weaponName, damageDone);
                     weapons.Add(newWeapon);
-                    // Create UI element for this new weapon
+                    ModContent.GetInstance<MainSystem>().state.container.panel.CreateWeaponBarSP(weaponName);
+                }
+                else
+                {
+                    existing.damage += damageDone;
+                }
+            }
+
+            public void SendBossFightToPanel()
+            {
+                weapons = weapons.OrderByDescending(w => w.damage).ToList();
+                ModContent.GetInstance<MainSystem>()
+                          .state
+                          .container
+                          .panel
+                          .UpdateAllWeaponBarsSP(weapons);
+            }
+        }
+
+        /// <summary>
+        /// Represents a general multi‐segment worm‐like boss fight (e.g., The Destroyer),
+        /// tracked by realLife. The "headIndex" is the whoAmI of the head segment.
+        /// </summary>
+        public class WormBossFight
+        {
+            public int headIndex;     // NPC.whoAmI of the worm's head
+            public string bossName;   // The name of the worm boss (e.g., "The Destroyer")
+
+            public int totalLife;
+            public int totalLifeMax;
+            public int damageTaken;
+
+            public List<Weapon> weapons = new List<Weapon>();
+
+            public WormBossFight(int headIndex, string bossName)
+            {
+                this.headIndex = headIndex;
+                this.bossName = bossName;
+            }
+
+            public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
+            {
+                Weapon existing = weapons.FirstOrDefault(w => w.weaponName == weaponName);
+                if (existing == null)
+                {
+                    var newWeapon = new Weapon(weaponID, weaponName, damageDone);
+                    weapons.Add(newWeapon);
                     ModContent.GetInstance<MainSystem>().state.container.panel.CreateWeaponBarSP(weaponName);
                 }
                 else
@@ -97,7 +143,8 @@ namespace DPSPanel.Common.DamageCalculation
         #region Fields
 
         private NormalBossFight normalFight;  // For single‐NPC bosses
-        private EoWFight eaterFight;          // For Eater of Worlds
+        private EoWFight eaterFight;          // For the Eater of Worlds specifically
+        private WormBossFight wormFight;      // For all other worm‐like bosses (e.g., The Destroyer)
 
         #endregion
 
@@ -112,8 +159,9 @@ namespace DPSPanel.Common.DamageCalculation
             // Check once per second
             if (Main.time % 60 == 0)
             {
-                bool eaterFound = false; // Did we find at least one EoW segment?
-                bool normalBossFound = false; // Did we find a normal boss that we want to track?
+                bool eaterFound = false;        // Did we find any EoW segment?
+                bool otherWormFound = false;    // Did we find a worm that's NOT EoW?
+                bool normalBossFound = false;   // Did we find a normal single‐NPC boss?
 
                 for (int i = 0; i < Main.npc.Length; i++)
                 {
@@ -121,17 +169,12 @@ namespace DPSPanel.Common.DamageCalculation
                     if (!npc.active)
                         continue;
 
-                    // 1) Check if this is a normal (single‐NPC) boss 
-                    //    (not the EoW segments)
-                    if (npc.boss
-                        && npc.type != NPCID.EaterofWorldsHead
-                        && npc.type != NPCID.EaterofWorldsBody
-                        && npc.type != NPCID.EaterofWorldsTail)
+                    // 1) Normal single‐NPC boss (boss && realLife == -1).
+                    //    EoW and other worms typically have realLife != -1
+                    //    so this excludes them.
+                    if (npc.boss && npc.realLife == -1)
                     {
                         normalBossFound = true;
-
-                        // If we don't already have a normalFight,
-                        // create one now for this boss.
                         if (normalFight == null)
                         {
                             normalFight = new NormalBossFight
@@ -153,17 +196,15 @@ namespace DPSPanel.Common.DamageCalculation
                         }
                     }
 
-                    // 2) Check if this is an Eater of Worlds segment
-                    bool isEaterSegment =
+                    // 2) Check EoW specifically by type:
+                    bool isEoWSegment =
                         npc.type == NPCID.EaterofWorldsHead ||
                         npc.type == NPCID.EaterofWorldsBody ||
                         npc.type == NPCID.EaterofWorldsTail;
 
-                    if (isEaterSegment)
+                    if (isEoWSegment)
                     {
                         eaterFound = true;
-
-                        // If we don't already have an eaterFight, create one
                         if (eaterFight == null)
                         {
                             eaterFight = new EoWFight
@@ -173,18 +214,62 @@ namespace DPSPanel.Common.DamageCalculation
                                 totalLifeMax = 0
                             };
 
+                            // Minimal logging
+                            Mod.Logger.Info(
+                                $"[DPSPanel] Detected EoW segment: FullName={npc.FullName}, " +
+                                $"whoAmI={npc.whoAmI}, realLife={npc.realLife}"
+                            );
+
                             var sys = ModContent.GetInstance<MainSystem>();
                             sys.state.container.panel.ClearPanelAndAllItems();
+                            // We can just name it "Eater of Worlds" or npc.FullName
                             sys.state.container.panel.SetBossTitle(
                                 "Eater of Worlds",
-                                -1, // no single whoAmI for the worm
+                                -1,
                                 npc.GetBossHeadTextureIndex()
                             );
                         }
                     }
+                    // 3) Check if realLife != -1 for "other worm" logic (e.g., The Destroyer).
+                    //    But skip EoW since that's already handled by the check above.
+                    else if (npc.realLife != -1)
+                    {
+                        NPC headNpc = Main.npc[npc.realLife];
+                        // If the head is a boss and it's not EoW, let's treat it as a worm boss
+                        if (headNpc.boss && !IsEaterOfWorlds(headNpc.type))
+                        {
+                            otherWormFound = true;
+
+                            // Create a general wormFight if none exists
+                            if (wormFight == null)
+                            {
+                                wormFight = new WormBossFight(npc.realLife, headNpc.FullName)
+                                {
+                                    damageTaken = 0,
+                                    totalLife = 0,
+                                    totalLifeMax = 0
+                                };
+
+                                // Minimal logging
+                                Mod.Logger.Info(
+                                    $"[DPSPanel] Detected worm-like boss segment: FullName={npc.FullName}, " +
+                                    $"whoAmI={npc.whoAmI}, realLife={npc.realLife}. " +
+                                    $"Head = {headNpc.FullName} (whoAmI={headNpc.whoAmI})"
+                                );
+
+                                var sys = ModContent.GetInstance<MainSystem>();
+                                sys.state.container.panel.ClearPanelAndAllItems();
+                                sys.state.container.panel.SetBossTitle(
+                                    headNpc.FullName,
+                                    -1, // no single whoAmI for the entire worm
+                                    headNpc.GetBossHeadTextureIndex()
+                                );
+                            }
+                        }
+                    }
                 }
 
-                // If we had a normalFight, but the boss is actually gone now, check that
+                // NORMAL BOSS cleanup
                 if (!normalBossFound && normalFight != null)
                 {
                     // That means the normal boss is dead or despawned
@@ -193,51 +278,73 @@ namespace DPSPanel.Common.DamageCalculation
                 }
                 else if (normalFight != null)
                 {
-                    // If the normalFight is active, update currentLife from the NPC
+                    // If the boss is still active, update life
                     NPC bossNpc = Main.npc[normalFight.whoAmI];
                     if (!bossNpc.active || bossNpc.life <= 0)
                     {
-                        // Boss died
                         normalFight.SendBossFightToPanel();
                         normalFight = null;
                     }
                     else
                     {
-                        // Just refresh currentLife in case it’s changed
                         normalFight.currentLife = bossNpc.life;
                     }
                 }
 
-                // If we had an eaterFight, but no segments are found, that means EoW is gone
+                // EATER OF WORLDS cleanup
                 if (!eaterFound && eaterFight != null)
                 {
                     eaterFight.SendBossFightToPanel();
                     eaterFight = null;
                 }
-                // If we still have an eaterFight and found segments, recalc total life
                 else if (eaterFound && eaterFight != null)
                 {
-                    RecalculateWormLife();
-                    // If totalLife is 0, the worm is effectively dead
+                    RecalculateEoWLife();
                     if (eaterFight.totalLife <= 0)
                     {
                         eaterFight.SendBossFightToPanel();
                         eaterFight = null;
                     }
                 }
+
+                // OTHER WORM cleanup
+                if (!otherWormFound && wormFight != null)
+                {
+                    wormFight.SendBossFightToPanel();
+                    wormFight = null;
+                }
+                else if (otherWormFound && wormFight != null)
+                {
+                    RecalculateWormLife();
+                    if (wormFight.totalLife <= 0)
+                    {
+                        wormFight.SendBossFightToPanel();
+                        wormFight = null;
+                    }
+                }
             }
         }
 
         /// <summary>
-        /// Recalculate total EoW life by summing active segments.
+        /// Helper: Check if an npcType corresponds to Eater of Worlds segments.
         /// </summary>
-        private void RecalculateWormLife()
+        private bool IsEaterOfWorlds(int npcType)
+        {
+            return (npcType == NPCID.EaterofWorldsHead ||
+                    npcType == NPCID.EaterofWorldsBody ||
+                    npcType == NPCID.EaterofWorldsTail);
+        }
+
+        /// <summary>
+        /// Sums up the active life of all EoW segments.
+        /// </summary>
+        private void RecalculateEoWLife()
         {
             if (eaterFight == null)
                 return;
 
-            int totalLife = 0;
-            int totalLifeMax = 0;
+            int total = 0;
+            int totalMax = 0;
 
             for (int i = 0; i < Main.npc.Length; i++)
             {
@@ -245,20 +352,45 @@ namespace DPSPanel.Common.DamageCalculation
                 if (!npc.active)
                     continue;
 
-                bool isEaterSegment =
-                    npc.type == NPCID.EaterofWorldsHead ||
-                    npc.type == NPCID.EaterofWorldsBody ||
-                    npc.type == NPCID.EaterofWorldsTail;
-
-                if (isEaterSegment)
+                if (IsEaterOfWorlds(npc.type))
                 {
-                    totalLife += npc.life;
-                    totalLifeMax += npc.lifeMax;
+                    total += npc.life;
+                    totalMax += npc.lifeMax;
                 }
             }
 
-            eaterFight.totalLife = totalLife;
-            eaterFight.totalLifeMax = totalLifeMax;
+            eaterFight.totalLife = total;
+            eaterFight.totalLifeMax = totalMax;
+        }
+
+        /// <summary>
+        /// Sums up the active life of all worm segments sharing the wormFight.headIndex.
+        /// </summary>
+        private void RecalculateWormLife()
+        {
+            if (wormFight == null)
+                return;
+
+            int total = 0;
+            int totalMax = 0;
+            int headIndex = wormFight.headIndex;
+
+            for (int i = 0; i < Main.npc.Length; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active)
+                    continue;
+
+                // All segments that belong to the same worm have npc.realLife == headIndex
+                if (npc.realLife == headIndex)
+                {
+                    total += npc.life;
+                    totalMax += npc.lifeMax;
+                }
+            }
+
+            wormFight.totalLife = total;
+            wormFight.totalLifeMax = totalMax;
         }
 
         /// <summary>
@@ -302,20 +434,17 @@ namespace DPSPanel.Common.DamageCalculation
 
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
-            Config c = ModContent.GetInstance<Config>();
-            // If we are not supposed to track all entities, and there's no active boss fight, just return
-            bool anyFightActive = (normalFight != null || eaterFight != null);
+            // Only track if a fight is active
+            bool anyFightActive = (normalFight != null || eaterFight != null || wormFight != null);
             if (!anyFightActive)
                 return;
 
-            // 1) If we have a normalFight, is this NPC the boss for that fight?
+            // 1) Is this NPC the single‐NPC boss we’re tracking?
             if (normalFight != null && npc.whoAmI == normalFight.whoAmI)
             {
-                // Update the weapon damage
                 normalFight.UpdateWeapon(weaponID, weaponName, damageDone);
                 normalFight.damageTaken += damageDone;
 
-                // If the boss died from this hit
                 if (npc.life <= 0)
                 {
                     normalFight.SendBossFightToPanel();
@@ -325,36 +454,40 @@ namespace DPSPanel.Common.DamageCalculation
                 {
                     normalFight.currentLife = npc.life;
                 }
-
-                // Update UI
                 normalFight?.SendBossFightToPanel();
             }
-            // 2) If we have an eaterFight, is this NPC an EoW segment?
-            else if (eaterFight != null)
+            // 2) Is this an EoW segment?
+            else if (eaterFight != null && IsEaterOfWorlds(npc.type))
             {
-                bool isEoWSegment =
-                    npc.type == NPCID.EaterofWorldsHead ||
-                    npc.type == NPCID.EaterofWorldsBody ||
-                    npc.type == NPCID.EaterofWorldsTail;
+                eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                eaterFight.damageTaken += damageDone;
 
-                if (isEoWSegment)
+                RecalculateEoWLife();
+                if (eaterFight.totalLife <= 0)
                 {
-                    eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                    eaterFight.damageTaken += damageDone;
+                    eaterFight.SendBossFightToPanel();
+                    eaterFight = null;
+                }
+                else
+                {
+                    eaterFight.SendBossFightToPanel();
+                }
+            }
+            // 3) Is this part of another worm‐like boss?
+            else if (wormFight != null && npc.realLife == wormFight.headIndex)
+            {
+                wormFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                wormFight.damageTaken += damageDone;
 
-                    // After hitting a segment, recalc total HP
-                    RecalculateWormLife();
-                    if (eaterFight.totalLife <= 0)
-                    {
-                        // The worm is fully dead
-                        eaterFight.SendBossFightToPanel();
-                        eaterFight = null;
-                    }
-                    else
-                    {
-                        // Keep tracking
-                        eaterFight.SendBossFightToPanel();
-                    }
+                RecalculateWormLife();
+                if (wormFight.totalLife <= 0)
+                {
+                    wormFight.SendBossFightToPanel();
+                    wormFight = null;
+                }
+                else
+                {
+                    wormFight.SendBossFightToPanel();
                 }
             }
         }

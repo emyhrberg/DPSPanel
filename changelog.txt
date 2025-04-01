@@ -1,2 +1,4 @@
-[0.4.1]
-- Fixed issue where weapon calculation where previous minions and sentries spawned would only count towards the newest damage source.
+(v0.5)
+- Fixed damage calculation issue where old instances of weapons (e.g minions) would only count towards the newest damage source instead of its own.
+- Fixed issue where Eater of Worlds was not tracked properly.
+- Fixed issue where other worm bosses were not tracked properly (e.g The Destroyer).
