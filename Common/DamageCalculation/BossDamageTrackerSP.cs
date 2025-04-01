@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Common.Configs;
-using DPSPanel.Helpers;
 using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;
@@ -13,342 +11,354 @@ namespace DPSPanel.Common.DamageCalculation
     public class BossDamageTrackerSP : ModPlayer
     {
         #region Classes
-        public class BossFight
+
+        /// <summary>
+        /// Represents a normal single‐NPC boss fight (e.g., Eye of Cthulhu, Skeletron, etc.).
+        /// </summary>
+        public class NormalBossFight
         {
+            public int whoAmI;        // NPC index of the boss
+            public string bossName;   // e.g., "Eye of Cthulhu"
             public int currentLife;
-            public int whoAmI;
             public int initialLife;
-            public string bossName;
             public int damageTaken;
-            public bool isAlive = false;
-            public List<Weapon> weapons = [];
+
+            public List<Weapon> weapons = new List<Weapon>();
 
             public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
             {
-                // Check if the weapon already exists
-                Weapon weapon = weapons.FirstOrDefault(w => w.weaponName == weaponName);
-                if (weapon == null)
+                Weapon existing = weapons.FirstOrDefault(w => w.weaponName == weaponName);
+                if (existing == null)
                 {
-                    // Check if we already reach max cap of weapons
-                    Config c = ModContent.GetInstance<Config>();
-
-                    // Add a new weapon to the fight
-                    weapon = new Weapon(weaponID, weaponName, damageDone);
-                    weapons.Add(weapon);
-                    weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                    MainSystem sys = ModContent.GetInstance<MainSystem>();
-                    sys.state.container.panel.CreateWeaponBarSP(weaponName);
+                    var newWeapon = new Weapon(weaponID, weaponName, damageDone);
+                    weapons.Add(newWeapon);
+                    // We create the weapon bar once
+                    ModContent.GetInstance<MainSystem>().state.container.panel.CreateWeaponBarSP(weaponName);
                 }
                 else
                 {
-                    // Update existing weapon's damage
-                    weapon.damage += damageDone;
-                }
-            }
-
-            public void FixFinalBlowDiscrepancy(Weapon weapon)
-            {
-                if (damageTaken < initialLife)
-                {
-                    int totalTrackedDamage = weapons.Sum(w => w.damage);
-                    int unknownDamage = initialLife - totalTrackedDamage;
-
-                    // If the final blow weapon reference is null, treat it as "Unknown"
-                    if (weapon == null)
-                    {
-                        // Try to update the existing "Unknown" weapon damage
-                        Weapon unknownWeapon = weapons.FirstOrDefault(w => w.weaponName == "Unknown");
-                        if (unknownWeapon != null)
-                        {
-                            unknownWeapon.damage += unknownDamage;
-                        }
-                        else
-                        {
-                            // If "Unknown" doesn't exist, create it
-                            unknownWeapon = new Weapon(-1, "Unknown", unknownDamage)
-                            {
-                                weaponName = "Unknown",
-                                weaponItemID = -1, // Invalid ID so no icon is drawn
-                                damage = unknownDamage
-                            };
-                            weapons.Add(unknownWeapon);
-
-                            // Ensure the list is re-sorted and update the UI accordingly
-                            weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                            MainSystem sys = ModContent.GetInstance<MainSystem>();
-                            sys.state.container.panel.CreateWeaponBarSP("Unknown");
-                        }
-                    }
-                    else
-                    {
-                        // Log.Info($"Final BLOW on Boss: {bossName} | Unknown Damage: {unknownDamage} weapon: {weapon.weaponName} | damage: {weapon.damage}");
-
-                        // Add the discrepancy to the weapon that landed the final blow
-                        Weapon finalWeapon = weapons.FirstOrDefault(w => w.weaponName == weapon.weaponName);
-                        if (finalWeapon != null)
-                        {
-                            finalWeapon.damage += unknownDamage;
-                        }
-                    }
+                    existing.damage += damageDone;
                 }
             }
 
             public void SendBossFightToPanel()
             {
                 weapons = weapons.OrderByDescending(w => w.damage).ToList();
-                MainSystem sys = ModContent.GetInstance<MainSystem>();
-                sys.state.container.panel.UpdateAllWeaponBarsSP(weapons);
-            }
-
-            public void PrintFightData(Mod mod)
-            {
-                if (weapons.Count == 0)
-                {
-                    // Log.info($"Boss: {bossName} | ID: {bossId} | No weapons tracked | DamageTaken: {damageTaken} | InitialLife: {initialLife}");
-                    return;
-                }
-
-                string highestWeapon = weapons[0].weaponName;
-                int highestDamage = weapons[0].damage;
-                string s = $"{highestWeapon} ({highestDamage})";
-                int weaponID = weapons[0].weaponItemID;
-                // // Log.info($"Boss: {bossName} | ID: {bossId} | Highest weapon: {s} ID: {weaponID} | DamageTaken: {damageTaken} | InitialLife: {initialLife}");
+                ModContent.GetInstance<MainSystem>()
+                          .state
+                          .container
+                          .panel
+                          .UpdateAllWeaponBarsSP(weapons);
             }
         }
+
+        /// <summary>
+        /// Represents an Eater of Worlds fight, which is multi‐segment.
+        /// We do not store whoAmI, because the worm has multiple NPCs.
+        /// Instead, we sum them up each time.
+        /// </summary>
+        public class EoWFight
+        {
+            public int damageTaken;
+            public int totalLife;       // Current sum of all EoW segments
+            public int totalLifeMax;    // Max sum of all EoW segments
+
+            public List<Weapon> weapons = [];
+
+            public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
+            {
+                Weapon existing = weapons.FirstOrDefault(w => w.weaponName == weaponName);
+                if (existing == null)
+                {
+                    var newWeapon = new Weapon(weaponID, weaponName, damageDone);
+                    weapons.Add(newWeapon);
+                    // Create UI element for this new weapon
+                    ModContent.GetInstance<MainSystem>().state.container.panel.CreateWeaponBarSP(weaponName);
+                }
+                else
+                {
+                    existing.damage += damageDone;
+                }
+            }
+
+            public void SendBossFightToPanel()
+            {
+                weapons = weapons.OrderByDescending(w => w.damage).ToList();
+                ModContent.GetInstance<MainSystem>()
+                          .state
+                          .container
+                          .panel
+                          .UpdateAllWeaponBarsSP(weapons);
+            }
+        }
+
         #endregion
 
-        private BossFight fight;
-        // private int fightId = 0;
+        #region Fields
+
+        private NormalBossFight normalFight;  // For single‐NPC bosses
+        private EoWFight eaterFight;          // For Eater of Worlds
+
+        #endregion
 
         #region Hooks
+
         public override void PreUpdate()
         {
+            // Only do local (single player) tracking; change if you want serverside logic
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
             // Check once per second
             if (Main.time % 60 == 0)
             {
-                // 2) If no fight exists, check for an active boss to start tracking
-                if (fight == null)
+                bool eaterFound = false; // Did we find at least one EoW segment?
+                bool normalBossFound = false; // Did we find a normal boss that we want to track?
+
+                for (int i = 0; i < Main.npc.Length; i++)
                 {
-                    NPC detectedBoss = null;
+                    NPC npc = Main.npc[i];
+                    if (!npc.active)
+                        continue;
 
-                    for (int i = 0; i < Main.npc.Length; i++)
+                    // 1) Check if this is a normal (single‐NPC) boss 
+                    //    (not the EoW segments)
+                    if (npc.boss
+                        && npc.type != NPCID.EaterofWorldsHead
+                        && npc.type != NPCID.EaterofWorldsBody
+                        && npc.type != NPCID.EaterofWorldsTail)
                     {
-                        NPC npc = Main.npc[i];
+                        normalBossFound = true;
 
-                        // Detect worm bosses (e.g., Eater of Worlds, Destroyer)
-                        if (npc.active && npc.type == NPCID.EaterofWorldsHead)
+                        // If we don't already have a normalFight,
+                        // create one now for this boss.
+                        if (normalFight == null)
                         {
-                            detectedBoss = npc;
-                            Log.Info("Eater of Worlds detected with real life and whoAmI: " + npc.whoAmI + ", " + npc.realLife);
-                            break; // Found a valid boss, no need to check further
-                        }
+                            normalFight = new NormalBossFight
+                            {
+                                whoAmI = npc.whoAmI,
+                                bossName = npc.FullName,
+                                currentLife = npc.life,
+                                initialLife = npc.lifeMax,
+                                damageTaken = 0
+                            };
 
-                        // Detect regular non-worm bosses.
-                        if (IsValidBoss(npc) && npc.life > 0)
-                        {
-                            detectedBoss = npc;
-                            break; // Found a valid boss, no need to check further
+                            var sys = ModContent.GetInstance<MainSystem>();
+                            sys.state.container.panel.ClearPanelAndAllItems();
+                            sys.state.container.panel.SetBossTitle(
+                                npc.FullName,
+                                npc.whoAmI,
+                                npc.GetBossHeadTextureIndex()
+                            );
                         }
                     }
 
-                    if (detectedBoss != null)
+                    // 2) Check if this is an Eater of Worlds segment
+                    bool isEaterSegment =
+                        npc.type == NPCID.EaterofWorldsHead ||
+                        npc.type == NPCID.EaterofWorldsBody ||
+                        npc.type == NPCID.EaterofWorldsTail;
+
+                    if (isEaterSegment)
                     {
-                        CreateNewBossFight(detectedBoss);
-                        // Log.info($"(SP) Boss {fight.bossName} created!");
+                        eaterFound = true;
+
+                        // If we don't already have an eaterFight, create one
+                        if (eaterFight == null)
+                        {
+                            eaterFight = new EoWFight
+                            {
+                                damageTaken = 0,
+                                totalLife = 0,
+                                totalLifeMax = 0
+                            };
+
+                            var sys = ModContent.GetInstance<MainSystem>();
+                            sys.state.container.panel.ClearPanelAndAllItems();
+                            sys.state.container.panel.SetBossTitle(
+                                "Eater of Worlds",
+                                -1, // no single whoAmI for the worm
+                                npc.GetBossHeadTextureIndex()
+                            );
+                        }
                     }
                 }
 
-                // 3) If a fight is active, handle "Unknown" damage
-                if (fight != null && fight.isAlive)
+                // If we had a normalFight, but the boss is actually gone now, check that
+                if (!normalBossFound && normalFight != null)
                 {
-                    // Find the current boss NPC based on the fight's boss name
-                    NPC bossNPC = Main.npc.FirstOrDefault(npc => npc.active && npc.boss && npc.FullName == fight.bossName);
-
-                    if (bossNPC != null)
+                    // That means the normal boss is dead or despawned
+                    normalFight.SendBossFightToPanel();
+                    normalFight = null;
+                }
+                else if (normalFight != null)
+                {
+                    // If the normalFight is active, update currentLife from the NPC
+                    NPC bossNpc = Main.npc[normalFight.whoAmI];
+                    if (!bossNpc.active || bossNpc.life <= 0)
                     {
-                        fight.currentLife = bossNPC.life;
-                        int totalTrackedDamage = fight.weapons.Where(w => w.weaponName != "Unknown").Sum(w => w.damage);
-                        int unknownDamage = fight.initialLife - fight.currentLife - totalTrackedDamage;
-
-                        // // Log.info($"Boss: {fight.bossName} | initial life: {fight.initialLife} | Total Tracked Damage: {totalTrackedDamage} | Current Life: {fight.currentLife} | Unknown Damage: {unknownDamage}");
-
-                        // Ensure discrepancy is not negative
-                        unknownDamage = Math.Max(unknownDamage, 0);
-
-                        // Update the "Unknown" damage
-                        Weapon unknownWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == "Unknown");
-                        if (unknownWeapon != null)
-                        {
-                            unknownWeapon.damage = unknownDamage;
-                        }
-                        else
-                        {
-                            if (unknownDamage == 0)
-                                return;
-
-                            // If "Unknown" doesn't exist, create it
-                            bool unknownWeaponExists = fight.weapons.Any(w => w.weaponName == "Unknown");
-                            if (!unknownWeaponExists)
-                            {
-                                unknownWeapon = new Weapon(-1, "Unknown", unknownDamage)
-                                {
-                                    weaponName = "Unknown",
-                                    weaponItemID = -1, // Invalid ID so no icon is drawn
-                                    damage = unknownDamage
-                                };
-                                fight.damageTaken += unknownDamage;
-                                fight.weapons.Add(unknownWeapon);
-                                fight.weapons = fight.weapons.OrderByDescending(w => w.damage).ToList();
-
-                                // Create damage bar for "Unknown" in the UI
-                                MainSystem sys = ModContent.GetInstance<MainSystem>();
-                                sys.state.container.panel.CreateWeaponBarSP("Unknown");
-                            }
-                            else
-                            {
-                                unknownWeapon.damage = unknownDamage;
-                            }
-                        }
-
-                        // Update the UI with the latest damage data
-                        fight.SendBossFightToPanel();
-                        // fight.PrintFightData(Mod);
+                        // Boss died
+                        normalFight.SendBossFightToPanel();
+                        normalFight = null;
                     }
                     else
                     {
-                        // Boss NPC is no longer active; ensure fight is stopped
-                        // Log.info($"Boss {fight.bossName} is no longer active!");
-                        fight = null;
+                        // Just refresh currentLife in case it’s changed
+                        normalFight.currentLife = bossNpc.life;
+                    }
+                }
+
+                // If we had an eaterFight, but no segments are found, that means EoW is gone
+                if (!eaterFound && eaterFight != null)
+                {
+                    eaterFight.SendBossFightToPanel();
+                    eaterFight = null;
+                }
+                // If we still have an eaterFight and found segments, recalc total life
+                else if (eaterFound && eaterFight != null)
+                {
+                    RecalculateWormLife();
+                    // If totalLife is 0, the worm is effectively dead
+                    if (eaterFight.totalLife <= 0)
+                    {
+                        eaterFight.SendBossFightToPanel();
+                        eaterFight = null;
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Recalculate total EoW life by summing active segments.
+        /// </summary>
+        private void RecalculateWormLife()
+        {
+            if (eaterFight == null)
+                return;
+
+            int totalLife = 0;
+            int totalLifeMax = 0;
+
+            for (int i = 0; i < Main.npc.Length; i++)
+            {
+                NPC npc = Main.npc[i];
+                if (!npc.active)
+                    continue;
+
+                bool isEaterSegment =
+                    npc.type == NPCID.EaterofWorldsHead ||
+                    npc.type == NPCID.EaterofWorldsBody ||
+                    npc.type == NPCID.EaterofWorldsTail;
+
+                if (isEaterSegment)
+                {
+                    totalLife += npc.life;
+                    totalLifeMax += npc.lifeMax;
+                }
+            }
+
+            eaterFight.totalLife = totalLife;
+            eaterFight.totalLifeMax = totalLifeMax;
+        }
+
+        /// <summary>
+        /// Called when you hit an NPC with an Item (melee, etc.).
+        /// </summary>
         public override void OnHitNPCWithItem(Item item, NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
-            // Log.Info($"OnHitNPCWithItem: ({item.Name}) ({damageDone})");
-
-            // Pass the actual item type (ID) explicitly for melee
-            int actualItemID = item?.type ?? -1;
-            string actualItemName = item?.Name ?? "unknownitem";
-            TrackBossDamage(actualItemID, actualItemName, damageDone, target);
+            int weaponID = item?.type ?? -1;
+            string weaponName = item?.Name ?? "Unknown";
+            TrackBossDamage(weaponID, weaponName, damageDone, target);
         }
 
+        /// <summary>
+        /// Called when you hit an NPC with a Projectile (ranged, magic, summon, etc.).
+        /// </summary>
         public override void OnHitNPCWithProj(Projectile proj, NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
-            // Grab the GlobalProj for *this* projectile
+            // If your GlobalProjectile stored the original weapon:
             GlobalProj gProj = proj.GetGlobalProjectile<GlobalProj>();
 
-            // Fallback values in case there's no stored weapon
             int weaponID = -1;
             string weaponName = "Unknown";
-
-            // If we actually stored an item in OnSpawn, use it
             if (gProj != null && gProj.sourceWeapon != null)
             {
                 weaponID = gProj.sourceWeapon.type;
                 weaponName = gProj.sourceWeapon.Name;
             }
 
-            // Optional logging
-            // Log.Info($"OnHitNPCWithProj: Projectile: {proj.Name}, Damage: {damageDone}, Weapon: {weaponName}, WeaponID: {weaponID}");
-
-            // Now pass these IDs/names to your track method
             TrackBossDamage(weaponID, weaponName, damageDone, target);
         }
 
         #endregion
 
         #region Methods
+
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
             Config c = ModContent.GetInstance<Config>();
+            // If we are not supposed to track all entities, and there's no active boss fight, just return
+            bool anyFightActive = (normalFight != null || eaterFight != null);
+            if (!anyFightActive)
+                return;
 
-            if (fight != null && !npc.friendly)
+            // 1) If we have a normalFight, is this NPC the boss for that fight?
+            if (normalFight != null && npc.whoAmI == normalFight.whoAmI)
             {
-                // If not tracking all entities and the NPC is not the boss, return
-                if (!c.TrackAllEntities && !(npc.boss && npc.whoAmI == fight.whoAmI))
-                    return;
+                // Update the weapon damage
+                normalFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                normalFight.damageTaken += damageDone;
 
-                // If the NPC is the actual boss.
-                if (npc.whoAmI == fight.whoAmI)
+                // If the boss died from this hit
+                if (npc.life <= 0)
                 {
-                    // If the boss died, handle final blow then end fight
-                    Weapon currentWeapon = fight.weapons.FirstOrDefault(w => w.weaponName == weaponName);
-
-                    if (HandleBossDeath(npc, currentWeapon))
-                        return;
-
-                    fight.currentLife = npc.life;
+                    normalFight.SendBossFightToPanel();
+                    normalFight = null;
+                }
+                else
+                {
+                    normalFight.currentLife = npc.life;
                 }
 
-                // Otherwise update the fight info
-                if (Main.netMode == NetmodeID.SinglePlayer)
+                // Update UI
+                normalFight?.SendBossFightToPanel();
+            }
+            // 2) If we have an eaterFight, is this NPC an EoW segment?
+            else if (eaterFight != null)
+            {
+                bool isEoWSegment =
+                    npc.type == NPCID.EaterofWorldsHead ||
+                    npc.type == NPCID.EaterofWorldsBody ||
+                    npc.type == NPCID.EaterofWorldsTail;
+
+                if (isEoWSegment)
                 {
-                    fight.UpdateWeapon(weaponID, weaponName, damageDone);
+                    eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                    eaterFight.damageTaken += damageDone;
+
+                    // After hitting a segment, recalc total HP
+                    RecalculateWormLife();
+                    if (eaterFight.totalLife <= 0)
+                    {
+                        // The worm is fully dead
+                        eaterFight.SendBossFightToPanel();
+                        eaterFight = null;
+                    }
+                    else
+                    {
+                        // Keep tracking
+                        eaterFight.SendBossFightToPanel();
+                    }
                 }
-
-                fight.damageTaken += damageDone;
-
-                // Update UI and log
-                fight.SendBossFightToPanel();
-                fight.PrintFightData(Mod);
             }
         }
 
-        private void CreateNewBossFight(NPC npc)
-        {
-            if (fight == null)
-            {
-                fight = new BossFight
-                {
-                    whoAmI = npc.whoAmI,
-                    currentLife = npc.life,
-                    initialLife = npc.lifeMax,
-                    bossName = npc.FullName,
-                    damageTaken = 0,
-                    weapons = [],
-                    isAlive = true
-                };
-                var sys = ModContent.GetInstance<MainSystem>();
-                sys.state.container.panel.ClearPanelAndAllItems();
-                sys.state.container.panel.SetBossTitle(npc.FullName, npc.whoAmI, npc.GetBossHeadTextureIndex());
-            }
-        }
-
-        private bool HandleBossDeath(NPC npc, Weapon weapon)
-        {
-            if (npc.life <= 0)
-            {
-                fight.isAlive = false;
-                fight.FixFinalBlowDiscrepancy(weapon); // ensure total damage == boss max HP
-                fight.SendBossFightToPanel();
-
-                // fightId++;
-                fight = null;
-                return true;
-            }
-            return false;
-        }
-
-        private bool IsValidBoss(NPC npc)
-        {
-            return npc.boss && !npc.friendly;
-        }
         #endregion
-
-        private bool IgnoreGolem(NPC npc)
-        {
-            return npc.type == NPCID.Golem || npc.type == NPCID.GolemFistLeft || npc.type == NPCID.GolemFistRight;
-        }
     }
 }
