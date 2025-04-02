@@ -1,39 +1,63 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using System.Reflection;
+using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Helpers
 {
+    /// <summary>
+    /// To add a new asset, simply add a new field like:
+    /// public static Asset<Texture2D> MyAsset;
+    /// </summary>
     public class LoadAssets : ModSystem
     {
         public override void Load()
         {
-            Assets.PreloadAllAssets();
+            _ = Ass.Initialized;
         }
     }
-
-    public static class Assets
+    public static class Ass
     {
-        // Textures
-        public static Asset<Texture2D> BarEmpty150;
-        public static Asset<Texture2D> BarFull150;
+        // My textures
+        public static Asset<Texture2D> Default;
+        public static Asset<Texture2D> BarFill;
         public static Asset<Texture2D> ToggleButton;
         public static Asset<Texture2D> ToggleButtonHighlighted;
 
-        public static void PreloadAllAssets()
+        // Block's Combo Textures
+        public static Asset<Texture2D> Fancy;
+        public static Asset<Texture2D> FancyFTW;
+        public static Asset<Texture2D> FancyLegendary;
+        public static Asset<Texture2D> FancyPlat;
+        public static Asset<Texture2D> Golden;
+        public static Asset<Texture2D> Leaf;
+        public static Asset<Texture2D> Remix;
+        public static Asset<Texture2D> Retro;
+        public static Asset<Texture2D> Sticks;
+        public static Asset<Texture2D> StoneGold;
+        public static Asset<Texture2D> Thin;
+        public static Asset<Texture2D> Tribute;
+        public static Asset<Texture2D> TwigLeaf;
+        public static Asset<Texture2D> Valkyrie;
+
+        // Bool for checking if assets are loaded
+        public static bool Initialized { get; set; }
+
+        // Constructor
+        static Ass()
         {
-            BarEmpty150 = PreloadAsset("BarEmpty150");
-            BarFull150 = PreloadAsset("BarFull150");
-            ToggleButton = PreloadAsset("ToggleButton");
-            ToggleButtonHighlighted = PreloadAsset("ToggleButtonHighlighted");
+            foreach (FieldInfo field in typeof(Ass).GetFields())
+            {
+                if (field.FieldType == typeof(Asset<Texture2D>))
+                {
+                    field.SetValue(null, RequestAsset(field.Name));
+                }
+            }
         }
 
-        /// <summary>
-        /// Preloads an asset with "ImmediateLoad" mode in the "DPSPanel/Assets" directory.
-        /// </summary>
-        private static Asset<Texture2D> PreloadAsset(string path)
+        private static Asset<Texture2D> RequestAsset(string path)
         {
-            return ModContent.Request<Texture2D>("DPSPanel/Assets/" + path, AssetRequestMode.ImmediateLoad);
+            return ModContent.Request<Texture2D>($"DPSPanel/Assets/" + path, AssetRequestMode.AsyncLoad);
         }
     }
 }

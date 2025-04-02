@@ -15,11 +15,14 @@ namespace DPSPanel.UI
         {
             Width.Set(26f, 0f);
             Height.Set(26f, 0f);
-            HAlign = 0.5f;
+            HAlign = 1.0f;
         }
 
         protected override void DrawSelf(SpriteBatch sb)
         {
+
+            //HAlign = 1.0f;
+
             base.DrawSelf(sb);
 
             if (_bossHeadID == -1)

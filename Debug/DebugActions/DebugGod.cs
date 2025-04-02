@@ -18,6 +18,10 @@ namespace DPSPanel.Debug.DebugActions
                 return;
             }
 
+            // Set the time to 8:15 AM
+            Main.time = 13500;
+            Main.dayTime = true;
+
             GodEnabled = true;
             Main.NewText("God mode enabled on enter world!", 255, 255, 0); // Yellow text
         }

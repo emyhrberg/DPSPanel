@@ -7,7 +7,9 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Localization;
 using Terraria.ModLoader;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
@@ -17,17 +19,17 @@ namespace DPSPanel.UI
         private readonly float ITEM_PADDING = 10f;
         private readonly float PANEL_HEIGHT = 40f;
         private readonly Color panelColor = new Color(49, 84, 141);
-        private float currentYOffset = 0f;
-        private const float ItemHeight = 16f;
+
+        // Adding new bars will increase the height of the panel.
+        public float currentYOffset = 0f;
+        public float ItemHeight = 16f;
 
         // Dictionary for player bars.
-        private Dictionary<int, PlayerBar> playerBars = new Dictionary<int, PlayerBar>();
+        private Dictionary<int, PlayerBar> playerBars = [];
 
         // (For singleplayer weapon bars – not used in MP if each player has its own damage panel.)
-        private Dictionary<string, WeaponBar> weaponBars = new Dictionary<string, WeaponBar>();
-
-        // Dictionary for damage panels.
-        private Dictionary<string, PlayerDamagePanel> damagePanels = new Dictionary<string, PlayerDamagePanel>();
+        private Dictionary<string, WeaponBar> weaponBars = [];
+        public Dictionary<string, WeaponBar> WeaponBars => weaponBars;
 
         public bool CurrentBossAlive = false; // their health. updated in PacketHandler.
         public int CurrentBossWhoAmI;
@@ -36,9 +38,22 @@ namespace DPSPanel.UI
         private const float bossHeaderHeight = 28f;
         public BossHead bossIcon = new BossHead();
 
+        // Show only when inventory open
+        public bool HideWhenInventoryOpen = true;
+
         public MainPanel()
         {
-            Width.Set(150, 0f);
+            // Convert from string to float using the dictionary to set the width.
+            Config c = ModContent.GetInstance<Config>();
+            string widthSize = c.Width;
+            float width = 150; // default
+            if (SizeHelper.WidthSizes.ContainsKey(widthSize))
+            {
+                width = SizeHelper.WidthSizes[widthSize];
+            }
+            Width.Set(width, 0f);
+
+            // Set other properties of the panel.
             Height.Set(PANEL_HEIGHT, 0f);
             BackgroundColor = panelColor;
             HAlign = 0.5f;
@@ -60,6 +75,7 @@ namespace DPSPanel.UI
             Append(bossTitle);
 
             Config c = ModContent.GetInstance<Config>();
+
             if (bossID != -1 && c.ShowBossIcon)
                 SetBossIcon(bossID);
 
@@ -74,15 +90,21 @@ namespace DPSPanel.UI
 
         public void SetBossIcon(int bossHeadId)
         {
-            bossIcon.Left.Set(60f, 0f);
             bossIcon.SetBossHeadID(bossHeadId);
             Append(bossIcon);
         }
 
         public override void Draw(SpriteBatch sb)
         {
+            //Log.Info("Width: " + Width.Pixels);
+
+            //Width.Set(400, 0);
+            //Height.Set(300, 0);
+            //Log.Info("currYOffset: " + currentYOffset);
+            // Log.Info("height: " + Height.Pixels);
+
             Config c = ModContent.GetInstance<Config>();
-            if (!Main.playerInventory && !c.ShowOnlyWhenInventoryOpen)
+            if (!Main.playerInventory && !HideWhenInventoryOpen)
                 return;
             base.Draw(sb);
         }

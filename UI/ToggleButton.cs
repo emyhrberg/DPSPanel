@@ -23,14 +23,17 @@ namespace DPSPanel.UI
             Top.Set(4f, 0f);
             Left.Set(4f, 0f);
 
-            img = Assets.ToggleButton.Value;
-            imgHighlighted = Assets.ToggleButtonHighlighted.Value;
+            img = Ass.ToggleButton.Value;
+            imgHighlighted = Ass.ToggleButtonHighlighted.Value;
         }
 
         protected override void DrawSelf(SpriteBatch sb)
         {
-            Config c = ModContent.GetInstance<Config>();
-            if (!Main.playerInventory && !c.ShowOnlyWhenInventoryOpen)
+
+            MainSystem sys = ModContent.GetInstance<MainSystem>();
+            bool showOnlyWhenInventoryOpen = sys.state.container.panel.HideWhenInventoryOpen;
+
+            if (!Main.playerInventory && !showOnlyWhenInventoryOpen)
                 return;
 
             base.DrawSelf(sb);
@@ -43,7 +46,8 @@ namespace DPSPanel.UI
 
 
             // Draw either the button or highlighted button based on hover state
-            if (IsMouseHovering && c.ShowHighlightButtonWhenHovering)
+            Config c = ModContent.GetInstance<Config>();
+            if (IsMouseHovering && c.ShowTooltipWhenHovering)
             {
                 sb.Draw(imgHighlighted, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                 Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open");
@@ -60,9 +64,11 @@ namespace DPSPanel.UI
             base.RightMouseDown(evt);
 
             // on right click we toggle the config setting to only show in inventory.
-            ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen = !ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen;
+            MainSystem sys = ModContent.GetInstance<MainSystem>();
+            sys.state.container.panel.HideWhenInventoryOpen = !sys.state.container.panel.HideWhenInventoryOpen;
+            bool hideWhenInventoryOpen = sys.state.container.panel.HideWhenInventoryOpen;
 
-            string text = ModContent.GetInstance<Config>().ShowOnlyWhenInventoryOpen ? "Always show DPSPanel" : "Show DPSPanel only when inventory is open";
+            string text = hideWhenInventoryOpen ? "Always show DPSPanel" : "Show DPSPanel only when inventory is open";
             Main.NewText(text, Color.White);
         }
         #endregion

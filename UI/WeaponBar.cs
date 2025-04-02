@@ -27,8 +27,12 @@ namespace DPSPanel.UI
 
         public WeaponBar(float currentYOffset)
         {
-            emptyBar = Assets.BarEmpty150;
-            fullBar = Assets.BarFull150;
+            Config c = ModContent.GetInstance<Config>();
+            string theme = c.Theme;
+            Asset<Texture2D> emptyBarTheme = typeof(Ass).GetField(theme)?.GetValue(null) as Asset<Texture2D>;
+
+            emptyBar = emptyBarTheme;
+            fullBar = Ass.BarFill;
 
             Width = new StyleDimension(0, 1.0f);
             Height = new StyleDimension(ItemHeight, 0f);
@@ -43,6 +47,11 @@ namespace DPSPanel.UI
             Append(textElement);
         }
 
+        public void UpdateTheme(Asset<Texture2D> updatedEmptyBar)
+        {
+            emptyBar = updatedEmptyBar;
+        }
+
         public void UpdateWeaponBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
         {
             percentage = _percentage;
@@ -54,6 +63,7 @@ namespace DPSPanel.UI
 
         protected override void DrawSelf(SpriteBatch sb)
         {
+            Height.Set(40, 0);
             base.DrawSelf(sb);
             DrawDamageBarFill(sb);
             DrawDamageBarOutline(sb);

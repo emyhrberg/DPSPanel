@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using DPSPanel.Common.DamageCalculation;
 using DPSPanel.Debug.DebugActions;
+using DPSPanel.Debug.DebugMisc;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
 using log4net;
@@ -17,7 +20,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using static DPSPanel.Common.Configs.Config;
 
-namespace DPSPanel.Debug
+namespace DPSPanel.Debug.DebugActions
 {
     public class DebugPanel : UIPanel
     {
@@ -36,17 +39,62 @@ namespace DPSPanel.Debug
 
             // Add action texts
             AddButton("Open Config", OpenConfig);
-            AddButton("Clear Panel", ClearPlayers);
-            AddButton("Add Player", AddPlayer);
-            AddButton("God", ToggleGod);
-            AddButton("Disable enemy spawn", ToggleEnemySpawns);
+            AddButton("Clear Panel", ClearPanel);
+            AddButton("Add PlayerBar", AddPlayer);
+            AddButton("Add WeaponBar", AddWeaponBar);
             AddButton("Open client log", OpenClientLog);
             AddButton("Clear client log", ClearClientLog);
             AddButton("Spawn King Slime", SpawnKingSlimeSP);
             AddButton("Set Spawn Point", SetSpawnPoint);
+            AddButton("Spawn Eye of Cthulhu", SpawnEyeOfCthulhu);
+            AddButton("Set Daytime", SetTime);
         }
 
         #region Actions
+
+        public List<Weapon> testWeapons = [];
+        public List<Weapon> currentWeapons = [];
+
+        private void AddWeaponBar()
+        {
+            for (int j = 1; j <= 100; j++)
+            {
+                testWeapons.Add(new Weapon(weaponItemID: -1, weaponName: $"test{j}", damage: j * 100));
+            }
+
+            // select a weapon from testweapons that doesnt exist in 
+            Weapon testWeaponToAdd = testWeapons.FirstOrDefault(w => !currentWeapons.Contains(w));
+            currentWeapons.Add(testWeaponToAdd);
+
+            MainSystem sys = ModContent.GetInstance<MainSystem>();
+            sys.state.container.panel.CreateWeaponBarSP(testWeaponToAdd.weaponName);
+            sys.state.container.panel.UpdateAllWeaponBarsSP(currentWeapons);
+        }
+
+        private void SetTime()
+        {
+            // Set time to day (0-54000 ticks)
+            // 0 = 4:30AM, 54000 = 7:30PM.
+            // 13500 is 8:15 AM (confirmed by testing).
+            Main.time = 13500;
+            Main.dayTime = true;
+            Main.NewText("Time set to day.");
+        }
+
+        private void SpawnEyeOfCthulhu()
+        {
+            // Spawn Eye of Cthulhu in Single Player
+            int eyeOfCthulhuID = NPCID.EyeofCthulhu;
+            int x = (int)Main.LocalPlayer.position.X;
+            int y = (int)Main.LocalPlayer.position.Y;
+
+            NPC.NewNPCDirect(
+                source: null,
+                x: x,
+                y: y,
+                type: eyeOfCthulhuID
+            );
+        }
 
         private void SetSpawnPoint()
         {
@@ -149,12 +197,13 @@ namespace DPSPanel.Debug
             Conf.C.Open();
         }
 
-        private void ClearPlayers()
+        private void ClearPanel()
         {
             Main.NewText("Cleared all items in the panel!");
             MainSystem sys = ModContent.GetInstance<MainSystem>();
             sys.state.container.panel.ClearPanelAndAllItems();
             sys.state.container.panel.SetBossTitle("DPSPanel", -1, -1);
+            currentWeapons = [];
         }
         #endregion
 
@@ -178,7 +227,8 @@ namespace DPSPanel.Debug
         }
         public override void Update(GameTime gameTime)
         {
-
+            // Hot reload here
+            //currentWeapons = [];
 
             if (ContainsPoint(Main.MouseScreen))
             {

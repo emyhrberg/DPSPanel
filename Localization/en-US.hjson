@@ -6,16 +6,21 @@ Mods: {
 
 				Headers: {
 					DamageCalculation: Damage Calculation
-					PanelSettings: Panel Settings
+					UI: UI
+					Settings: Settings
 				}
 
 				TrackAllEntities: {
 					Label: "[i:StardustCellStaff] Track All Entities"
-					Tooltip: Tracks damage done to all entities during a boss fight, otherwise tracks only damage done to boss itself
+					Tooltip:
+						'''
+						Tracks damage done to all entities during a boss fight. 
+						              Otherwise tracks only damage done to boss itself
+						'''
 				}
 
 				ShowPlayerIcons: {
-					Label: "[i:CactusHelmet] Show Player Icons"
+					Label: "     Show Player Icons"
 					Tooltip: Show icons for every player during a boss fight
 				}
 
@@ -24,10 +29,7 @@ Mods: {
 					Tooltip: Show the boss icon during a boss fight
 				}
 
-				ShowHighlightButtonWhenHovering: {
-					Label: "[i:LivingIchorBlock] Show Highlight Button When Hovering"
-					Tooltip: Disable this if you find the button highlighting to interfere with boss fights
-				}
+				ShowHighlightButtonWhenHovering.Tooltip: Disable this if you find the button highlighting to interfere with boss fights
 
 				ShowWeaponsDuringBossFight: {
 					Label: "[i:LivingFrostFireBlock] Show Weapons Panel During Boss Fight"
@@ -41,7 +43,32 @@ Mods: {
 
 				TrackUnknownDamage: {
 					Label: "[i:DPSPanel/ConfigUnknownItem] Track Unknown Damage"
-					Tooltip: Some projectiles have an unknown damage source. If on, the tracker will track this damage as 'Unknown'. If off, the tracker will ignore this damage completely.
+					Tooltip:
+						'''
+						Some projectiles have an unknown damage source. 
+						      If on, the tracker will track this damage as 'Unknown'. 
+						      If off, the tracker will ignore this damage completely
+						'''
+				}
+
+				Theme: {
+					Label: Theme
+					Tooltip: Set the theme
+				}
+
+				Width: {
+					Label: Width
+					Tooltip: Set the width of the panel
+				}
+
+				Height: {
+					Label: Height
+					Tooltip: Set the height of every bar
+				}
+
+				ShowTooltipWhenHovering: {
+					Label: "[i:RainbowCursor] Show Tooltip When Hovering"
+					Tooltip: Disable this option to make the panel more subtle
 				}
 			}
 		}

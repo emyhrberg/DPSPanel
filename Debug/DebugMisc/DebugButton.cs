@@ -37,7 +37,11 @@ namespace DPSPanel.Debug
         public override void LeftClick(UIMouseEvent evt)
         {
             // base.LeftClick(evt);
-            onClick?.Invoke();
+
+            if (onClick != null)
+            {
+                onClick?.Invoke();
+            }
         }
 
         public override void Update(GameTime gameTime)

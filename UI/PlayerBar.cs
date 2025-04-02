@@ -37,8 +37,8 @@ namespace DPSPanel.UI
         public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
         {
             Config c = ModContent.GetInstance<Config>();
-            emptyBar = Assets.BarEmpty150;
-            fullBar = Assets.BarFull150;
+            emptyBar = Ass.Default;
+            fullBar = Ass.BarFill;
 
             Width = new StyleDimension(0, 1.0f);
             Height = new StyleDimension(ItemHeight, 0f);

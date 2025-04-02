@@ -7,6 +7,10 @@ using Terraria.UI;
 
 namespace DPSPanel.Debug.DebugMisc
 {
+    /// <summary>
+    /// If the config is set to debug, this system will be loaded and the UI will be created.
+    /// Otherwise, it will not be loaded.
+    /// </summary>
     [Autoload(Side = ModSide.Client)]
     public class DebugSystem : ModSystem
     {
