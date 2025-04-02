@@ -20,25 +20,30 @@ namespace DPSPanel.Helpers
     {
         // My textures
         public static Asset<Texture2D> Default;
+        public static Asset<Texture2D> DefaultLarge;
         public static Asset<Texture2D> BarFill;
         public static Asset<Texture2D> ToggleButton;
         public static Asset<Texture2D> ToggleButtonHighlighted;
 
         // Block's Combo Textures
         public static Asset<Texture2D> Fancy;
-        public static Asset<Texture2D> FancyFTW;
-        public static Asset<Texture2D> FancyLegendary;
-        public static Asset<Texture2D> FancyPlat;
+        public static Asset<Texture2D> FancyLarge;
         public static Asset<Texture2D> Golden;
+        public static Asset<Texture2D> GoldenLarge;
         public static Asset<Texture2D> Leaf;
-        public static Asset<Texture2D> Remix;
+        public static Asset<Texture2D> LeafLarge;
         public static Asset<Texture2D> Retro;
+        public static Asset<Texture2D> RetroLarge;
         public static Asset<Texture2D> Sticks;
+        public static Asset<Texture2D> SticksLarge;
         public static Asset<Texture2D> StoneGold;
-        public static Asset<Texture2D> Thin;
+        public static Asset<Texture2D> StoneGoldLarge;
         public static Asset<Texture2D> Tribute;
+        public static Asset<Texture2D> TributeLarge;
         public static Asset<Texture2D> TwigLeaf;
+        public static Asset<Texture2D> TwigLeafLarge;
         public static Asset<Texture2D> Valkyrie;
+        public static Asset<Texture2D> ValkyrieLarge;
 
         // Bool for checking if assets are loaded
         public static bool Initialized { get; set; }

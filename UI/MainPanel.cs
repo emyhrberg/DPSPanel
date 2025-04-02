@@ -9,23 +9,23 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
     public class MainPanel : UIPanel
     {
-        private readonly float PANEL_PADDING = 5f;
-        private readonly float ITEM_PADDING = 10f;
-        private readonly float PANEL_HEIGHT = 40f;
+        private float PANEL_PADDING = 5f;
+        private float BAR_SPACING = 10f;
         private readonly Color panelColor = new Color(49, 84, 141);
 
         // Adding new bars will increase the height of the panel.
-        public float currentYOffset = 0f;
         public float ItemHeight = 16f;
+        private float bossHeaderHeight = 40f;
+        public float currentYOffset = 40f;
 
         // Dictionary for player bars.
         private Dictionary<int, PlayerBar> playerBars = [];
+        public Dictionary<int, PlayerBar> PlayerBars => playerBars;
 
         // (For singleplayer weapon bars – not used in MP if each player has its own damage panel.)
         private Dictionary<string, WeaponBar> weaponBars = [];
@@ -35,30 +35,25 @@ namespace DPSPanel.UI
         public int CurrentBossWhoAmI;
         public int CurrentBossID;
         public string CurrentBossName;
-        private const float bossHeaderHeight = 28f;
         public BossHead bossIcon = new BossHead();
 
         // Show only when inventory open
         public bool HideWhenInventoryOpen = true;
 
+        #region Constructor
         public MainPanel()
         {
             // Convert from string to float using the dictionary to set the width.
-            Config c = ModContent.GetInstance<Config>();
-            string widthSize = c.Width;
-            float width = 150; // default
-            if (SizeHelper.WidthSizes.ContainsKey(widthSize))
-            {
-                width = SizeHelper.WidthSizes[widthSize];
-            }
+            float width = SizeHelper.GetWidthFromConfig();
             Width.Set(width, 0f);
 
             // Set other properties of the panel.
-            Height.Set(PANEL_HEIGHT, 0f);
+            Height.Set(bossHeaderHeight, 0f);
             BackgroundColor = panelColor;
             HAlign = 0.5f;
             SetPadding(PANEL_PADDING);
         }
+        #endregion
 
         public void SetBossTitle(string bossName, int bossWhoAmI, int bossID)
         {
@@ -67,7 +62,8 @@ namespace DPSPanel.UI
             CurrentBossName = bossName;
 
             // Change the text size based on the boss name length.
-            float textSize = bossName.Length > 14 ? 0.75f : 1.0f;
+            // float textSize = bossName.Length > 20 ? 0.75f : 1.0f;
+            float textSize = 1.0f;
 
             UIText bossTitle = new(bossName, textSize);
             bossTitle.HAlign = 0.52f;
@@ -75,17 +71,11 @@ namespace DPSPanel.UI
             Append(bossTitle);
 
             Config c = ModContent.GetInstance<Config>();
-
             if (bossID != -1 && c.ShowBossIcon)
                 SetBossIcon(bossID);
 
             currentYOffset = bossHeaderHeight;
             ResizePanelHeight();
-        }
-
-        public void SetCurrentBossAliveFlag(bool isAlive)
-        {
-            CurrentBossAlive = isAlive;
         }
 
         public void SetBossIcon(int bossHeadId)
@@ -96,14 +86,11 @@ namespace DPSPanel.UI
 
         public override void Draw(SpriteBatch sb)
         {
-            //Log.Info("Width: " + Width.Pixels);
+            // hot reload here
+            //Height.Set(50, 0);
+            BAR_SPACING = 10f;
+            //Log.SlowInfo("height" + Height.Pixels);
 
-            //Width.Set(400, 0);
-            //Height.Set(300, 0);
-            //Log.Info("currYOffset: " + currentYOffset);
-            // Log.Info("height: " + Height.Pixels);
-
-            Config c = ModContent.GetInstance<Config>();
             if (!Main.playerInventory && !HideWhenInventoryOpen)
                 return;
             base.Draw(sb);
@@ -118,8 +105,10 @@ namespace DPSPanel.UI
             PlayerBar bar = new(currentYOffset, playerName, playerWhoAmI);
             Append(bar);
             playerBars[playerWhoAmI] = bar;
-            currentYOffset += ItemHeight + ITEM_PADDING * 2;
-            ResizePanelHeight();
+
+            // Skip bar spacing here.
+            // currentYOffset += ItemHeight + BAR_SPACING;
+            // ResizePanelHeight();
         }
 
         // In MP, we update each player's bar and then update its damage panel with weapon data.
@@ -140,21 +129,30 @@ namespace DPSPanel.UI
             // Sort players by descending damage so that the highest damage is first.
             var sortedPlayers = playerBars.OrderByDescending(p => p.Value.PlayerDamage).ToList();
 
+            // Reset the current Y offset to the top of the panel.
             currentYOffset = bossHeaderHeight;
+
             int highestDamage = sortedPlayers.First().Value.PlayerDamage;
             for (int i = 0; i < sortedPlayers.Count; i++)
             {
                 string currentPlayerName = sortedPlayers[i].Value.PlayerName;
                 PlayerBar currentBar = sortedPlayers[i].Value;
+
+                // Update the bar's position and height:
                 currentBar.Top.Set(currentYOffset, 0f);
-                currentYOffset += ItemHeight + ITEM_PADDING * 2;
+                currentYOffset += ItemHeight;
 
                 int percentageToFill = highestDamage > 0 ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100) : 0;
                 Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
                 currentBar.UpdatePlayerBar(percentageToFill, currentPlayerName, currentBar.PlayerDamage, barColor);
             }
 
+            if (sortedPlayers.Count > 0)
+                currentYOffset += 5f;
+
             playerBars[playerWhoAmI].UpdateWeaponData(weapons);
+
+            // Update the panels height after all bars are updated.
             ResizePanelHeight();
         }
 
@@ -171,11 +169,77 @@ namespace DPSPanel.UI
         {
             if (Parent is not MainContainer parentContainer)
                 return;
-            parentContainer.Height.Set(currentYOffset + ITEM_PADDING, 0f);
+
+            // If no bars, currentYOffset is just bossHeaderHeight (40).
+            float finalHeight = currentYOffset;
+
+            // If somehow finalHeight < 40, clamp it to 40 so there's always at least 40 for the header
+            if (finalHeight < bossHeaderHeight)
+                finalHeight = bossHeaderHeight;
+
+            // Now we do NOT add +PANEL_PADDING, because we already added 5 after the last bar above.
+            // finalHeight is now the exact size we want.
+
+            parentContainer.Height.Set(finalHeight, 0f);
             parentContainer.Recalculate();
-            Height.Set(currentYOffset + ITEM_PADDING, 0f);
+
+            Height.Set(finalHeight, 0f);
             Recalculate();
         }
+
+        #region Rebuild panel size
+        public void RebuildAllBarsLayout()
+        {
+            // Start offset below the boss header:
+            currentYOffset = bossHeaderHeight;
+
+            // 1) Re-position and re-draw PlayerBars
+            //    If you want to keep them in damage-sorted order, you can
+            //    replicate the logic in UpdatePlayerBars. For a minimal example:
+            var sortedPlayers = playerBars.OrderByDescending(p => p.Value.PlayerDamage).ToList();
+            int highestDamage = sortedPlayers.Count > 0 ? sortedPlayers.First().Value.PlayerDamage : 1;
+
+            for (int i = 0; i < sortedPlayers.Count; i++)
+            {
+                PlayerBar bar = sortedPlayers[i].Value;
+
+                bar.Top.Set(currentYOffset, 0f);
+                currentYOffset += ItemHeight + BAR_SPACING;
+
+                // Re-calculate the fill percentage:
+                int percent = highestDamage > 0 ?
+                    (int)(bar.PlayerDamage / (float)highestDamage * 100) : 0;
+
+                // Use any color logic you like:
+                Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
+                bar.UpdatePlayerBar(percent, bar.PlayerName, bar.PlayerDamage, barColor);
+
+                // Update leftoffset for the player damage panel to the width of the config
+                Config c = ModContent.GetInstance<Config>();
+                float width = SizeHelper.GetWidthFromConfig();
+                float height = SizeHelper.HeightSizes[c.BarHeight];
+
+                // Change left offset for player damage panel
+                bar.playerDamagePanel.UpdateLeft(width);
+                bar.playerDamagePanel.UpdatePanelWidth(width);
+                bar.playerDamagePanel.UpdateBarHeight(height);
+            }
+
+
+
+            // 2) Re-position the singleplayer weapon bars (if you’re using them)
+            //    We'll just re-stack them in the order they exist:
+            foreach (WeaponBar wBar in weaponBars.Values)
+            {
+                wBar.Top.Set(currentYOffset, 0f);
+                currentYOffset += ItemHeight;
+                // We do NOT recalc fill percentages here unless you also want to.
+            }
+
+            // 3) Finally, adjust the panel's total height
+            ResizePanelHeight();
+        }
+        #endregion
 
         #region (Singleplayer weapon bars - not used in MP)
         public void CreateWeaponBarSP(string barName)
@@ -191,7 +255,7 @@ namespace DPSPanel.UI
 
         public void UpdateAllWeaponBarsSP(List<Weapon> weapons)
         {
-            currentYOffset = bossHeaderHeight + (playerBars.Count * (ItemHeight + ITEM_PADDING * 2));
+            currentYOffset = bossHeaderHeight + (playerBars.Count * (ItemHeight + BAR_SPACING));
             if (weapons == null || weapons.Count == 0)
             {
                 ResizePanelHeight();
@@ -210,7 +274,7 @@ namespace DPSPanel.UI
                 Color color = PanelColors.colors[i % PanelColors.colors.Length];
                 bar.UpdateWeaponBar(percentageToFill, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
                 bar.Top.Set(currentYOffset, 0f);
-                currentYOffset += ItemHeight + ITEM_PADDING * 2;
+                currentYOffset += ItemHeight + BAR_SPACING;
             }
             ResizePanelHeight();
         }

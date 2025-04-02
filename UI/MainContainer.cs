@@ -31,13 +31,7 @@ namespace DPSPanel.UI
         public MainContainer()
         {
             // Convert from string to float using the dictionary to set the width.
-            Config c = ModContent.GetInstance<Config>();
-            string widthSize = c.Width;
-            float width = 150; // default
-            if (SizeHelper.WidthSizes.ContainsKey(widthSize))
-            {
-                width = SizeHelper.WidthSizes[widthSize];
-            }
+            float width = SizeHelper.GetWidthFromConfig();
             Width.Set(width, 0f);
 
             VAlign = 0.07f; // 7% down from top
@@ -116,17 +110,8 @@ namespace DPSPanel.UI
         {
             base.Update(gameTime);
 
-            Log.SlowInfo("Width: " + Width.Pixels);
-
-            //Width.Set(400, 0);
-            //MaxWidth.Set(500, 0);
-
-            // This ensures we do not use other items while dragging
-            // if (ContainsPoint(Main.MouseScreen))
-            // Main.LocalPlayer.mouseInterface = true;
-
-            // log state of clickstartinsidepanel
-            // // Log.Info($"clickStartInsidePanel: {clickStartInsidePanel}");
+            //Height.Set(3000, 0);
+            //Height.Set(40, 0);
 
             if (dragging)
             {

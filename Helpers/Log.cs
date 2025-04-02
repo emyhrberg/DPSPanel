@@ -1,3 +1,6 @@
+using System;
+using System.IO;
+using System.Runtime.CompilerServices;
 using Terraria.ModLoader;
 
 namespace DPSPanel.Helpers
@@ -5,6 +8,7 @@ namespace DPSPanel.Helpers
     public static class Log
     {
         private static Mod ModInstance => ModContent.GetInstance<DPSPanel>();
+        private static DateTime lastLogTime = DateTime.MinValue;
 
         public static void Info(string message)
         {
@@ -21,12 +25,21 @@ namespace DPSPanel.Helpers
             ModInstance.Logger.Error(message);
         }
 
-        public static void SlowInfo(string message, float delay = 0.5f)
+        public static void SlowInfo(string message, int seconds = 1, [CallerFilePath] string callerFilePath = "")
         {
-            if (TimeHelper.ToSeconds(delay).TotalSeconds > 0.5f)
+            // Extract the class name from the caller's file path.
+            string className = Path.GetFileNameWithoutExtension(callerFilePath);
+            var instance = ModInstance;
+            if (instance == null || instance.Logger == null)
+                return; // Skip logging if the mod is unloading or null
+
+            // Use TimeSpanFactory to create a 3-second interval.
+            TimeSpan interval = TimeHelper.FromSeconds(seconds);
+            if (DateTime.UtcNow - lastLogTime >= interval)
             {
-                ModInstance.Logger.Info($"[SlowInfo] {message}");
-                return;
+                // Prepend the class name to the log message.
+                instance.Logger.Info($"[{className}] {message}");
+                lastLogTime = DateTime.UtcNow;
             }
         }
     }

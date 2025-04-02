@@ -13,10 +13,10 @@ namespace DPSPanel.UI
 {
     public class PlayerDamagePanel : UIPanel
     {
-        private readonly float PANEL_PADDING = 5f; // No extra padding on the panel
-        private readonly float ITEM_PADDING = 10f;   // Vertical spacing between weapon bars
+        private float PANEL_PADDING = 5f; // No extra padding on the panel
+        private float ITEM_PADDING = 10f;   // Vertical spacing between weapon bars
         private float currentYOffset = 0f;           // Y offset for each new weapon bar
-        private const float ItemHeight = 16f;        // Height of each weapon bar
+        private float ItemHeight = 16f;        // Height of each weapon bar
 
         public bool IsVisible;
 
@@ -25,12 +25,40 @@ namespace DPSPanel.UI
 
         public PlayerDamagePanel()
         {
-            Width.Set(150, 0f);
+            float width = SizeHelper.GetWidthFromConfig();
+            Width.Set(width, 0f);
+            // Width.Set(150, 0f);
+
+            // Other
+            MaxHeight = new StyleDimension(1000f, 0f); // must be done to allow producing new bars
+
+            // Offset to the left by one panel
+            Left.Set(width, 0);
 
             // Start with a minimal height (will be updated by UpdateWeaponBars).
             Height.Set(40f, 0f);
             BackgroundColor = new Color(27, 29, 85); // Dark blue background.
             SetPadding(PANEL_PADDING);
+        }
+
+        public void UpdateBarHeight(float updatedHeight)
+        {
+            ItemHeight = updatedHeight;
+            // Update the height of each weapon bar.
+            foreach (var weaponBar in weaponBars.Values)
+            {
+                weaponBar.Height.Set(updatedHeight, 0f);
+            }
+        }
+
+        public void UpdateLeft(float updatedLeftOffset)
+        {
+            Left.Set(updatedLeftOffset, 0);
+        }
+
+        public void UpdatePanelWidth(float updatedWidth)
+        {
+            Width.Set(updatedWidth, 0f);
         }
 
         public void CreateWeaponBar(string weaponName)

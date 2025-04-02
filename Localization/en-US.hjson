@@ -70,6 +70,16 @@ Mods: {
 					Label: "[i:RainbowCursor] Show Tooltip When Hovering"
 					Tooltip: Disable this option to make the panel more subtle
 				}
+
+				PanelWidth: {
+					Label: Panel Width
+					Tooltip: ""
+				}
+
+				BarHeight: {
+					Label: Bar Height
+					Tooltip: ""
+				}
 			}
 		}
 

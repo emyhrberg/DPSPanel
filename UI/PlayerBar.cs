@@ -10,6 +10,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.UI;
 using Terraria.UI;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
@@ -18,7 +19,7 @@ namespace DPSPanel.UI
         private readonly Asset<Texture2D> emptyBar; // Background 
         private readonly Asset<Texture2D> fullBar;  // Foreground fill texture
         private readonly UIText textElement; // Text element for displaying player info
-        private const float ItemHeight = 40f; // Height of the player bar
+        private float ItemHeight = 40f; // Height of the player bar
 
         private Color fillColor; // Fill color
         private int percentage;  // Fill percentage (0-100)
@@ -29,7 +30,7 @@ namespace DPSPanel.UI
         public int PlayerWhoAmI { get; set; }
 
         // The damage panel is attached as a child of the PlayerBar.
-        private PlayerDamagePanel playerDamagePanel;
+        public PlayerDamagePanel playerDamagePanel;
 
         // Player head element
         private PlayerHead playerHeadElement;
@@ -37,8 +38,16 @@ namespace DPSPanel.UI
         public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
         {
             Config c = ModContent.GetInstance<Config>();
-            emptyBar = Ass.Default;
+            string theme = c.Theme;
+            Asset<Texture2D> emptyBarTheme = typeof(Ass).GetField(theme)?.GetValue(null) as Asset<Texture2D>;
+
+            emptyBar = emptyBarTheme;
             fullBar = Ass.BarFill;
+
+            if (theme == "Default" && Conf.C.PanelWidth == "Large")
+            {
+                emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
+            }
 
             Width = new StyleDimension(0, 1.0f);
             Height = new StyleDimension(ItemHeight, 0f);
@@ -66,10 +75,8 @@ namespace DPSPanel.UI
 
             // Create the damage panel.
             playerDamagePanel = new PlayerDamagePanel();
-            playerDamagePanel.MaxHeight = new StyleDimension(500f, 0f);
 
             // Offset by one panel size to the right.
-            playerDamagePanel.Left.Set(150f, 0f);
             Append(playerDamagePanel);
         }
 
@@ -144,6 +151,12 @@ namespace DPSPanel.UI
             Vector2 position = new(dims.X, dims.Y);
             Rectangle rect = new((int)position.X, (int)position.Y, (int)dims.Width, (int)dims.Height);
             spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
+        }
+
+        public void SetItemHeight(float newHeight)
+        {
+            this.ItemHeight = newHeight;
+            Height.Set(newHeight, 0f);
         }
     }
 }

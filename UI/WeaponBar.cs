@@ -8,6 +8,7 @@ using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
@@ -16,7 +17,7 @@ namespace DPSPanel.UI
         private Asset<Texture2D> emptyBar; // Background 
         private Asset<Texture2D> fullBar;  // Foreground fill texture
         private readonly UIText textElement; // Text element for display
-        private const float ItemHeight = 40f; // Height of the bar
+        private float ItemHeight = 40f; // Height of the bar
 
         private Color fillColor; // Fill color
         private int percentage;  // Fill percentage
@@ -34,8 +35,18 @@ namespace DPSPanel.UI
             emptyBar = emptyBarTheme;
             fullBar = Ass.BarFill;
 
+            if (theme == "Default" && Conf.C.PanelWidth == "Large")
+            {
+                emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
+            }
+
+            // Get the current height from the config (e.g. "Small", "Medium", or "Large")
+            float newHeight = SizeHelper.HeightSizes[c.BarHeight];
+            // Set our internal height to the config value instead of the default
+            ItemHeight = newHeight;
+
             Width = new StyleDimension(0, 1.0f);
-            Height = new StyleDimension(ItemHeight, 0f);
+            Height = new StyleDimension(newHeight, 0f);
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f;
 
@@ -63,7 +74,7 @@ namespace DPSPanel.UI
 
         protected override void DrawSelf(SpriteBatch sb)
         {
-            Height.Set(40, 0);
+            //Height.Set(40, 0);
             base.DrawSelf(sb);
             DrawDamageBarFill(sb);
             DrawDamageBarOutline(sb);
@@ -110,6 +121,13 @@ namespace DPSPanel.UI
             int iconY = (int)(dims.Y + (dims.Height - scaledHeight) / 2f);
             Rectangle destRect = new Rectangle(iconX, iconY, scaledWidth, scaledHeight);
             sb.Draw(texture, destRect, Color.White);
+        }
+
+        public void SetItemHeight(float newHeight)
+        {
+            ItemHeight = newHeight;
+            // Update the UIElement's own Height style
+            Height.Set(newHeight, 0f);
         }
     }
 }
