@@ -8,7 +8,6 @@ using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
-using Terraria.ModLoader.UI;
 using Terraria.UI;
 using static DPSPanel.Common.Configs.Config;
 
@@ -44,13 +43,21 @@ namespace DPSPanel.UI
             emptyBar = emptyBarTheme;
             fullBar = Ass.BarFill;
 
-            if (theme == "Default" && Conf.C.PanelWidth == "Large")
+            // Set the width to a special asset
+            if (Conf.C.PanelWidth == "Large")
             {
                 emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
             }
 
             Width = new StyleDimension(0, 1.0f);
-            Height = new StyleDimension(ItemHeight, 0f);
+
+
+            // set the height
+            // Retrieve the current bar height from the config
+            float newHeight = SizeHelper.HeightSizes[ModContent.GetInstance<Config>().BarHeight];
+            this.ItemHeight = newHeight;
+            Height = new StyleDimension(newHeight, 0f);
+
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f;
 

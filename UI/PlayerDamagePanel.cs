@@ -8,6 +8,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.UI;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
@@ -94,8 +95,17 @@ namespace DPSPanel.UI
 
                 WeaponBar bar = weaponBars[wpn.weaponName];
                 int percent = (int)((float)wpn.damage / highestDamage * 100);
+
                 // Use the sorted index to assign a color.
-                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+                Color color = Color.White; // Default color
+                if (Conf.C.BarColors == "Rainbow")
+                {
+                    color = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
+                }
+                else
+                {
+                    color = ColorHelper.standardColors[i % ColorHelper.standardColors.Length];
+                }
                 bar.UpdateWeaponBar(percent, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
 
                 // Position the weapon bar at the current offset.

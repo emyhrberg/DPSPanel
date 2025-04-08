@@ -29,7 +29,7 @@ namespace DPSPanel.UI
                 return;
 
             CalculatedStyle dims = GetDimensions();
-            int xOffset = 0;
+            int xOffset = 1;
             int yOffset = 16;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
@@ -42,12 +42,30 @@ namespace DPSPanel.UI
             // meaning the head will be flipped if the player is facing left
             PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
 
+            // Small, Medium, Large Bar Height equates to 0.9, 1.1 and 1.3 respectively
+            float headScale = 0.9f;
+            if (c.BarHeight == "Small")
+            {
+                headScale = 0.9f;
+                drawPosition -= new Vector2(0, 1); // Adjust position for small head size
+            }
+            else if (c.BarHeight == "Medium")
+            {
+                headScale = 1.1f;
+                drawPosition += new Vector2(0, 2); // Adjust position for medium head size
+            }
+            else if (c.BarHeight == "Large")
+            {
+                headScale = 1.3f;
+                drawPosition += new Vector2(0, 4); // Adjust position for larger head size
+            }
+
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
                 player, // player to draw
                 drawPosition,
                 1f, // alpha/transparency
-                0.9f, // scale
+                headScale, // scale
                 Color.White // border color
             );
             PlayerHeadFlipSystem.shouldFlipHeadDraw = false;

@@ -22,6 +22,7 @@ namespace DPSPanel.Helpers
         public static Asset<Texture2D> Default;
         public static Asset<Texture2D> DefaultLarge;
         public static Asset<Texture2D> BarFill;
+        public static Asset<Texture2D> BarFillLarge;
         public static Asset<Texture2D> ToggleButton;
         public static Asset<Texture2D> ToggleButtonHighlighted;
 

@@ -73,11 +73,16 @@ Mods: {
 
 				PanelWidth: {
 					Label: Panel Width
-					Tooltip: ""
+					Tooltip: Set the width of the panel
 				}
 
 				BarHeight: {
 					Label: Bar Height
+					Tooltip: Set the height of every bar
+				}
+
+				BarColors: {
+					Label: Bar Colors
 					Tooltip: ""
 				}
 			}

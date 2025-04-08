@@ -19,9 +19,8 @@ namespace DPSPanel.Common.Configs
         [DefaultValue(true)]
         public bool TrackAllEntities;
 
-        // Calamity Red
+        [BackgroundColor(192, 54, 64)] // Calamity Red
         [DefaultValue(true)]
-        // Calamity Red
         public bool TrackUnknownDamage;
 
         [Header("UI")]
@@ -30,6 +29,12 @@ namespace DPSPanel.Common.Configs
         [DefaultValue("Default")]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         public string Theme;
+
+        [DrawTicks]
+        [OptionStrings(["Default", "Rainbow",])]
+        [DefaultValue("Default")]
+        [BackgroundColor(255, 192, 8)] // Golden Yellow
+        public string BarColors;
 
         [DrawTicks]
         [OptionStrings(["Small", "Medium", "Large",])]
@@ -46,23 +51,23 @@ namespace DPSPanel.Common.Configs
         [Header("Settings")]
 
         [CustomModConfigItem(typeof(ShowPlayerIconConfigElement))]
-        [BackgroundColor(69, 80, 232)] // Damp Blue
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool ShowPlayerIcons;
 
-        [BackgroundColor(69, 80, 232)] // Damp Blue
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool ShowBossIcon;
 
-        [BackgroundColor(69, 80, 232)] // Damp Blue
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool ShowTooltipWhenHovering;
 
-        [BackgroundColor(69, 80, 232)] // Damp Blue
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool ShowWeaponsDuringBossFight;
 
-        [BackgroundColor(69, 80, 232)] // Damp Blue
+        [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
         public bool MakePanelDraggable;
 
@@ -100,34 +105,19 @@ namespace DPSPanel.Common.Configs
 
                 // Get the corresponding asset.
                 Asset<Texture2D> emptyBar = null;
-                try
+                Asset<Texture2D> fullBar = null;
+                if (Conf.C.PanelWidth == "Large")
                 {
-                    emptyBar = typeof(Ass).GetField(theme)?.GetValue(null) as Asset<Texture2D>;
-
-                    if (Conf.C.PanelWidth == "Large")
-                    {
-                        try
-                        {
-                            emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error("Failed to get emptyBar Large theme: " + e.Message);
-                        }
-                        emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Log.Error("Failed to get emptyBar theme: " + e.Message);
+                    emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
+                    fullBar = Ass.BarFillLarge;
                 }
 
                 // Custom case for Default and PanelWidth Large, we get the DefaultLarge.
-                if (emptyBar != null)
+                if (emptyBar != null && fullBar != null)
                 {
                     Log.Info($"Applying theme \"{theme}\" to weapon bar \"{kvp.Key}\".");
                     WeaponBar weaponBar = kvp.Value;
-                    weaponBar.UpdateTheme(emptyBar);
+                    weaponBar.UpdateTheme(emptyBar, fullBar);
                 }
                 else
                 {

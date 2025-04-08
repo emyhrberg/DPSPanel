@@ -17,7 +17,6 @@ namespace DPSPanel.UI
         private Asset<Texture2D> emptyBar; // Background 
         private Asset<Texture2D> fullBar;  // Foreground fill texture
         private readonly UIText textElement; // Text element for display
-        private float ItemHeight = 40f; // Height of the bar
 
         private Color fillColor; // Fill color
         private int percentage;  // Fill percentage
@@ -35,18 +34,22 @@ namespace DPSPanel.UI
             emptyBar = emptyBarTheme;
             fullBar = Ass.BarFill;
 
-            if (theme == "Default" && Conf.C.PanelWidth == "Large")
+            if (Conf.C.PanelWidth == "Large")
             {
                 emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
+                fullBar = Ass.BarFillLarge;
             }
 
             // Get the current height from the config (e.g. "Small", "Medium", or "Large")
             float newHeight = SizeHelper.HeightSizes[c.BarHeight];
             // Set our internal height to the config value instead of the default
-            ItemHeight = newHeight;
+            Height = new StyleDimension(newHeight, 0f);
+
+            // set the height
+            // Retrieve the current bar height from the config
+            Height = new StyleDimension(newHeight, 0f);
 
             Width = new StyleDimension(0, 1.0f);
-            Height = new StyleDimension(newHeight, 0f);
             Top = new StyleDimension(currentYOffset, 0f);
             HAlign = 0.5f;
 
@@ -58,9 +61,10 @@ namespace DPSPanel.UI
             Append(textElement);
         }
 
-        public void UpdateTheme(Asset<Texture2D> updatedEmptyBar)
+        public void UpdateTheme(Asset<Texture2D> updatedEmptyBar, Asset<Texture2D> updatedFullBar)
         {
             emptyBar = updatedEmptyBar;
+            fullBar = updatedFullBar;
         }
 
         public void UpdateWeaponBar(int _percentage, string _weaponName, int weaponDamage, int weaponID, Color _fillColor)
@@ -125,8 +129,6 @@ namespace DPSPanel.UI
 
         public void SetItemHeight(float newHeight)
         {
-            ItemHeight = newHeight;
-            // Update the UIElement's own Height style
             Height.Set(newHeight, 0f);
         }
     }

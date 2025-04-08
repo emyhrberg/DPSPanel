@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using static DPSPanel.Common.Configs.Config;
 
 namespace DPSPanel.UI
 {
@@ -143,7 +144,19 @@ namespace DPSPanel.UI
                 currentYOffset += ItemHeight;
 
                 int percentageToFill = highestDamage > 0 ? (int)(currentBar.PlayerDamage / (float)highestDamage * 100) : 0;
-                Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
+
+                // Use the sorted index to assign a color.
+                Color barColor = Color.White; // Default color
+                if (Conf.C.BarColors == "Rainbow")
+                {
+                    barColor = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
+                }
+                else
+                {
+                    barColor = ColorHelper.standardColors[i % ColorHelper.standardColors.Length];
+                }
+
+                // Update the player bar with the new values.
                 currentBar.UpdatePlayerBar(percentageToFill, currentPlayerName, currentBar.PlayerDamage, barColor);
             }
 
@@ -210,8 +223,15 @@ namespace DPSPanel.UI
                 int percent = highestDamage > 0 ?
                     (int)(bar.PlayerDamage / (float)highestDamage * 100) : 0;
 
-                // Use any color logic you like:
-                Color barColor = PanelColors.colors[i % PanelColors.colors.Length];
+                Color barColor = Color.White; // Default color
+                if (Conf.C.BarColors == "Rainbow")
+                {
+                    barColor = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
+                }
+                else
+                {
+                    barColor = ColorHelper.standardColors[i % ColorHelper.standardColors.Length];
+                }
                 bar.UpdatePlayerBar(percent, bar.PlayerName, bar.PlayerDamage, barColor);
 
                 // Update leftoffset for the player damage panel to the width of the config
@@ -224,8 +244,6 @@ namespace DPSPanel.UI
                 bar.playerDamagePanel.UpdatePanelWidth(width);
                 bar.playerDamagePanel.UpdateBarHeight(height);
             }
-
-
 
             // 2) Re-position the singleplayer weapon bars (if you’re using them)
             //    We'll just re-stack them in the order they exist:
@@ -269,9 +287,21 @@ namespace DPSPanel.UI
                 {
                     CreateWeaponBarSP(wpn.weaponName);
                 }
-                WeaponBar bar = weaponBars[wpn.weaponName];
+
+                // Calculate the percentage to fill the bar based on the weapon's damage.
                 int percentageToFill = (int)(wpn.damage / (float)highest * 100);
-                Color color = PanelColors.colors[i % PanelColors.colors.Length];
+                Color color = Color.White; // Default color
+                if (Conf.C.BarColors == "Rainbow")
+                {
+                    color = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
+                }
+                else
+                {
+                    color = ColorHelper.standardColors[i % ColorHelper.standardColors.Length];
+                }
+
+                // Update the weapon bar with the new values.
+                WeaponBar bar = weaponBars[wpn.weaponName];
                 bar.UpdateWeaponBar(percentageToFill, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
                 bar.Top.Set(currentYOffset, 0f);
                 currentYOffset += ItemHeight + BAR_SPACING;
