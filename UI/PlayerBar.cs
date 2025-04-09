@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using DPSPanel.Common.Configs;
-using DPSPanel.Common.DamageCalculation;
+using DPSPanel.DamageCalculation.Classes;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

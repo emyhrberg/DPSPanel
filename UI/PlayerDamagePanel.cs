@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DPSPanel.Common.Configs;
-using DPSPanel.Common.DamageCalculation;
+using DPSPanel.DamageCalculation.Classes;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
 using static DPSPanel.Common.Configs.Config;
 

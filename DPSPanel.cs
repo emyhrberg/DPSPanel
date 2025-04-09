@@ -1,5 +1,5 @@
 using System.IO;
-using DPSPanel.Networking;
+// using DPSPanel.Networking;
 using Terraria.ModLoader;
 
 namespace DPSPanel
@@ -9,7 +9,7 @@ namespace DPSPanel
     {
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
-            PacketHandler.Handle(reader);
+            // PacketHandler.Handle(reader);
         }
     }
 }

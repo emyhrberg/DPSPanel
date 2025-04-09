@@ -1,9 +1,8 @@
-using DPSPanel.Debug.DebugMisc;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Debug.DebugActions
+namespace DPSPanel.Debug
 {
     public class DebugGod : ModPlayer
     {

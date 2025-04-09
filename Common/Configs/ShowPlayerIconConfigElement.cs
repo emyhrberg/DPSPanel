@@ -1,12 +1,9 @@
 using DPSPanel.Common.Systems;
-using DPSPanel.Debug.DebugMisc;
-using DPSPanel.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.ModLoader.Config.UI;
 using Terraria.UI;
 using Terraria.UI.Chat;

@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 
 
-namespace DPSPanel.Debug.DebugMisc
+namespace DPSPanel.Debug
 {
     /// <summary>
     /// If the config is set to debug, this system will be loaded and the UI will be created.

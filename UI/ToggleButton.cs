@@ -7,7 +7,6 @@ using Terraria.ModLoader;
 using Terraria.UI;
 
 namespace DPSPanel.UI
-
 {
     public class ToggleButton : UIElement
     {

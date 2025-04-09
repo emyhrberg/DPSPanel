@@ -1,7 +1,4 @@
-﻿using DPSPanel.Helpers;
-using Terraria;
-using Terraria.ModLoader;
-using Terraria.UI;
+﻿using Terraria.UI;
 
 namespace DPSPanel.UI
 {
@@ -13,8 +10,6 @@ namespace DPSPanel.UI
         {
             container = new MainContainer();
             Append(container);
-
-            // Log.Info("MainState initialized!");
         }
     }
 }

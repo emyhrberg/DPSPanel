@@ -4,9 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using DPSPanel.Common.DamageCalculation;
-using DPSPanel.Debug.DebugActions;
-using DPSPanel.Debug.DebugMisc;
+using DPSPanel.DamageCalculation.Classes;
 using DPSPanel.Helpers;
 using DPSPanel.UI;
 using log4net;
@@ -20,7 +18,7 @@ using Terraria.ModLoader;
 using Terraria.UI;
 using static DPSPanel.Common.Configs.Config;
 
-namespace DPSPanel.Debug.DebugActions
+namespace DPSPanel.Debug
 {
     public class DebugPanel : UIPanel
     {
@@ -39,15 +37,15 @@ namespace DPSPanel.Debug.DebugActions
 
             // Add action texts
             AddButton("Open Config", OpenConfig);
+            AddButton("Set Spawn Point", SetSpawnPoint);
+            AddButton("Set Daytime", SetTime);
             AddButton("Clear Panel", ClearPanel);
             AddButton("Add PlayerBar", AddPlayer);
             AddButton("Add WeaponBar", AddWeaponBar);
-            AddButton("Open client log", OpenClientLog);
-            AddButton("Clear client log", ClearClientLog);
             AddButton("Spawn King Slime", SpawnKingSlimeSP);
-            AddButton("Set Spawn Point", SetSpawnPoint);
             AddButton("Spawn Eye of Cthulhu", SpawnEyeOfCthulhu);
-            AddButton("Set Daytime", SetTime);
+            AddButton("Spawn EoW", SpawnEoW);
+            AddButton("Spawn Destroyer", SpawnDestroyer);
         }
 
         #region Actions
@@ -79,6 +77,36 @@ namespace DPSPanel.Debug.DebugActions
             Main.time = 13500;
             Main.dayTime = true;
             Main.NewText("Time set to day.");
+        }
+
+        private void SpawnDestroyer()
+        {
+            // Spawn Destroyer in Single Player
+            int destroyerID = NPCID.TheDestroyer;
+            int x = (int)Main.LocalPlayer.position.X;
+            int y = (int)Main.LocalPlayer.position.Y;
+
+            NPC.NewNPCDirect(
+                source: null,
+                x: x,
+                y: y,
+                type: destroyerID
+            );
+        }
+
+        private void SpawnEoW()
+        {
+            // Spawn EoW in Single Player
+            int eowID = NPCID.EaterofWorldsHead;
+            int x = (int)Main.LocalPlayer.position.X;
+            int y = (int)Main.LocalPlayer.position.Y;
+
+            NPC.NewNPCDirect(
+                source: null,
+                x: x,
+                y: y,
+                type: eowID
+            );
         }
 
         private void SpawnEyeOfCthulhu()
@@ -159,8 +187,8 @@ namespace DPSPanel.Debug.DebugActions
 
         private void ToggleEnemySpawns()
         {
-            DebugSpawnRater.DisableSpawns = !DebugSpawnRater.DisableSpawns;
-            Main.NewText($"Disable spawn and kill all NPCs is now {(DebugSpawnRater.DisableSpawns ? "enabled" : "disabled")}.");
+            DebugSpawnRate.DisableSpawns = !DebugSpawnRate.DisableSpawns;
+            Main.NewText($"Disable spawn and kill all NPCs is now {(DebugSpawnRate.DisableSpawns ? "enabled" : "disabled")}.");
         }
 
         private void ToggleGod()

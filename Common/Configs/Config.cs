@@ -38,7 +38,7 @@ namespace DPSPanel.Common.Configs
 
         [DrawTicks]
         [OptionStrings(["Small", "Medium", "Large",])]
-        [DefaultValue("Medium")]
+        [DefaultValue("Small")]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         public string PanelWidth;
 
