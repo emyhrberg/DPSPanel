@@ -25,7 +25,7 @@ namespace DPSPanel.Helpers
             ModInstance.Logger.Error(message);
         }
 
-        public static void SlowInfo(string message, int seconds = 1, [CallerFilePath] string callerFilePath = "")
+        public static void SlowInfo(string message, int seconds = 1, bool debug = false, [CallerFilePath] string callerFilePath = "")
         {
             // Extract the class name from the caller's file path.
             string className = Path.GetFileNameWithoutExtension(callerFilePath);
@@ -38,7 +38,8 @@ namespace DPSPanel.Helpers
             if (DateTime.UtcNow - lastLogTime >= interval)
             {
                 // Prepend the class name to the log message.
-                instance.Logger.Info($"[{className}] {message}");
+                string formattedMessage = debug ? $"[{className}] {message}" : message;
+                instance.Logger.Info(formattedMessage);
                 lastLogTime = DateTime.UtcNow;
             }
         }

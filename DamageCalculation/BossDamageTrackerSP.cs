@@ -73,8 +73,6 @@ namespace DPSPanel.Common.DamageCalculation
             // TODO fix so we can get multiple bosses
             NPC activeBossNpc = Main.npc.FirstOrDefault(npc => npc.active && npc.boss);
 
-
-
             // 1) Normal single‐NPC boss (boss && realLife == -1).
             if (activeBossNpc != null && activeBossNpc.realLife == -1)
             {
@@ -87,7 +85,7 @@ namespace DPSPanel.Common.DamageCalculation
                         whoAmI = activeBossNpc.whoAmI,
                         bossName = activeBossNpc.FullName,
                         currentLife = activeBossNpc.life,
-                        initialLife = activeBossNpc.lifeMax,
+                        // initialLife = activeBossNpc.lifeMax,
                         damageTaken = 0
                     };
 

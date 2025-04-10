@@ -12,7 +12,6 @@ namespace DPSPanel.DamageCalculation.Classes
         public int whoAmI;        // NPC index of the boss
         public string bossName;   // e.g., "Eye of Cthulhu"
         public int currentLife;
-        public int initialLife;
         public int damageTaken;
 
         public List<Weapon> weapons = [];

@@ -37,6 +37,7 @@ namespace DPSPanel.Debug
 
             // Add action texts
             AddButton("Open Config", OpenConfig);
+            AddButton("God Mode", ToggleGod);
             AddButton("Set Spawn Point", SetSpawnPoint);
             AddButton("Set Daytime", SetTime);
             AddButton("Clear Panel", ClearPanel);
@@ -187,8 +188,8 @@ namespace DPSPanel.Debug
 
         private void ToggleEnemySpawns()
         {
-            DebugSpawnRate.DisableSpawns = !DebugSpawnRate.DisableSpawns;
-            Main.NewText($"Disable spawn and kill all NPCs is now {(DebugSpawnRate.DisableSpawns ? "enabled" : "disabled")}.");
+            // DebugSpawnRate.DisableSpawns = !DebugSpawnRate.DisableSpawns;
+            // Main.NewText($"Disable spawn and kill all NPCs is now {(DebugSpawnRate.DisableSpawns ? "enabled" : "disabled")}.");
         }
 
         private void ToggleGod()

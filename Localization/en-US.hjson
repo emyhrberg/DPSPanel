@@ -12,11 +12,7 @@ Mods: {
 
 				TrackAllEntities: {
 					Label: "[i:StardustCellStaff] Track All Entities"
-					Tooltip:
-						'''
-						Tracks damage done to all entities during a boss fight. 
-						              Otherwise tracks only damage done to boss itself
-						'''
+					Tooltip: "Tracks damage to all entities during a boss fight, or track only damage to the boss itself "
 				}
 
 				ShowPlayerIcons: {

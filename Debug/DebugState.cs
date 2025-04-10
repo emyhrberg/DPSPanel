@@ -10,6 +10,9 @@ namespace DPSPanel.Debug
         {
             debugPanel = new DebugPanel();
             Append(debugPanel);
+
+            DebugText debugText = new DebugText();
+            Append(debugText);
         }
     }
 }
