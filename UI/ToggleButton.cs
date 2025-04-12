@@ -47,7 +47,7 @@ namespace DPSPanel.UI
 
             // Draw either the button or highlighted button based on hover state
             Config c = ModContent.GetInstance<Config>();
-            if (IsMouseHovering && c.ShowTooltip)
+            if (IsMouseHovering && c.ShowTooltips)
             {
                 sb.Draw(imgHighlighted, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
                 Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open\nAlt click to open config");

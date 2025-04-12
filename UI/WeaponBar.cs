@@ -65,7 +65,14 @@ namespace DPSPanel.UI
             this.weaponName = weaponName;
             weaponItemID = weaponID;
 
-            textElement.SetText($"{weaponName} ({weaponDamage})");
+            if (Conf.C.DamageDisplay == "Damage")
+            {
+                textElement.SetText($"{weaponName} ({weaponDamage})");
+            }
+            else if (Conf.C.DamageDisplay == "Percent")
+            {
+                textElement.SetText($"{weaponName} ({percentage}%)");
+            }
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

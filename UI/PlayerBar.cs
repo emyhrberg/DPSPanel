@@ -101,15 +101,15 @@ namespace DPSPanel.UI
 
                 // Check if config option and if boss is alive
                 Config c = ModContent.GetInstance<Config>();
-                bool showOnHover = c.ShowWeaponsDuringBossFight;
+                // bool showOnHover = c.ShowWeaponsDuringBossFight;
                 bool isBossAlive = sys.state.container.panel.CurrentBossAlive;
                 // // Log.Info("ShowOnHover: " + showOnHover + " IsBossAlive: " + isBossAlive);
 
-                if (!showOnHover && isBossAlive)
-                {
-                    playerDamagePanel.IsVisible = false;
-                    return;
-                }
+                // if (!showOnHover && isBossAlive)
+                // {
+                // playerDamagePanel.IsVisible = false;
+                // return;
+                // }
 
                 // If either this PlayerBar or its damage panel is hovered, make the damage panel visible.
                 if (IsMouseHovering || playerDamagePanel.IsMouseHovering)
@@ -130,7 +130,16 @@ namespace DPSPanel.UI
             this.fillColor = fillColor;
             PlayerName = playerName;
             PlayerDamage = playerDamage;
-            textElement.SetText($"{playerName} ({playerDamage})");
+            // textElement.SetText($"{playerName} ({playerDamage})");
+
+            if (Conf.C.DamageDisplay == "Damage")
+            {
+                textElement.SetText($"{playerName} ({playerDamage})");
+            }
+            else if (Conf.C.DamageDisplay == "Percent")
+            {
+                textElement.SetText($"{playerName} ({percentage}%)");
+            }
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)

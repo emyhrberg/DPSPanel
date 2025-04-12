@@ -25,7 +25,7 @@ namespace DPSPanel.Common.Configs
 
         [Header("UI")]
         [DrawTicks]
-        // [CustomModConfigItem(typeof(ThemeConfigElement))]
+        [CustomModConfigItem(typeof(ThemeConfigElement))]
         [OptionStrings(["Default", "Fancy", "Golden", "Leaf", "Retro", "Sticks", "StoneGold", "Tribute", "TwigLeaf", "Valkyrie"])]
         [DefaultValue("Default")]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
@@ -45,6 +45,12 @@ namespace DPSPanel.Common.Configs
 
         [Header("Settings")]
 
+        [DrawTicks]
+        [OptionStrings(["Damage", "Percent"])]
+        [DefaultValue("Damage")]
+        [BackgroundColor(85, 111, 64)] // Damp Green
+        public string DamageDisplay;
+
         [CustomModConfigItem(typeof(ShowPlayerIconConfigElement))]
         [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
@@ -56,11 +62,11 @@ namespace DPSPanel.Common.Configs
 
         [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
-        public bool ShowTooltip;
+        public bool ShowTooltips;
 
-        [BackgroundColor(85, 111, 64)] // Damp Green
-        [DefaultValue(true)]
-        public bool ShowWeaponsDuringBossFight;
+        // [BackgroundColor(85, 111, 64)] // Damp Green
+        // [DefaultValue(true)]
+        // public bool ShowWeaponsDuringBossFight;
 
         [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]

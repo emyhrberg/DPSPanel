@@ -67,6 +67,11 @@ Mods: {
 					Tooltip: Disable this option to make the panel more subtle
 				}
 
+				ShowTooltips: {
+					Label: "[i:RainbowCursor] Show Tooltips"
+					Tooltip: Disable this option to make the panel more subtle
+				}
+
 				PanelWidth: {
 					Label: Panel Width
 					Tooltip: Set the width of the panel
@@ -80,6 +85,11 @@ Mods: {
 				BarColors: {
 					Label: Bar Colors
 					Tooltip: ""
+				}
+
+				DamageDisplay: {
+					Tooltip: Show total damage or percentage of damage in the bars
+					Label: "[i:3811] Damage Display"
 				}
 			}
 		}
