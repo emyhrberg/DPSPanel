@@ -86,7 +86,7 @@ namespace DPSPanel.Common.DamageCalculation
                     sys.state.container.panel.ClearPanelAndAllItems();
                     sys.state.container.panel.SetBossTitle(
                         "Eater of Worlds",
-                        -1,
+                        npc.whoAmI,
                         npc.GetBossHeadTextureIndex()
                     );
                 }

@@ -25,7 +25,7 @@ namespace DPSPanel.Common.Configs
 
         [Header("UI")]
         [DrawTicks]
-        [CustomModConfigItem(typeof(ThemeConfigElement))]
+        // [CustomModConfigItem(typeof(ThemeConfigElement))]
         [OptionStrings(["Default", "Fancy", "Golden", "Leaf", "Retro", "Sticks", "StoneGold", "Tribute", "TwigLeaf", "Valkyrie"])]
         [DefaultValue("Default")]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
@@ -56,7 +56,7 @@ namespace DPSPanel.Common.Configs
 
         [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]
-        public bool ShowTooltipWhenHovering;
+        public bool ShowTooltip;
 
         [BackgroundColor(85, 111, 64)] // Damp Green
         [DefaultValue(true)]

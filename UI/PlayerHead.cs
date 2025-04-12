@@ -29,7 +29,7 @@ namespace DPSPanel.UI
                 return;
 
             CalculatedStyle dims = GetDimensions();
-            int xOffset = 1;
+            int xOffset = 16;
             int yOffset = 16;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 

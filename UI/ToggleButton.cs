@@ -2,6 +2,7 @@
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.UI;
@@ -46,10 +47,10 @@ namespace DPSPanel.UI
 
             // Draw either the button or highlighted button based on hover state
             Config c = ModContent.GetInstance<Config>();
-            if (IsMouseHovering && c.ShowTooltipWhenHovering)
+            if (IsMouseHovering && c.ShowTooltip)
             {
                 sb.Draw(imgHighlighted, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-                Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open");
+                Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open\nAlt click to open config");
             }
             else
             {
@@ -105,6 +106,17 @@ namespace DPSPanel.UI
                 }
 
                 parentContainer.TogglePanel();
+
+                // check if alt is pressed
+                if (Main.keyState.IsKeyDown(Keys.LeftAlt))
+                {
+                    // open the config menu
+                    var conf = ModContent.GetInstance<Config>();
+                    if (conf != null)
+                    {
+                        conf.Open();
+                    }
+                }
             }
         }
         #endregion
