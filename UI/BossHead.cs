@@ -1,15 +1,12 @@
-﻿using DPSPanel.Helpers;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Terraria;
 using Terraria.GameContent;
-using Terraria.ModLoader;
 using Terraria.UI;
 namespace DPSPanel.UI
 {
     public class BossHead : UIElement
     {
-        public int _bossHeadID;
+        public int _bossHeadID = -1; // -1 means no/invalid boss head
 
         public BossHead()
         {
@@ -20,10 +17,11 @@ namespace DPSPanel.UI
 
         protected override void DrawSelf(SpriteBatch sb)
         {
-
             //HAlign = 1.0f;
 
             base.DrawSelf(sb);
+
+            // TODO change icon size based on panel size maybe?
 
             if (_bossHeadID == -1)
                 return;

@@ -56,17 +56,16 @@ namespace DPSPanel.Debug
 
         private void AddWeaponBar()
         {
+            // create a list of test1, test2, test3, ... test100 weapons
             for (int j = 1; j <= 100; j++)
-            {
                 testWeapons.Add(new Weapon(weaponItemID: -1, weaponName: $"test{j}", damage: j * 100));
-            }
 
-            // select a weapon from testweapons that doesnt exist in 
+            // select a weapon
             Weapon testWeaponToAdd = testWeapons.FirstOrDefault(w => !currentWeapons.Contains(w));
             currentWeapons.Add(testWeaponToAdd);
 
+            // update the panel with the new weapon
             MainSystem sys = ModContent.GetInstance<MainSystem>();
-            sys.state.container.panel.CreateWeaponBarSP(testWeaponToAdd.weaponName);
             sys.state.container.panel.UpdateAllWeaponBarsSP(currentWeapons);
         }
 

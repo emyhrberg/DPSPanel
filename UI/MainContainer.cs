@@ -33,6 +33,7 @@ namespace DPSPanel.UI
             // Convert from string to float using the dictionary to set the width.
             float width = SizeHelper.GetWidthFromConfig();
             Width.Set(width, 0f);
+            Height.Set(40, 0);
 
             VAlign = 0.07f; // 7% down from top
             HAlign = 0.5f;  // center horizontally
@@ -40,6 +41,7 @@ namespace DPSPanel.UI
             // 1) Create the panel
             panel = new MainPanel();
             Append(panel);
+            Recalculate();
 
             // 2) Create the button
             toggleButton = new ToggleButton();

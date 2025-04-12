@@ -63,7 +63,7 @@ namespace DPSPanel.UI
         public void CreateWeaponBar(string weaponName)
         {
             // Create a new WeaponBar instance and store it in the dictionary.
-            WeaponBar damageBar = new WeaponBar(0f);
+            WeaponBar damageBar = new WeaponBar();
             weaponBars[weaponName] = damageBar;
             Append(damageBar);
 
@@ -96,11 +96,11 @@ namespace DPSPanel.UI
 
                 // Use the sorted index to assign a color.
                 Color color = Color.White; // Default color
-                if (Conf.C.BarColors == "Rainbow")
-                {
-                    color = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
-                }
-                else
+                // if (Conf.C.BarColors == "Rainbow")
+                // {
+                //     color = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
+                // }
+                // else
                 {
                     color = ColorHelper.standardColors[i % ColorHelper.standardColors.Length];
                 }

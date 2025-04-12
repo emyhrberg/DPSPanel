@@ -14,28 +14,41 @@ namespace DPSPanel.Common.DamageCalculation
 {
     /// <summary>
     /// Multiplayer version of boss damage tracking that handles:
-    /// 1) Normal single‐NPC bosses
+    /// 1) Normal single-NPC bosses
     /// 2) Eater of Worlds (custom logic)
-    /// 3) Other worm‐like bosses, by checking realLife
+    /// 3) Other worm-like bosses, by checking realLife
     /// </summary>
     [Autoload(Side = ModSide.Client)]
     public class BossDamageTrackerMP : ModPlayer
     {
         #region Fight Classes
-
         /// <summary>
         /// For single‐NPC bosses (boss && realLife == -1).
         /// </summary>
-        public class NormalBossFightMP(int whoAmI, string bossName, int bossHeadId, int initialLife, int currentLife)
+        public class NormalBossFightMP
         {
-            public int whoAmI = whoAmI;
-            public string bossName = bossName;
-            public int damageTaken = 0;
-            public int bossHeadId = bossHeadId;
-            public int initialLife = initialLife; // Initial life of the boss
-            public int currentLife = currentLife; // Current life of the boss
-            public List<PlayerFightData> players = [];
-            public List<Weapon> weapons = [];
+            public int whoAmI;
+            public string bossName;
+            public int damageTaken;
+            public int bossHeadId;
+            public int initialLife;
+            public int currentLife;
+
+            public List<PlayerFightData> players;
+            public List<Weapon> weapons;
+
+            public NormalBossFightMP(int whoAmI, string bossName, int bossHeadId, int initialLife, int currentLife)
+            {
+                this.whoAmI = whoAmI;
+                this.bossName = bossName;
+                this.bossHeadId = bossHeadId;
+                this.initialLife = initialLife;
+                this.currentLife = currentLife;
+
+                damageTaken = 0;
+                players = new List<PlayerFightData>();
+                weapons = new List<Weapon>();
+            }
 
             public void UpdatePlayerDamage(string playerName, int playerWhoAmI, int damageDone)
             {
@@ -79,13 +92,12 @@ namespace DPSPanel.Common.DamageCalculation
         public class EoWFightMP
         {
             public bool isAlive;
-            public string bossName;  // "Eater of Worlds"
+            public string bossName;
             public int damageTaken;
             public int totalLife;
             public int totalLifeMax;
             public int bossHeadId;
 
-            // Track which players have dealt damage and total weapon damage
             public List<PlayerFightData> players;
             public List<Weapon> weapons;
 
@@ -141,7 +153,7 @@ namespace DPSPanel.Common.DamageCalculation
         {
             public bool isAlive;
             public int headIndex;      // NPC.whoAmI of the worm head
-            public string bossName;    // e.g., "The Destroyer"
+            public string bossName;
             public int damageTaken;
             public int totalLife;
             public int totalLifeMax;
@@ -213,12 +225,14 @@ namespace DPSPanel.Common.DamageCalculation
             if (Main.netMode != NetmodeID.MultiplayerClient)
                 return;
 
-            // Same approach for EoW
+            // --------------------------------------------------------------------------------
+            // 1) Check if existing fights are still alive and end them if they're fully dead.
+            // --------------------------------------------------------------------------------
+
+            // Eater of Worlds
             if (eaterFight != null)
             {
-                // Recompute total HP
                 RecalculateEoWLife();
-                // If it’s fully gone, clear
                 if (eaterFight.totalLife <= 0)
                 {
                     eaterFight.isAlive = false;
@@ -227,7 +241,7 @@ namespace DPSPanel.Common.DamageCalculation
                 }
             }
 
-            // Same approach for wormFight
+            // Worm-like boss
             if (wormFight != null)
             {
                 RecalculateWormLife();
@@ -239,47 +253,64 @@ namespace DPSPanel.Common.DamageCalculation
                 }
             }
 
-            // 2) Now, see if we need to create a NEW fight (only if we don’t already have one)
-            //    For example, check normalFight first:
+            // Normal single‐NPC boss
+            if (normalFight != null)
+            {
+                NPC bossNpc = Main.npc[normalFight.whoAmI];
+                if (!bossNpc.active || bossNpc.life <= 0)
+                {
+                    // Boss is dead or inactive
+                    normalFight = null;
+                }
+                else
+                {
+                    // Update current life
+                    normalFight.currentLife = bossNpc.life;
+                }
+            }
+
+            // --------------------------------------------------------------------------------
+            // 2) If we have no active fights, look for a NEW one to start.
+            // --------------------------------------------------------------------------------
+
+            // Normal single-NPC boss detection
             if (normalFight == null)
             {
-                // Are there any active single-NPC bosses we can target?
-                NPC normalBoss = Main.npc
-                    .FirstOrDefault(n => n.active && n.boss && n.realLife == -1);
-
+                NPC normalBoss = Main.npc.FirstOrDefault(n =>
+                    n.active && n.boss && n.realLife == -1);
                 if (normalBoss != null)
                 {
-                    // Found one! Create a new fight object and send it to the server
                     normalFight = new NormalBossFightMP(
-                        normalBoss.whoAmI,
-                        normalBoss.FullName,
-                        normalBoss.life,
-                        normalBoss.lifeMax,
-                        normalBoss.GetBossHeadTextureIndex()
+                        whoAmI: normalBoss.whoAmI,
+                        bossName: normalBoss.FullName,
+                        bossHeadId: normalBoss.GetBossHeadTextureIndex(),
+                        initialLife: normalBoss.lifeMax,
+                        currentLife: normalBoss.life
                     );
-                    Log.Info("[MP] Created new normal boss fight2: " + normalFight.bossName);
+
+                    Log.Info("[MP] Created new normal boss fight: " + normalFight.bossName);
                     PacketSender.SendPlayerDamagePacket(normalFight);
                 }
             }
 
-            // 3) If no normalFight, then check for EoW if we don’t already have one:
+            // Eater of Worlds detection
             if (eaterFight == null)
             {
-                bool foundEoWSegment = false;
+                bool foundEoW = false;
                 for (int i = 0; i < Main.npc.Length; i++)
                 {
                     NPC npc = Main.npc[i];
                     if (npc.active && IsEaterOfWorlds(npc.type))
                     {
-                        foundEoWSegment = true;
                         eaterFight = new EoWFightMP("Eater of Worlds", npc.GetBossHeadTextureIndex());
+                        foundEoW = true;
                         PacketSender.SendPlayerDamagePacket(eaterFight);
-                        break; // only create once
+                        break;
                     }
                 }
             }
 
-            // 4) If still no EoW, see if there’s an active worm boss (other than EoW)
+            // Other worm-like boss detection
             if (wormFight == null)
             {
                 // Find the head of a worm-like boss (boss && realLife != -1 && not EoW)
@@ -289,12 +320,12 @@ namespace DPSPanel.Common.DamageCalculation
                 if (wormBossSegment != null)
                 {
                     NPC headNpc = Main.npc[wormBossSegment.realLife];
-                    if (headNpc.boss)
+                    if (headNpc.active && headNpc.boss)
                     {
                         wormFight = new WormBossFightMP(
-                            wormBossSegment.realLife,
-                            headNpc.FullName,
-                            headNpc.GetBossHeadTextureIndex()
+                            headIndex: wormBossSegment.realLife,
+                            bossName: headNpc.FullName,
+                            bossHeadId: headNpc.GetBossHeadTextureIndex()
                         );
                         PacketSender.SendPlayerDamagePacket(wormFight);
                     }
@@ -317,20 +348,21 @@ namespace DPSPanel.Common.DamageCalculation
             if (Main.netMode != NetmodeID.MultiplayerClient)
                 return;
 
-            // If your GlobalProjectile stored the original weapon:
+            // Check GlobalProjectile data to identify the source weapon
             GlobalProj gProj = proj.GetGlobalProjectile<GlobalProj>();
             int weaponID = -1;
             string weaponName = "Unknown";
+
             if (gProj != null && gProj.sourceWeapon != null)
             {
                 weaponID = gProj.sourceWeapon.type;
                 weaponName = gProj.sourceWeapon.Name;
             }
 
-            // Config option to ignore unknown projectiles
+            // Config option to ignore truly unknown projectiles
             if (weaponName == "Unknown" && !Conf.C.TrackUnknownDamage)
             {
-                Log.Info("[MP] Ignoring unknown projectile damage from proj: " + proj.Name);
+                // Log.Info("[MP] Ignoring unknown projectile damage from proj: " + proj.Name);
                 return;
             }
 
@@ -341,75 +373,94 @@ namespace DPSPanel.Common.DamageCalculation
 
         #region Internal Methods
 
+        /// <summary>
+        /// Main entry point for tracking boss damage. 
+        /// Respects Conf.C.TrackAllEntities: 
+        /// - If true, track damage on ANY NPC while a boss fight is active.
+        /// - If false, only track damage if the NPC matches the current boss or its segments.
+        /// </summary>
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
-            // Only proceed if there's an active fight or if tracking all entities is enabled.
-            bool anyFightActive = normalFight != null || eaterFight != null || wormFight != null;
+            bool anyFightActive = (normalFight != null || eaterFight != null || wormFight != null);
             if (!anyFightActive)
                 return;
 
-            // 1) Normal single‐NPC boss damage tracking.
+            Player localPlayer = Main.LocalPlayer;
+
+            // ---------------------------------------------------------------------
+            // Normal single‐NPC boss damage
+            // ---------------------------------------------------------------------
             if (normalFight != null)
             {
-                // Track damage if TrackAllEntities is on, or if this NPC is the current boss.
+                // If trackAllEntities is ON, record any hit.
+                // Otherwise, only record if npc.whoAmI == normalFight.whoAmI.
                 if (Conf.C.TrackAllEntities || npc.whoAmI == normalFight.whoAmI)
                 {
-                    Player player = Main.LocalPlayer;
                     normalFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                    normalFight.UpdatePlayerDamage(player.name, player.whoAmI, damageDone);
+                    normalFight.UpdatePlayerDamage(localPlayer.name, localPlayer.whoAmI, damageDone);
                     normalFight.damageTaken += damageDone;
-                }
 
-                // If this is the main boss, update its health or end the fight.
-                if (npc.whoAmI == normalFight.whoAmI)
-                {
-                    if (npc.life <= 0)
+                    // Check if that was the main boss
+                    if (npc.whoAmI == normalFight.whoAmI && npc.life <= 0)
                     {
                         normalFight = null;
                         return;
                     }
-                    else
+                }
+            }
+
+            // ---------------------------------------------------------------------
+            // Eater of Worlds damage
+            // ---------------------------------------------------------------------
+            if (eaterFight != null && eaterFight.isAlive)
+            {
+                // If trackAllEntities is ON, record any hit.
+                // Otherwise, only record if this NPC is an EoW segment.
+                if (Conf.C.TrackAllEntities || IsEaterOfWorlds(npc.type))
+                {
+                    eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                    eaterFight.UpdatePlayerDamage(localPlayer.name, localPlayer.whoAmI, damageDone);
+                    eaterFight.damageTaken += damageDone;
+
+                    // Recalculate total life to see if fight ends
+                    RecalculateEoWLife();
+                    if (eaterFight.totalLife <= 0)
                     {
-                        normalFight.currentLife = npc.life;
+                        eaterFight.isAlive = false;
+                        eaterFight = null;
+                        return;
                     }
                 }
             }
-            // 2) EoW segment tracking.
-            else if (eaterFight != null && IsEaterOfWorlds(npc.type))
-            {
-                eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                eaterFight.damageTaken += damageDone;
 
-                RecalculateEoWLife();
-                if (eaterFight.totalLife <= 0)
-                {
-                    eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                    eaterFight = null;
-                }
-                else
-                {
-                    eaterFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                }
-            }
-            // 3) Worm-like boss tracking.
-            else if (wormFight != null && npc.realLife == wormFight.headIndex)
+            // ---------------------------------------------------------------------
+            // Worm‐like boss damage
+            // ---------------------------------------------------------------------
+            if (wormFight != null && wormFight.isAlive)
             {
-                wormFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                wormFight.damageTaken += damageDone;
-
-                RecalculateWormLife();
-                if (wormFight.totalLife <= 0)
+                // If trackAllEntities is ON, record any hit.
+                // Otherwise, only record if npc.realLife == wormFight.headIndex.
+                if (Conf.C.TrackAllEntities || npc.realLife == wormFight.headIndex)
                 {
                     wormFight.UpdateWeapon(weaponID, weaponName, damageDone);
-                    wormFight = null;
-                }
-                else
-                {
-                    wormFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                    wormFight.UpdatePlayerDamage(localPlayer.name, localPlayer.whoAmI, damageDone);
+                    wormFight.damageTaken += damageDone;
+
+                    // Recalculate total life to see if fight ends
+                    RecalculateWormLife();
+                    if (wormFight.totalLife <= 0)
+                    {
+                        wormFight.isAlive = false;
+                        wormFight = null;
+                        return;
+                    }
                 }
             }
         }
 
+        /// <summary>
+        /// Checks if the given type belongs to Eater of Worlds (head, body, tail).
+        /// </summary>
         private bool IsEaterOfWorlds(int npcType)
         {
             return npcType == NPCID.EaterofWorldsHead ||
@@ -428,10 +479,7 @@ namespace DPSPanel.Common.DamageCalculation
             for (int i = 0; i < Main.npc.Length; i++)
             {
                 NPC npc = Main.npc[i];
-                if (!npc.active)
-                    continue;
-
-                if (IsEaterOfWorlds(npc.type))
+                if (npc.active && IsEaterOfWorlds(npc.type))
                 {
                     total += npc.life;
                     totalMax += npc.lifeMax;
@@ -454,10 +502,7 @@ namespace DPSPanel.Common.DamageCalculation
             for (int i = 0; i < Main.npc.Length; i++)
             {
                 NPC npc = Main.npc[i];
-                if (!npc.active)
-                    continue;
-
-                if (npc.realLife == headIndex)
+                if (npc.active && npc.realLife == headIndex)
                 {
                     total += npc.life;
                     totalMax += npc.lifeMax;

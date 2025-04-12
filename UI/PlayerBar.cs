@@ -18,7 +18,6 @@ namespace DPSPanel.UI
         private readonly Asset<Texture2D> emptyBar; // Background 
         private readonly Asset<Texture2D> fullBar;  // Foreground fill texture
         private readonly UIText textElement; // Text element for displaying player info
-        private float ItemHeight = 40f; // Height of the player bar
 
         private Color fillColor; // Fill color
         private int percentage;  // Fill percentage (0-100)
@@ -34,7 +33,7 @@ namespace DPSPanel.UI
         // Player head element
         private PlayerHead playerHeadElement;
 
-        public PlayerBar(float currentYOffset, string playerName, int playerWhoAmI)
+        public PlayerBar(string playerName, int playerWhoAmI, float currentYOffset = 0f)
         {
             Config c = ModContent.GetInstance<Config>();
             string theme = c.Theme;
@@ -44,9 +43,10 @@ namespace DPSPanel.UI
             fullBar = Ass.BarFill;
 
             // Set the width to a special asset
-            if (Conf.C.PanelWidth == "Large")
+            if (Conf.C.Width == "Large" || Conf.C.Width == "Medium")
             {
                 emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
+                fullBar = Ass.BarFillLarge;
             }
 
             Width = new StyleDimension(0, 1.0f);
@@ -54,8 +54,9 @@ namespace DPSPanel.UI
 
             // set the height
             // Retrieve the current bar height from the config
-            float newHeight = SizeHelper.HeightSizes[ModContent.GetInstance<Config>().BarHeight];
-            this.ItemHeight = newHeight;
+            // float newHeight = SizeHelper.HeightSizes[ModContent.GetInstance<Config>().BarHeight];
+            float newHeight = SizeHelper.HeightSizes["Medium"];
+
             Height = new StyleDimension(newHeight, 0f);
 
             Top = new StyleDimension(currentYOffset, 0f);
@@ -158,12 +159,6 @@ namespace DPSPanel.UI
             Vector2 position = new(dims.X, dims.Y);
             Rectangle rect = new((int)position.X, (int)position.Y, (int)dims.Width, (int)dims.Height);
             spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
-        }
-
-        public void SetItemHeight(float newHeight)
-        {
-            this.ItemHeight = newHeight;
-            Height.Set(newHeight, 0f);
         }
     }
 }

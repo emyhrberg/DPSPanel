@@ -32,6 +32,34 @@ namespace DPSPanel.Common.DamageCalculation
             bool otherWormFound = false;    // Did we find a worm that's NOT EoW?
             bool normalBossFound = false;   // Did we find a normal single‐NPC boss?
 
+            // Check if the current fight whoAmI is still alive
+            if (normalFight != null)
+            {
+                NPC bossNpc = Main.npc[normalFight.whoAmI];
+                // Track the Name, NPC whoAmI, active status, and life
+                // Log.SlowInfo($"[DPSPanel] Tracking boss: Name={bossNpc.FullName}, whoAmI={bossNpc.whoAmI}, Active={bossNpc.active}, Life={bossNpc.life}");
+
+                // If any boss is alive, keep tracking something
+                // This is a dumb way to fix the issue of multiple bosses being alive at the same time.
+                if (Main.npc.Any(npc => npc.active && npc.boss))
+                {
+                    return;
+                }
+
+                if (!bossNpc.active || bossNpc.life <= 0)
+                {
+                    // Optionally, reset the panel.
+                    // But we actually want to keep stats once boss is dead so we can view them, so we dont reset.
+                    // MainSystem sys = ModContent.GetInstance<MainSystem>();
+                    // sys.state.container.panel.ClearPanelAndAllItems();
+                    // sys.state.container.panel.SetBossTitle("DPSPanel", -1, -1);
+
+                    // Log.Info("[SP] Normal boss is dead or despawned.");
+                    normalFight.SendBossFightToPanel();
+                    normalFight = null;
+                }
+            }
+
             // Check for EoW
             foreach (NPC npc in Main.npc)
             {
@@ -50,9 +78,9 @@ namespace DPSPanel.Common.DamageCalculation
 
                         // Minimal logging
                         Log.Info(
-                            $"[DPSPanel] Detected EoW segment: FullName={npc.FullName}, " +
-                            $"whoAmI={npc.whoAmI}, realLife={npc.realLife}"
-                        );
+                                                $"[DPSPanel] Detected EoW segment: FullName={npc.FullName}, " +
+                                                $"whoAmI={npc.whoAmI}, realLife={npc.realLife}"
+                                            );
                     }
                     MainSystem sys = ModContent.GetInstance<MainSystem>();
                     sys.state.container.panel.ClearPanelAndAllItems();
@@ -326,7 +354,7 @@ namespace DPSPanel.Common.DamageCalculation
             // Config option to ignore unknown projectiles
             if (weaponName == "Unknown" && !Conf.C.TrackUnknownDamage)
             {
-                Log.Info("[SP] Ignoring unknown proj with name: " + proj.Name + ", damage: " + damageDone);
+                // Log.Info("[SP] Ignoring unknown proj with name: " + proj.Name + ", damage: " + damageDone);
                 return;
             }
 

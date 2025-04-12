@@ -51,12 +51,18 @@ namespace DPSPanel.Common.Configs
 
             CalculatedStyle dims = GetDimensions();
             int xOffset = 16;
-            int yOffset = 16;
+            int yOffset = 14;
             Vector2 drawPosition = new(dims.X + xOffset, dims.Y + yOffset);
 
             // assign the shouldFlipHeadDraw flag to the direction of the player,
             // meaning the head will be flipped if the player is facing left
             PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
+
+            Color color = Color.White * 1.0f;
+            if (Value == false)
+            {
+                color = Color.Red;
+            }
 
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
@@ -64,7 +70,7 @@ namespace DPSPanel.Common.Configs
                 drawPosition,
                 1f, // alpha/transparency
                 0.6f, // scale
-                Color.White // border color
+                color // border color
             );
             PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
         }

@@ -1,4 +1,5 @@
 using DPSPanel.Common.DamageCalculation;
+using DPSPanel.DamageCalculation;
 using DPSPanel.DamageCalculation.Classes;
 using DPSPanel.Helpers;
 using Terraria;

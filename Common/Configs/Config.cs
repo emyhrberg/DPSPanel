@@ -25,28 +25,23 @@ namespace DPSPanel.Common.Configs
 
         [Header("UI")]
         [DrawTicks]
+        [CustomModConfigItem(typeof(ThemeConfigElement))]
         [OptionStrings(["Default", "Fancy", "Golden", "Leaf", "Retro", "Sticks", "StoneGold", "Tribute", "TwigLeaf", "Valkyrie"])]
         [DefaultValue("Default")]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
         public string Theme;
 
         [DrawTicks]
-        [OptionStrings(["Default", "Rainbow",])]
-        [DefaultValue("Default")]
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        public string BarColors;
-
-        [DrawTicks]
         [OptionStrings(["Small", "Medium", "Large",])]
         [DefaultValue("Small")]
         [BackgroundColor(255, 192, 8)] // Golden Yellow
-        public string PanelWidth;
+        public string Width;
 
-        [DrawTicks]
-        [OptionStrings(["Small", "Medium", "Large",])]
-        [DefaultValue("Medium")]
-        [BackgroundColor(255, 192, 8)] // Golden Yellow
-        public string BarHeight;
+        // [DrawTicks]
+        // [OptionStrings(["Small", "Medium", "Large",])]
+        // [DefaultValue("Medium")]
+        // [BackgroundColor(255, 192, 8)] // Golden Yellow
+        // public string BarHeight;
 
         [Header("Settings")]
 
@@ -91,7 +86,7 @@ namespace DPSPanel.Common.Configs
 
             UpdateTheme(sys);
             UpdateWidth(sys);
-            UpdateHeight(sys);
+            // UpdateHeight(sys);
         }
 
         private static void UpdateTheme(MainSystem sys)
@@ -105,19 +100,21 @@ namespace DPSPanel.Common.Configs
 
                 // Get the corresponding asset.
                 Asset<Texture2D> emptyBar = null;
-                Asset<Texture2D> fullBar = null;
-                if (Conf.C.PanelWidth == "Large")
+                if (Conf.C.Width == "Large" || Conf.C.Width == "Medium")
                 {
                     emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
-                    fullBar = Ass.BarFillLarge;
+                }
+                else
+                {
+                    emptyBar = typeof(Ass).GetField($"{theme}")?.GetValue(null) as Asset<Texture2D>;
                 }
 
                 // Custom case for Default and PanelWidth Large, we get the DefaultLarge.
-                if (emptyBar != null && fullBar != null)
+                if (emptyBar != null)
                 {
                     Log.Info($"Applying theme \"{theme}\" to weapon bar \"{kvp.Key}\".");
                     WeaponBar weaponBar = kvp.Value;
-                    weaponBar.UpdateTheme(emptyBar, fullBar);
+                    weaponBar.UpdateTheme(emptyBar, Conf.C.Width);
                 }
                 else
                 {
@@ -126,14 +123,14 @@ namespace DPSPanel.Common.Configs
             }
         }
 
-        private void UpdateWidth(MainSystem sys)
+        private static void UpdateWidth(MainSystem sys)
         {
             // This is straightforward.
             // Set the width of the container based on the selected option.
             MainContainer mainContainer = sys.state.container;
 
-            mainContainer.Width.Pixels = SizeHelper.WidthSizes[Conf.C.PanelWidth];
-            mainContainer.panel.Width.Pixels = SizeHelper.WidthSizes[Conf.C.PanelWidth];
+            mainContainer.Width.Pixels = SizeHelper.WidthSizes[Conf.C.Width];
+            mainContainer.panel.Width.Pixels = SizeHelper.WidthSizes[Conf.C.Width];
             sys.state.container.Recalculate();
             // Also update the bar asset, otherwise it will look stretched out and ugly.
             // Meaning its 300 px version or 400 px version etc.
@@ -141,27 +138,27 @@ namespace DPSPanel.Common.Configs
 
         private void UpdateHeight(MainSystem sys)
         {
-            MainPanel panel = sys.state.container.panel;
+            // MainPanel panel = sys.state.container.panel;
 
-            // Look up the new bar height based on your config's "Height" value:
-            float newHeight = SizeHelper.HeightSizes[Conf.C.BarHeight];
+            // // Look up the new bar height based on your config's "Height" value:
+            // float newHeight = SizeHelper.HeightSizes[Conf.C.BarHeight];
 
-            // 1) Update the MainPanel's ItemHeight so newly created bars will match
-            panel.ItemHeight = newHeight;
+            // // 1) Update the MainPanel's ItemHeight so newly created bars will match
+            // panel.ItemHeight = newHeight;
 
-            // 2) Update each existing bar (both player bars & weapon bars)
-            //    so they change their own Height property.
-            foreach (var pb in panel.PlayerBars.Values)
-            {
-                pb.SetItemHeight(newHeight);
-            }
-            foreach (var wb in panel.WeaponBars.Values)
-            {
-                wb.SetItemHeight(newHeight);
-            }
+            // // 2) Update each existing bar (both player bars & weapon bars)
+            // //    so they change their own Height property.
+            // foreach (var pb in panel.PlayerBars.Values)
+            // {
+            //     pb.SetItemHeight(newHeight);
+            // }
+            // foreach (var wb in panel.WeaponBars.Values)
+            // {
+            //     wb.SetItemHeight(newHeight);
+            // }
 
-            // 3) Re-build the layout so the panel repositions bars and resizes itself
-            panel.RebuildAllBarsLayout();
+            // // 3) Re-build the layout so the panel repositions bars and resizes itself
+            // panel.RebuildAllBarsLayout();
         }
 
         public static class Conf

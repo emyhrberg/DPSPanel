@@ -44,21 +44,21 @@ namespace DPSPanel.UI
 
             // Small, Medium, Large Bar Height equates to 0.9, 1.1 and 1.3 respectively
             float headScale = 0.9f;
-            if (c.BarHeight == "Small")
-            {
-                headScale = 0.9f;
-                drawPosition -= new Vector2(0, 1); // Adjust position for small head size
-            }
-            else if (c.BarHeight == "Medium")
-            {
-                headScale = 1.1f;
-                drawPosition += new Vector2(0, 2); // Adjust position for medium head size
-            }
-            else if (c.BarHeight == "Large")
-            {
-                headScale = 1.3f;
-                drawPosition += new Vector2(0, 4); // Adjust position for larger head size
-            }
+            // if (c.BarHeight == "Small")
+            // {
+            //     headScale = 0.9f;
+            //     drawPosition -= new Vector2(0, 1); // Adjust position for small head size
+            // }
+            // else if (c.BarHeight == "Medium")
+            // {
+            //     headScale = 1.1f;
+            //     drawPosition += new Vector2(0, 2); // Adjust position for medium head size
+            // }
+            // else if (c.BarHeight == "Large")
+            // {
+            //     headScale = 1.3f;
+            //     drawPosition += new Vector2(0, 4); // Adjust position for larger head size
+            // }
 
             Main.MapPlayerRenderer.DrawPlayerHead(
                 Main.Camera,
