@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Common.Configs;
+using DPSPanel.Common.DamageCalculation;
 using DPSPanel.DamageCalculation.Classes;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
@@ -156,12 +157,16 @@ namespace DPSPanel.UI
         /// <summary>
         /// Clears all bars and resets the panel to the basic boss header only.
         /// </summary>
-        public void ClearPanelAndAllItems()
+        public void ClearPanelAndAllItems(bool resetTracker = true)
         {
             RemoveAllChildren();
             playerBars.Clear();
             weaponBars.Clear();
             Append(bossIcon); // re‐append bossIcon if you still want it shown
+
+            if (resetTracker && Main.LocalPlayer != null)
+                Main.LocalPlayer.GetModPlayer<BossDamageTrackerSP>()
+                                .ResetCurrentFight();
         }
         #endregion
 

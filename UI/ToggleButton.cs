@@ -1,4 +1,5 @@
 ﻿using DPSPanel.Common.Configs;
+using DPSPanel.Common.DamageCalculation;
 using DPSPanel.Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -50,7 +51,7 @@ namespace DPSPanel.UI
             if (IsMouseHovering && c.ShowTooltips)
             {
                 sb.Draw(imgHighlighted, pos, null, Color.White, 0f, Vector2.Zero, scale, SpriteEffects.None, 0f);
-                Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open\nAlt click to open config");
+                Main.instance.MouseText("Left click to toggle panel \nRight click to only show when inventory is open\nAlt click to open config\nCtrl click to clear panel");
             }
             else
             {
@@ -105,6 +106,17 @@ namespace DPSPanel.UI
                     return;
                 }
 
+                // check if ctrl is pressed
+                if (Main.keyState.IsKeyDown(Keys.LeftControl))
+                {
+                    // clear
+                    MainSystem sys = ModContent.GetInstance<MainSystem>();
+                    sys.state.container.panel.ClearPanelAndAllItems();
+                    sys.state.container.panel.SetBossTitle("DPSPanel", bossWhoAmI: -1, bossID: -1);
+                    return;
+                }
+
+                // Toggle the panel visibility
                 parentContainer.TogglePanel();
 
                 // check if alt is pressed
@@ -117,6 +129,8 @@ namespace DPSPanel.UI
                         conf.Open();
                     }
                 }
+
+
             }
         }
         #endregion

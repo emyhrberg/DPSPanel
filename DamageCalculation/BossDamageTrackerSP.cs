@@ -16,6 +16,7 @@ namespace DPSPanel.Common.DamageCalculation
         private NormalBossFight normalFight;  // For single‐NPC bosses
         private EoWFight eaterFight;          // For the Eater of Worlds specifically
         private WormBossFight wormFight;      // For all other worm‐like bosses (e.g., The Destroyer)
+        private DummyFight dummyFight;
 
         #endregion
 
@@ -327,6 +328,8 @@ namespace DPSPanel.Common.DamageCalculation
             if (Main.netMode != NetmodeID.SinglePlayer)
                 return;
 
+            Log.Info($"[SP] Hit NPC with item: {item.Name}, NPC Name: {target.FullName}, NPC ID: {target.whoAmI}, NPC NETID, {target.netID}");
+
             int weaponID = item?.type ?? -1;
             string weaponName = item?.Name ?? "Unknown";
             TrackBossDamage(weaponID, weaponName, damageDone, target);
@@ -365,8 +368,45 @@ namespace DPSPanel.Common.DamageCalculation
 
         #region Methods
 
+        public void ResetCurrentFight()
+        {
+            normalFight = null;
+            eaterFight = null;
+            wormFight = null;
+            dummyFight = null;
+            Log.Info("[DPSPanel] Resetting current boss fight tracking.");
+        }
+
         private void TrackBossDamage(int weaponID, string weaponName, int damageDone, NPC npc)
         {
+            // If we hit a dummy, start tracking that and nothing else
+            if (npc.netID == 488)
+            {
+                if (dummyFight == null)
+                {
+                    dummyFight = new()
+                    {
+                        whoAmI = npc.whoAmI,
+                        bossName = npc.FullName,
+                        damageTaken = 0
+                    };
+                    MainSystem sys = ModContent.GetInstance<MainSystem>();
+                    sys.state.container.panel.ClearPanelAndAllItems(resetTracker: false);
+                    sys.state.container.panel.SetBossTitle(
+                        npc.FullName,
+                        -1,
+                        -1
+                    );
+                }
+                else
+                {
+                    dummyFight.UpdateWeapon(weaponID, weaponName, damageDone);
+                    dummyFight.damageTaken += damageDone;
+                }
+                dummyFight.SendBossFightToPanel();
+                return;
+            }
+
             // Only proceed if there's an active fight or if tracking all entities is enabled.
             bool anyFightActive = normalFight != null || eaterFight != null || wormFight != null;
             if (!anyFightActive && !Conf.C.TrackAllEntities)

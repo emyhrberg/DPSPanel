@@ -17,25 +17,24 @@ namespace DPSPanel.UI
 
         protected override void DrawSelf(SpriteBatch sb)
         {
-            //HAlign = 1.0f;
-
             base.DrawSelf(sb);
-
-            // TODO change icon size based on panel size maybe?
 
             if (_bossHeadID == -1)
                 return;
 
-            // ensure index is valid!
-            if (_bossHeadID >= 0 && _bossHeadID <= TextureAssets.NpcHeadBoss.Length && TextureAssets.NpcHead[_bossHeadID]?.Value != null)
+            // Make sure we stay within array bounds and match the array we’re about to use:
+            if (_bossHeadID >= 0
+                && _bossHeadID < TextureAssets.NpcHeadBoss.Length
+                && TextureAssets.NpcHeadBoss[_bossHeadID]?.Value != null)
             {
-                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[_bossHeadID]?.Value;
+                Texture2D bossHeadTexture = TextureAssets.NpcHeadBoss[_bossHeadID].Value;
                 CalculatedStyle dims = GetDimensions();
                 Rectangle pos = dims.ToRectangle();
                 sb.Draw(bossHeadTexture, pos, Color.White);
             }
             else
             {
+                // Optional logging or fallback
                 // Log.Info($"Invalid boss index {_bossHeadID}");
             }
         }
