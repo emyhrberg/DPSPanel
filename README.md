@@ -1,5 +1,3 @@
-# DPSPanel
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
@@ -9,14 +7,24 @@
 
   <h3 align="center">DPSPanel</h3>
 
-  The ultimate Terraria DPS Mod, displaying damage calculation per player and per weapon!
+A real-time DPS overlay for Terraria that tracks and compares damage from your weapons, minions, and sentries in solo or multiplayer boss fights.
+
+  <p align="center">
+    <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3408391079">Workshop Page</a>
+    &middot;
+    <a href="https://github.com/emyhrberg/ModHelper/issues?q=sort%3Aupdated-desc+is%3Aissue+is%3Aopen">Bug Report</a>
+  </p>
 </div>
 
-## How to use
-Subscribe to the mod on the [tModLoader Workshop!](https://steamcommunity.com/sharedfiles/filedetails/?id=3408391079)
+# Features:
 
-## Demo
-![download](https://github.com/user-attachments/assets/cc74f150-528b-4840-8850-6a7b94086046)
+🔹 Tracks damage done to NPCs and breaks damage source down by which weapons were used
 
-https://github.com/user-attachments/assets/5dd5e5a1-32c4-4677-973d-0dec368fef44
+🔹 Supports multiplayer boss fights
+
+🔹 Supports multiple bar themes and heavy customization via the config
+
+# Demo
+
+![download](https://github.com/user-attachments/assets/76520fa0-dc38-44ac-9378-bce95d7a0a7b)
 
