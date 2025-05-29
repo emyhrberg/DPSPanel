@@ -1,0 +1,22 @@
+[h1] DPSPanel [/h1]
+Ever wondered who did the most damage in a boss fight? And by which weapons they did it with? Now you can! DPSPanel provides a intuitive combat analysis of damage done by each player. It tracks, sorts, and displays the damage done by player and weapon.
+
+[h2] Usage [/h2]
+With the mod enabled, a toggle button will appear which you can use to toggle the visibility of the panel, open config, clear boss fight, and more. When a boss fight starts, the tracking will automatically begin!
+
+[img]https://raw.githubusercontent.com/emyhrberg/DPSPanel/refs/heads/master/Assets/ToggleButton.png[/img]
+
+[h2] Changelog [/h2]
+[list]
+[*] [b]v0.6.1:[/b] Added dummy damage and clear fight option
+[*] [b]v0.6:[/b] Added customizable bar themes to config
+[*] [b]v0.4:[/b] Added weapon panel to each player in multiplayer
+[*] [b]v0.3:[/b] Added option to track all entities in config
+[/list]
+
+[h2] Links [/h2]
+[list]
+[*] Source code hosted at: [url=https://github.com/emyhrberg/DPSPanel] GitHub [/url]
+[*] Got questions or suggestions? Join us at: [url=https://discord.com/invite/JNFYABQM] Discord [/url]
+[*] Wish to support my mod development? You can do so at  [url=https://ko-fi.com/erkyy] Ko-Fi [/url]
+[/list]

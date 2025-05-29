@@ -1,1 +1,4 @@
-Ready to dominate every boss fight? Unleash your inner champion with our cutting-edge mod that lets you test custom weapons, minions, and sentry setups while discovering who truly brings the heat. Whether you’re flying solo or squaring off with your friends, get ready to compare damage outputs in real time and elevate your game to the next level!
+DPSPanel provides a intuitive combat analysis of damage done by each player. It tracks, sorts, and displays the damage done by player and weapon.
+
+Usage:
+With the mod enabled, a toggle button will appear which you can use to toggle the visibility of the panel, open config, clear boss fight, and more. When a boss fight starts, the tracking will automatically begin!
