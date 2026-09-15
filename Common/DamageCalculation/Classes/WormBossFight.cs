@@ -3,18 +3,28 @@ using System.Linq;
 using DPSPanel.UI;
 using Terraria.ModLoader;
 
-namespace DPSPanel.DamageCalculation.Classes
-{/// <summary>
- /// Represents a normal single‐NPC boss fight (e.g., Eye of Cthulhu, Skeletron, etc.).
- /// </summary>
-    public class NormalBossFight
+namespace DPSPanel.Common.DamageCalculation.Classes
+{
+    /// <summary>
+    /// Represents a general multi‐segment worm‐like boss fight (e.g., The Destroyer),
+    /// tracked by realLife. The "headIndex" is the whoAmI of the head segment.
+    /// </summary>
+    public class WormBossFight
     {
-        public int whoAmI;        // NPC index of the boss
-        public string bossName;   // e.g., "Eye of Cthulhu"
-        public int currentLife;
+        public int headIndex;     // NPC.whoAmI of the worm's head
+        public string bossName;   // The name of the worm boss (e.g., "The Destroyer")
+
+        public int totalLife;
+        public int totalLifeMax;
         public int damageTaken;
 
-        public List<Weapon> weapons = [];
+        public List<Weapon> weapons = new List<Weapon>();
+
+        public WormBossFight(int headIndex, string bossName)
+        {
+            this.headIndex = headIndex;
+            this.bossName = bossName;
+        }
 
         public void UpdateWeapon(int weaponID, string weaponName, int damageDone)
         {
@@ -23,8 +33,8 @@ namespace DPSPanel.DamageCalculation.Classes
             {
                 var newWeapon = new Weapon(weaponID, weaponName, damageDone);
                 weapons.Add(newWeapon);
-                // Create the weapon bar once
-                ModContent.GetInstance<MainSystem>().state.container.panel.CreateWeaponBarSP(weaponName);
+                MainSystem sys = ModContent.GetInstance<MainSystem>();
+                sys.state.container.panel.CreateWeaponBarSP(weaponName);
             }
             else
             {

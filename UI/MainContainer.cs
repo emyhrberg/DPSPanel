@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using DPSPanel.Common.Configs;
-using DPSPanel.Helpers;
+using DPSPanel.Core.Utilities;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;

@@ -1,4 +1,4 @@
-namespace DPSPanel.DamageCalculation.Classes
+namespace DPSPanel.Common.DamageCalculation.Classes
 {
     public class Weapon(int weaponItemID, string weaponName, int damage)
     {

@@ -1,7 +1,5 @@
 using DPSPanel.Common.DamageCalculation;
-using DPSPanel.DamageCalculation;
-using DPSPanel.DamageCalculation.Classes;
-using DPSPanel.Helpers;
+using DPSPanel.Common.DamageCalculation.Classes;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;

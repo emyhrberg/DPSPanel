@@ -1,5 +1,5 @@
 using System;
-using DPSPanel.Helpers;
+using DPSPanel.Core.Utilities;
 using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using Terraria.Graphics.Renderers;

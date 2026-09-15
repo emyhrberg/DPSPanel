@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework;
 using Terraria;
 
-namespace DPSPanel.Helpers
+namespace DPSPanel.Core.Utilities
 {
     public static class ColorHelper
     {

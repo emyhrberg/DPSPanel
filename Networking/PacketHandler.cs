@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
-using DPSPanel.DamageCalculation.Classes;
+using DPSPanel.Common.DamageCalculation.Classes;
 using DPSPanel.UI;
 using Terraria;
 using Terraria.ID;

@@ -3,7 +3,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using Terraria.ModLoader;
 
-namespace DPSPanel.Helpers
+namespace DPSPanel.Core.Utilities
 {
     public static class Log
     {

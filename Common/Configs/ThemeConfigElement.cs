@@ -1,5 +1,5 @@
 using DPSPanel.Common.Systems;
-using DPSPanel.Helpers;
+using DPSPanel.Core.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;

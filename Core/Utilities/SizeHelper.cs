@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using DPSPanel.Common.Configs;
 using Terraria.ModLoader;
 
-namespace DPSPanel.UI
+namespace DPSPanel.Core.Utilities
 {
     public static class SizeHelper
     {

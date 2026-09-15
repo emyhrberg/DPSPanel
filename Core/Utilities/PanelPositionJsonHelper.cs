@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 using Newtonsoft.Json;
 using Terraria;
 
-namespace DPSPanel.Helpers
+namespace DPSPanel.Core.Utilities
 {
     public static class PanelPositionJsonHelper
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using DPSPanel.DamageCalculation.Classes;
-using DPSPanel.Helpers;
+using DPSPanel.Common.DamageCalculation.Classes;
+using DPSPanel.Core.Utilities;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;

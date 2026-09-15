@@ -1,4 +1,4 @@
-namespace DPSPanel.DamageCalculation.Classes
+namespace DPSPanel.Common.DamageCalculation.Classes
 {
     public class PlayerFightData(int playerWhoAmI, string playerName, int playerDamage)
     {

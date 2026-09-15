@@ -3,7 +3,7 @@ using System.Linq;
 using DPSPanel.UI;
 using Terraria.ModLoader;
 
-namespace DPSPanel.DamageCalculation.Classes
+namespace DPSPanel.Common.DamageCalculation.Classes
 {
     /// <summary>
     /// Represents an Eater of Worlds fight, which is multi‐segment.

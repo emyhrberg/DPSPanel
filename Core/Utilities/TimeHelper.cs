@@ -1,6 +1,6 @@
 using System;
 
-namespace DPSPanel.Helpers
+namespace DPSPanel.Core.Utilities
 {
     public static class TimeHelper
     {

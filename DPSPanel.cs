@@ -4,14 +4,13 @@ using DPSPanel.Networking;
 // using DPSPanel.Networking;
 using Terraria.ModLoader;
 
-namespace DPSPanel
+namespace DPSPanel;
+
+[Autoload(Side = ModSide.Both)]
+public class DPSPanel : Mod
 {
-    [Autoload(Side = ModSide.Both)]
-    public class DPSPanel : Mod
+    public override void HandlePacket(BinaryReader reader, int whoAmI)
     {
-        public override void HandlePacket(BinaryReader reader, int whoAmI)
-        {
-            PacketHandler.Handle(reader);
-        }
+        PacketHandler.Handle(reader);
     }
 }

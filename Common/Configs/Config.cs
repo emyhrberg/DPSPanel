@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using DPSPanel.Helpers;
+using DPSPanel.Core.Utilities;
 using DPSPanel.UI;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
