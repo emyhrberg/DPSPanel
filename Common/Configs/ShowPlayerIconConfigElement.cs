@@ -56,7 +56,6 @@ namespace DPSPanel.Common.Configs
 
             // assign the shouldFlipHeadDraw flag to the direction of the player,
             // meaning the head will be flipped if the player is facing left
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
 
             Color color = Color.White * 1.0f;
             if (Value == false)
@@ -64,15 +63,8 @@ namespace DPSPanel.Common.Configs
                 color = Color.Red;
             }
 
-            Main.MapPlayerRenderer.DrawPlayerHead(
-                Main.Camera,
-                player, // player to draw
-                drawPosition,
-                1f, // alpha/transparency
-                0.6f, // scale
-                color // border color
-            );
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
+            if (player != null)
+                PlayerHeadFlipSystem.DrawHead(player, drawPosition, 0.6f, color);
         }
 
         private void DrawToggleTexture(SpriteBatch sb)

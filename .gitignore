@@ -8,6 +8,8 @@
 /.vs
 /obj
 /bin
+/Tests/bin
+/Tests/obj
 
 # Ignore files:
 Properties/launchSettings.json

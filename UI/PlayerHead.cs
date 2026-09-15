@@ -40,7 +40,6 @@ namespace DPSPanel.UI
 
             // assign the shouldFlipHeadDraw flag to the direction of the player,
             // meaning the head will be flipped if the player is facing left
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = player.direction == -1;
 
             // Small, Medium, Large Bar Height equates to 0.9, 1.1 and 1.3 respectively
             float headScale = 0.9f;
@@ -60,15 +59,7 @@ namespace DPSPanel.UI
             //     drawPosition += new Vector2(0, 4); // Adjust position for larger head size
             // }
 
-            Main.MapPlayerRenderer.DrawPlayerHead(
-                Main.Camera,
-                player, // player to draw
-                drawPosition,
-                1f, // alpha/transparency
-                headScale, // scale
-                Color.White // border color
-            );
-            PlayerHeadFlipSystem.shouldFlipHeadDraw = false;
+            PlayerHeadFlipSystem.DrawHead(player, drawPosition, headScale, Color.White);
         }
     }
 }

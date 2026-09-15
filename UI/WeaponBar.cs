@@ -1,166 +1,34 @@
-﻿using DPSPanel.Common.Configs;
-using DPSPanel.Core.Utilities;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
-using Terraria;
+using System;
+using DPSPanel.Common.DamageCalculation.Classes;
 using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
 using Terraria.UI;
-using static DPSPanel.Common.Configs.Config;
 
-namespace DPSPanel.UI
+namespace DPSPanel.UI;
+
+public sealed class WeaponBar : DamageBar
 {
-    public class WeaponBar : UIElement
+    private int itemId = -1;
+
+    public void SetWeapon(Weapon weapon, long highest, Color color)
     {
-        private Asset<Texture2D> emptyBar; // Background 
-        private Asset<Texture2D> fullBar;  // Foreground fill texture
-        private readonly UIText textElement; // For weapon name & damage
+        itemId = weapon.weaponItemID;
+        SetData(weapon.weaponName, weapon.damage, highest > 0 ? (int)(weapon.damage * 100d / highest) : 0, color);
+    }
 
-        private Color fillColor;
-        private int percentage;
-
-        // Weapon info
-        private int weaponItemID;
-        private string weaponName;
-
-        public WeaponBar()
+    protected override void DrawIcon(SpriteBatch sb, CalculatedStyle dims)
+    {
+        Texture2D texture;
+        if (itemId <= 0 || itemId >= TextureAssets.Item.Length)
+            texture = TextureAssets.NpcHead[0].Value;
+        else
         {
-            Config c = ModContent.GetInstance<Config>();
-            string theme = c.Theme;
-
-            // Default (medium) textures unless user config says large
-            emptyBar = typeof(Ass).GetField(theme)?.GetValue(null) as Asset<Texture2D>;
-            fullBar = Ass.BarFill;
-
-            if (Conf.C.Width == "Large" || Conf.C.Width == "Medium")
-            {
-                emptyBar = typeof(Ass).GetField($"{theme}Large")?.GetValue(null) as Asset<Texture2D>;
-                fullBar = Ass.BarFillLarge;
-            }
-
-            // Height from config (e.g. "Small", "Medium", "Large")
-            float newHeight = SizeHelper.HeightSizes["Medium"];
-            Height.Set(newHeight, 0f);
-
-            Width.Set(0, 1.0f);
-            HAlign = 0.5f;
-
-            textElement = new UIText("", 0.8f)
-            {
-                HAlign = 0.5f,
-                VAlign = 0.5f,
-            };
-            Append(textElement);
+            Main.instance.LoadItem(itemId);
+            texture = TextureAssets.Item[itemId].Value;
         }
-
-        /// <summary>
-        /// Updates the bar with new data (percentage fill, name, damage, etc.).
-        /// </summary>
-        public void UpdateWeaponBar(int percentage, string weaponName, int weaponDamage, int weaponID, Color fillColor)
-        {
-            this.percentage = percentage;
-            this.fillColor = fillColor;
-            this.weaponName = weaponName;
-            weaponItemID = weaponID;
-
-            if (Conf.C.DamageDisplay == "Damage")
-            {
-                textElement.SetText($"{weaponName} ({weaponDamage})");
-            }
-            else if (Conf.C.DamageDisplay == "Percent")
-            {
-                textElement.SetText($"{weaponName} ({percentage}%)");
-            }
-        }
-
-        protected override void DrawSelf(SpriteBatch spriteBatch)
-        {
-            base.DrawSelf(spriteBatch);
-            DrawDamageBarFill(spriteBatch);
-            DrawDamageBarOutline(spriteBatch);
-            DrawWeaponIcon(spriteBatch);
-        }
-
-        public void UpdateTheme(Asset<Texture2D> emptyBar, string large)
-        {
-            this.emptyBar = emptyBar;
-            if (large == "Large")
-            {
-                this.fullBar = Ass.BarFillLarge;
-            }
-        }
-
-        private void DrawDamageBarFill(SpriteBatch spriteBatch)
-        {
-            CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new(dims.X, dims.Y);
-
-            int fillWidth = (int)(dims.Width * (percentage / 100f));
-            if (fillWidth <= 0) return;
-
-            Rectangle sourceRect = new(
-                0, 0,
-                (int)(fullBar.Width() * (percentage / 100f)),
-                fullBar.Height()
-            );
-
-            Rectangle destRect = new Rectangle(
-                (int)pos.X,
-                (int)pos.Y,
-                fillWidth,
-                (int)dims.Height
-            );
-
-            spriteBatch.Draw(fullBar.Value, destRect, sourceRect, fillColor);
-        }
-
-        private void DrawDamageBarOutline(SpriteBatch spriteBatch)
-        {
-            CalculatedStyle dims = GetDimensions();
-            Vector2 pos = new(dims.X, dims.Y);
-
-            Rectangle rect = new(
-                (int)pos.X,
-                (int)pos.Y,
-                (int)dims.Width,
-                (int)dims.Height
-            );
-
-            spriteBatch.Draw(emptyBar.Value, rect, Color.DarkGray);
-        }
-
-        private void DrawWeaponIcon(SpriteBatch spriteBatch)
-        {
-            // Draw either the known item icon or a placeholder
-            Texture2D texture;
-            if (weaponItemID < 0 || weaponItemID >= TextureAssets.Item.Length)
-            {
-                // Fallback: question mark or NPC head #0
-                texture = TextureAssets.NpcHead[0].Value;
-            }
-            else
-            {
-                texture = TextureAssets.Item[weaponItemID].Value;
-            }
-
-            CalculatedStyle dims = GetDimensions();
-            const int maxIconHeight = 32;
-            const int paddingLeft = 5;
-
-            int origW = texture.Width;
-            int origH = texture.Height;
-            float scale = (origH > maxIconHeight) ? (maxIconHeight / (float)origH) : 1f;
-
-            int scaledW = (int)(origW * scale);
-            int scaledH = (int)(origH * scale);
-
-            int iconX = (int)dims.X + paddingLeft;
-            int iconY = (int)(dims.Y + (dims.Height - scaledH) / 2f);
-
-            Rectangle destRect = new(iconX, iconY, scaledW, scaledH);
-            spriteBatch.Draw(texture, destRect, Color.White);
-        }
+        Rectangle frame = itemId > 0 && itemId < Main.itemAnimations.Length && Main.itemAnimations[itemId] != null
+            ? Main.itemAnimations[itemId].GetFrame(texture) : texture.Bounds;
+        float scale = Math.Min(1f, 30f / Math.Max(frame.Width, frame.Height));
+        sb.Draw(texture, new Vector2(dims.X + 20, dims.Y + dims.Height / 2), frame, Color.White,
+            0f, frame.Size() / 2, scale, SpriteEffects.None, 0f);
     }
 }

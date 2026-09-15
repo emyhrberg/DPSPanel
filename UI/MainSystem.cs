@@ -25,7 +25,15 @@ namespace DPSPanel.UI
 
         public override void UpdateUI(GameTime gameTime)
         {
-            ui?.Update(gameTime); // Always update the UI (everything in the PanelState, Panel, etc.)
+            if (!Main.gameMenu)
+                ui?.Update(gameTime);
+        }
+
+        public override void Unload()
+        {
+            ui?.SetState(null);
+            ui = null;
+            state = null;
         }
 
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
@@ -37,7 +45,8 @@ namespace DPSPanel.UI
                     "DPSPanel: MainSystem",
                     delegate
                     {
-                        ui.Draw(Main.spriteBatch, new GameTime());
+                        if (!Main.gameMenu)
+                            ui?.Draw(Main.spriteBatch, new GameTime());
                         return true;
                     },
                     InterfaceScaleType.UI)

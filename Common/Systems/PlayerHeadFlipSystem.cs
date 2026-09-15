@@ -7,9 +7,24 @@ using Terraria.ModLoader;
 
 namespace DPSPanel.Common.Systems
 {
+    [Autoload(Side = ModSide.Client)]
     public class PlayerHeadFlipSystem : ModSystem
     {
-        public static bool shouldFlipHeadDraw = true;
+        public static bool shouldFlipHeadDraw;
+
+        public static void DrawHead(Player player, Vector2 position, float scale, Color border)
+        {
+            bool previous = shouldFlipHeadDraw;
+            try
+            {
+                shouldFlipHeadDraw = player.direction == -1;
+                Main.MapPlayerRenderer.DrawPlayerHead(Main.Camera, player, position, 1f, scale, border);
+            }
+            finally
+            {
+                shouldFlipHeadDraw = previous;
+            }
+        }
 
         public override void Load()
         {

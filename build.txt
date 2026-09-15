@@ -1,7 +1,7 @@
 displayName = DPSPanel
 author = Erky
-version = 0.6.1
+version = 0.6.2
 side=both
 hideCode = true
 hideResources = true
-buildIgnore = Assets\Old*
+buildIgnore = Assets\Old*, Tests\*

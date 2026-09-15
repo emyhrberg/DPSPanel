@@ -111,13 +111,9 @@ namespace DPSPanel.UI
                 {
                     // clear
                     MainSystem sys = ModContent.GetInstance<MainSystem>();
-                    sys.state.container.panel.ClearPanelAndAllItems();
-                    sys.state.container.panel.SetBossTitle("DPSPanel", bossWhoAmI: -1, bossID: -1);
+                    ModContent.GetInstance<EncounterSystem>().ClearVisible();
                     return;
                 }
-
-                // Toggle the panel visibility
-                parentContainer.TogglePanel();
 
                 // check if alt is pressed
                 if (Main.keyState.IsKeyDown(Keys.LeftAlt))
@@ -128,9 +124,9 @@ namespace DPSPanel.UI
                     {
                         conf.Open();
                     }
+                    return;
                 }
-
-
+                parentContainer.TogglePanel();
             }
         }
         #endregion

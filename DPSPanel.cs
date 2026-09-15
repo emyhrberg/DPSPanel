@@ -11,6 +11,6 @@ public class DPSPanel : Mod
 {
     public override void HandlePacket(BinaryReader reader, int whoAmI)
     {
-        PacketHandler.Handle(reader);
+        PacketHandler.Handle(reader, whoAmI);
     }
 }

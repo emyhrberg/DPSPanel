@@ -22,6 +22,7 @@ public static class Ass
     public static Asset<Texture2D> ToggleButton;
     public static Asset<Texture2D> ToggleButtonHighlighted;
     public static Asset<Texture2D> IconLock;
+    public static Asset<Texture2D> ConfigUnknownItem;
 
 
     // Block's Combo Textures
@@ -68,6 +69,7 @@ public static class Ass
 /// <summary>
 /// Initializes asset loading for the mod when the system is loaded with all assets in <see cref="Ass"/>
 /// </summary>
+[Autoload(Side = ModSide.Client)]
 public class AssetLoader : ModSystem
 {
     public override void Load() => _ = Ass.Initialized;

@@ -31,7 +31,7 @@ public class ConfigSystem : ModSystem
     private const float IconLeft = 8f;
     private const float RowHeight = 30f;
     private const float TextOffset = IconLeft + IconSize + 8f;
-    private const string ConfigLocalizationPrefix = "Mods.ErkySSC.Configs";
+    private const string ConfigLocalizationPrefix = "Mods.DPSPanel.Configs";
     private const string LockedTooltipColor = "FF0000";
     private static readonly Color LockedBackgroundColor = new(80, 80, 80);
     private static readonly Color LockedIconColor = new(145, 145, 145);
@@ -75,6 +75,11 @@ public class ConfigSystem : ModSystem
 
     private static void HandleHeader(HandleHeaderOrig orig, UIElement parent, ref int top, ref int order, PropertyFieldWrapper variable)
     {
+        if (variable?.MemberInfo?.DeclaringType?.Assembly != typeof(ConfigSystem).Assembly)
+        {
+            orig(parent, ref top, ref order, variable);
+            return;
+        }
         pendingHeaderIcon = GetHeaderIcon(variable?.MemberInfo);
         try
         {
@@ -98,6 +103,8 @@ public class ConfigSystem : ModSystem
             return result;
 
         MemberInfo member = memberInfo?.MemberInfo;
+        if (member?.DeclaringType?.Assembly != typeof(ConfigSystem).Assembly)
+            return result;
         LockState memberLock = GetMemberLock(member, item);
         LockState groupLock = GetGroupLock(member, item);
         LockState dependencySourceLock = GetDependencySourceLock(member, item);
@@ -261,8 +268,7 @@ public class ConfigSystem : ModSystem
             }
         }
 
-        string serverLabel = GetLocalizedLabel(nameof(ServerConfig), fieldName);
-        return string.IsNullOrWhiteSpace(serverLabel) ? NicifyName(fieldName) : serverLabel;
+        return NicifyName(fieldName);
     }
 
     private static string GetLocalizedLabel(string configTypeName, string fieldName)

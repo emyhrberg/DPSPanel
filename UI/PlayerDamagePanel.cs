@@ -1,126 +1,75 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Common.DamageCalculation.Classes;
-using DPSPanel.Core.Utilities;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Terraria.GameContent.UI.Elements;
 using Terraria.UI;
-using static DPSPanel.Common.Configs.Config;
 
-namespace DPSPanel.UI
+namespace DPSPanel.UI;
+
+/// <summary>A single popup owned by the root UI, outside the player-row height constraints.</summary>
+public sealed class PlayerDamagePanel : UIPanel
 {
-    public class PlayerDamagePanel : UIPanel
+    private readonly Dictionary<int, WeaponBar> bars = [];
+    public bool IsVisible { get; set; }
+    public int OwnerId { get; private set; } = -1;
+    public int WeaponCount => bars.Count;
+
+    public PlayerDamagePanel()
     {
-        private float PANEL_PADDING = 5f; // No extra padding on the panel
-        private float ITEM_PADDING = 10f;   // Vertical spacing between weapon bars
-        private float currentYOffset = 0f;           // Y offset for each new weapon bar
-        private float ItemHeight = 16f;        // Height of each weapon bar
+        SetPadding(PanelLayout.Padding);
+        MaxHeight.Set(float.MaxValue, 0);
+        MaxWidth.Set(float.MaxValue, 0);
+        BackgroundColor = new Color(27, 29, 85);
+    }
 
-        public bool IsVisible;
-
-        // Dictionary mapping weapon names to their corresponding WeaponBar.
-        private Dictionary<string, WeaponBar> weaponBars = new Dictionary<string, WeaponBar>();
-
-        public PlayerDamagePanel()
+    public void SetPlayer(PlayerFightData player)
+    {
+        if (OwnerId != player.PlayerId)
+            Reset();
+        OwnerId = player.PlayerId;
+        var weapons = player.Weapons.OrderByDescending(w => w.damage).ThenBy(w => w.weaponItemID).ToArray();
+        var ids = weapons.Select(w => w.weaponItemID).ToHashSet();
+        foreach (int id in bars.Keys.Where(id => !ids.Contains(id)).ToArray())
         {
-            float width = SizeHelper.GetWidthFromConfig();
-            Width.Set(width, 0f);
-            // Width.Set(150, 0f);
-
-            // Other
-            MaxHeight = new StyleDimension(1000f, 0f); // must be done to allow producing new bars
-
-            // Offset to the left by one panel
-            Left.Set(width, 0);
-
-            // Start with a minimal height (will be updated by UpdateWeaponBars).
-            Height.Set(40f, 0f);
-            BackgroundColor = new Color(27, 29, 85); // Dark blue background.
-            SetPadding(PANEL_PADDING);
+            bars[id].Remove();
+            bars.Remove(id);
         }
-
-        public void UpdateBarHeight(float updatedHeight)
+        long highest = weapons.FirstOrDefault()?.damage ?? 0;
+        for (int i = 0; i < weapons.Length; i++)
         {
-            ItemHeight = updatedHeight;
-            // Update the height of each weapon bar.
-            foreach (var weaponBar in weaponBars.Values)
+            var weapon = weapons[i];
+            if (!bars.TryGetValue(weapon.weaponItemID, out var bar))
             {
-                weaponBar.Height.Set(updatedHeight, 0f);
+                bar = new WeaponBar();
+                bars.Add(weapon.weaponItemID, bar);
+                Append(bar);
             }
+            bar.SetWeapon(weapon, highest, ColorHelper.standardColors[i % ColorHelper.standardColors.Length]);
+            bar.Top.Set(PanelLayout.RowTop(i), 0);
         }
+        ApplyLayout();
+    }
 
-        public void UpdateLeft(float updatedLeftOffset)
-        {
-            Left.Set(updatedLeftOffset, 0);
-        }
+    public void ApplyLayout()
+    {
+        Width.Set(SizeHelper.GetWidthFromConfig(), 0);
+        Height.Set(PanelLayout.Height(bars.Count), 0);
+        Recalculate();
+    }
 
-        public void UpdatePanelWidth(float updatedWidth)
-        {
-            Width.Set(updatedWidth, 0f);
-        }
+    public void Reset()
+    {
+        RemoveAllChildren();
+        bars.Clear();
+        OwnerId = -1;
+        IsVisible = false;
+        Height.Set(PanelLayout.Height(0), 0);
+    }
 
-        public void CreateWeaponBar(string weaponName)
-        {
-            // Create a new WeaponBar instance and store it in the dictionary.
-            WeaponBar damageBar = new WeaponBar();
-            weaponBars[weaponName] = damageBar;
-            Append(damageBar);
-
-            // Add padding to the panel's height for the new weapon bar.
-            Height.Pixels += ItemHeight + ITEM_PADDING;
-        }
-
-        public void UpdateWeaponBars(List<Weapon> weapons)
-        {
-            // Reset the current offset at the start.
-            currentYOffset = 0f;
-
-            // Sort weapons by descending damage.
-            var sortedWeapons = weapons.OrderByDescending(w => w.damage).ToList();
-
-            // Determine the highest damage (avoid division by zero).
-            int highestDamage = sortedWeapons.Count > 0 ? sortedWeapons.First().damage : 1;
-            if (highestDamage == 0)
-                highestDamage = 1;
-
-            // Loop over each weapon in sorted order.
-            for (int i = 0; i < sortedWeapons.Count; i++)
-            {
-                var wpn = sortedWeapons[i];
-                if (!weaponBars.ContainsKey(wpn.weaponName))
-                    CreateWeaponBar(wpn.weaponName);
-
-                WeaponBar bar = weaponBars[wpn.weaponName];
-                int percent = (int)((float)wpn.damage / highestDamage * 100);
-
-                // Use the sorted index to assign a color.
-                Color color = Color.White; // Default color
-                // if (Conf.C.BarColors == "Rainbow")
-                // {
-                //     color = ColorHelper.rainbowColors()[i % ColorHelper.rainbowColors().Length];
-                // }
-                // else
-                {
-                    color = ColorHelper.standardColors[i % ColorHelper.standardColors.Length];
-                }
-                bar.UpdateWeaponBar(percent, wpn.weaponName, wpn.damage, wpn.weaponItemID, color);
-
-                // Position the weapon bar at the current offset.
-                bar.Top.Set(currentYOffset, 0f);
-                currentYOffset += ItemHeight + ITEM_PADDING * 2;
-            }
-            // Update the panel's height to fit all weapon bars.
-            Height.Set(currentYOffset + ITEM_PADDING, 0f);
-            Recalculate();
-        }
-
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            if (!IsVisible)
-                return;
-
-            base.Draw(spriteBatch);
-        }
+    public override bool ContainsPoint(Vector2 point) => IsVisible && base.ContainsPoint(point);
+    public override void Draw(SpriteBatch sb)
+    {
+        if (IsVisible)
+            base.Draw(sb);
     }
 }

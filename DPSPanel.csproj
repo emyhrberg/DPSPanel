@@ -12,5 +12,10 @@
    <PackageReference Include="Krafs.Publicizer" PrivateAssets="none" Version="2.3.0" />
    <Publicize Include="tModLoader" IncludeVirtualMembers="false" IncludeCompilerGeneratedMembers="false" />
 </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Tests/**/*.cs" />
+      <Folder Include="Assets\Effects\" />
+      <Folder Include="Core\Configs\ConfigElements\" />
+    </ItemGroup>
 
 </Project>

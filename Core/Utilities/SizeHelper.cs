@@ -17,7 +17,7 @@ namespace DPSPanel.Core.Utilities
         public static float GetWidthFromConfig()
         {
             Config c = ModContent.GetInstance<Config>();
-            string widthSize = c.Width;
+            string widthSize = c?.Width ?? "Small";
             float width = 150; // default
             if (SizeHelper.WidthSizes.ContainsKey(widthSize))
             {
