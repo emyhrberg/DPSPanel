@@ -62,7 +62,7 @@ public sealed class Config : ModConfig
         // tModLoader can load config before the client UI exists.
         if (Main.dedServ)
             return;
-        ModContent.GetInstance<MainSystem>()?.state?.container?.panel?.ApplyLayout();
+        ModContent.GetInstance<MainSystem>()?.RequestRebuild();
     }
 
     public static class Conf

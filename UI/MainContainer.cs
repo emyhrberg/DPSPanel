@@ -45,6 +45,20 @@ public sealed class MainContainer : UIElement
         Main.LocalPlayer.mouseInterface = true;
     }
 
+    public void ClampToScreen()
+    {
+        if (Parent == null || dragging)
+            return;
+        var screen = Parent.GetInnerDimensions();
+        float margin = Math.Max(0, DPSPanelLayout.ScreenMargin);
+        float minimumHeight = DPSPanelLayout.HeaderHeight + DPSPanelLayout.HeaderGap +
+            DPSPanelLayout.PanelPaddingTop + DPSPanelLayout.PanelPaddingBottom +
+            Math.Max(1, Math.Max(DPSPanelLayout.PlayerBarHeight, DPSPanelLayout.WeaponBarHeight));
+        float y = Math.Clamp(GetDimensions().Y - screen.Y, margin, Math.Max(margin, screen.Height - minimumHeight - margin));
+        Top.Set(0, y / Math.Max(1, screen.Height));
+        Recalculate();
+    }
+
     public override void LeftMouseUp(UIMouseEvent evt)
     {
         base.LeftMouseUp(evt);
@@ -59,6 +73,7 @@ public sealed class MainContainer : UIElement
         Top.Set(0, Math.Clamp(vertical, 0, 1));
         PanelPositionJsonHelper.WritePanelPosition(new Vector2(HAlign, Top.Percent));
         Recalculate();
+        ModContent.GetInstance<MainSystem>().RequestRebuild();
     }
 
     public override void Update(GameTime gameTime)
@@ -72,6 +87,7 @@ public sealed class MainContainer : UIElement
             Left.Set(Math.Clamp(mouse.X - dragOffset.X - parent.X, 0, Math.Max(0, parent.Width - Width.Pixels)), 0);
             Top.Set(Math.Clamp(mouse.Y - dragOffset.Y - parent.Y, 0, Math.Max(0, parent.Height - Height.Pixels)), 0);
             Recalculate();
+            panel.ApplyLayout();
             Main.LocalPlayer.mouseInterface = true;
         }
         base.Update(gameTime);
@@ -92,6 +108,7 @@ public sealed class MainContainer : UIElement
         {
             Append(panel);
             Append(toggleButton);
+            panel.ApplyLayout();
         }
         else
             panel.Remove();

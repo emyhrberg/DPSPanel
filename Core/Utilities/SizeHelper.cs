@@ -1,38 +1,9 @@
-using System.Collections.Generic;
 using DPSPanel.Common.Configs;
-using Terraria.ModLoader;
+using DPSPanel.UI;
 
-namespace DPSPanel.Core.Utilities
+namespace DPSPanel.Core.Utilities;
+
+public static class SizeHelper
 {
-    public static class SizeHelper
-    {
-        // Width is straightforward, only one dictionary needed to adjust the sizes of MainPanel and MainContainer.
-        public static Dictionary<string, float> WidthSizes = new()
-        {
-            { "Small", 150f },
-            { "Medium", 300f },
-            { "Large", 450f },
-        };
-
-        public static float GetWidthFromConfig()
-        {
-            Config c = ModContent.GetInstance<Config>();
-            string widthSize = c?.Width ?? "Small";
-            float width = 150; // default
-            if (SizeHelper.WidthSizes.ContainsKey(widthSize))
-            {
-                width = SizeHelper.WidthSizes[widthSize];
-            }
-            return width;
-        }
-
-        // Height is a bit more complicated, as we need to adjust:
-        // - each Bar's height. Default is 40f
-        public static Dictionary<string, float> HeightSizes = new()
-        {
-            { "Small", 30f },
-            { "Medium", 40f },
-            { "Large", 50f },
-        };
-    }
+    public static float GetWidthFromConfig() => DPSPanelLayout.WidthFor(Config.Conf.C?.Width);
 }

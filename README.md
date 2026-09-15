@@ -26,5 +26,7 @@ A real-time DPS overlay for Terraria that tracks and compares damage from your w
 
 # Demo
 
+Developer controls and live layout editing: [Debugging and Hot Reload](DEBUGGING.md).
+
 ![download](https://github.com/user-attachments/assets/76520fa0-dc38-44ac-9378-bce95d7a0a7b)
 

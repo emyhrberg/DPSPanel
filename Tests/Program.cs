@@ -1,6 +1,8 @@
 using DPSPanel.Common.DamageCalculation.Classes;
 using DPSPanel.Core.Utilities;
 using DPSPanel.Networking;
+using DPSPanel.UI;
+using DPSPanel.Core.Debug;
 
 int passed = 0;
 void Check(string name, Action action)
@@ -198,5 +200,128 @@ Check("New and disconnected players do not displace a hovered row unnecessarily"
 });
 Check("Equal damage uses stable player-ID ordering", () =>
     Assert(PanelLayout.OrderPlayers([], [(5, 100L), (2, 100L)], false).SequenceEqual([2, 5]), "Ties reorder unpredictably."));
+Check("Unchanged layout defaults do not repeatedly rebuild the UI", () =>
+{
+    DPSPanelLayout.Update();
+    int version = DPSPanelLayout.Version;
+    for (int i = 0; i < 100; i++)
+        Assert(!DPSPanelLayout.Update(), "An unchanged frame requested rebuilding.");
+    Assert(DPSPanelLayout.Version == version, "Layout version changed without an edit.");
+});
+Check("Applying changed layout values advances the version once", () =>
+{
+    int version = DPSPanelLayout.Version;
+    DPSPanelLayout.SmallWidth = 999;
+    DPSPanelLayout.PanelPaddingTop = 999;
+    Assert(DPSPanelLayout.Update(), "Changed layout was not detected.");
+    Assert(DPSPanelLayout.Version == version + 1 && DPSPanelLayout.SmallWidth == 150,
+        "Layout was not reapplied as one revision.");
+});
+Check("Width and theme changes invalidate the appearance independently", () =>
+{
+    var appearance = new PanelAppearance("Default", "Small", "Damage", true, true, true);
+    Assert(appearance != appearance with { Theme = "Fancy" }, "Theme does not trigger a rebuild.");
+    Assert(appearance != appearance with { Width = "Large" }, "Width does not trigger a rebuild.");
+    Assert(appearance != appearance with { ShowPlayerIcons = false }, "Icon toggle does not trigger a rebuild.");
+    Assert(DPSPanelLayout.WidthFor("Large") == 450 && DPSPanelLayout.WidthFor("Medium") == 300 &&
+        DPSPanelLayout.WidthFor("invalid") == 150, "Config width mapping is incorrect.");
+});
+Check("Custom bar heights and gaps include exactly the last row", () =>
+{
+    foreach (int count in new[] { 1, 3, 30 })
+        foreach (float height in new[] { 12f, 64f, 100f })
+            foreach (float gap in new[] { 0f, 7f, 30f })
+                Assert(PanelLayout.RowTop(count - 1, height, gap) + height == PanelLayout.RowsHeight(count, height, gap),
+                    "Custom row layout clips or adds an extra trailing gap.");
+});
+Check("Height limits create a viewport without discarding content", () =>
+{
+    var metrics = PanelLayout.Measure(1000, 65, 0, 300, 800);
+    Assert(metrics.Height == 300 && metrics.ViewportHeight == 235 && metrics.ContentHeight == 1000,
+        "Panel limits lost rows or ignored chrome/padding.");
+    Assert(PanelLayout.Measure(1000, 65, 0, 0, 200).Height == 200, "Screen height is not respected.");
+});
+Check("Automatic and fixed panel heights respect padding and minimums", () =>
+{
+    Assert(PanelLayout.Measure(140, 24, 0, 0, 1000).Height == 164, "Automatic popup height is wrong.");
+    Assert(PanelLayout.Measure(40, 50, 300, 300, 1000).Height == 300, "Fixed height is not supported.");
+    Assert(PanelLayout.Measure(0, 50, 0, 0, 1000).ViewportHeight == 0, "Empty panels retain row space.");
+    Assert(PanelLayout.Measure(1000, 50, 500, 200, 1000).Height == 200, "Minimum overrode the maximum.");
+});
+Check("Scrolling clamps after deletion or a viewport resize", () =>
+{
+    Assert(PanelLayout.ClampScroll(900, 1000, 200) == 800, "Scroll exceeded the last row.");
+    Assert(PanelLayout.ClampScroll(800, 100, 200) == 0, "Deleted rows left an empty scrolled panel.");
+    Assert(PanelLayout.ClampScroll(-40, 1000, 200) == 0, "Negative scroll was accepted.");
+    Assert(PanelLayout.ClampScroll(800, 1000, 600) == 400, "Larger viewport did not clamp scrolling.");
+});
+Check("Debug players have isolated weapon lists and identities", () =>
+{
+    var preview = new DebugPreviewState();
+    int a = preview.AddPlayer();
+    preview.AddWeapon(10, "A weapon", 100);
+    int b = preview.AddPlayer();
+    preview.AddWeapon(20, "B weapon", 200);
+    preview.ChangeDamage(50);
+    var snapshots = preview.Snapshots();
+    Assert(a >= 1000 && b != a, "Preview used a real player slot.");
+    Assert(snapshots.Single(p => p.PlayerId == a).Damage == 100, "Editing B changed A.");
+    Assert(snapshots.Single(p => p.PlayerId == b).Weapons.Single().weaponItemID == 20, "B inherited A's weapon.");
+});
+Check("Removing a debug player removes its weapons and preserves remaining identity", () =>
+{
+    var preview = new DebugPreviewState();
+    int a = preview.AddPlayer();
+    preview.AddWeapon(10, "A", 100);
+    int b = preview.AddPlayer();
+    preview.AddWeapon(20, "B", 200);
+    preview.RemovePlayer();
+    Assert(preview.SelectedPlayerId == a && preview.Snapshots().Single().Weapons.Single().weaponItemID == 10,
+        "Removed player's selection or weapons survived.");
+    Assert(preview.AddPlayer() != b, "New preview player reused stale identity.");
+});
+Check("Debug weapon deletion and selection handle the final entry", () =>
+{
+    var preview = new DebugPreviewState();
+    preview.AddPlayer();
+    preview.AddWeapon(10, "A", 100);
+    Assert(!preview.AddWeapon(10, "Duplicate", 200), "Duplicate weapon ID was added.");
+    preview.AddWeapon(20, "B", 200);
+    preview.RemoveWeapon();
+    Assert(preview.SelectedWeapon.weaponItemID == 10, "Weapon selection did not clamp after deletion.");
+    preview.RemoveWeapon();
+    preview.NextWeapon();
+    preview.ChangeDamage(100);
+    Assert(preview.SelectedWeapon == null && preview.Snapshots().Single().Weapons.Count == 0,
+        "Final weapon cannot be removed cleanly.");
+});
+Check("Debug damage snapshots stay immutable and clamp extreme edits", () =>
+{
+    var preview = new DebugPreviewState();
+    preview.AddPlayer();
+    preview.AddWeapon(10, "A", 100);
+    var before = preview.Snapshots().Single();
+    preview.ChangeDamage(long.MinValue);
+    Assert(preview.SelectedWeapon.damage == 0, "Damage became negative.");
+    preview.ChangeDamage(long.MaxValue);
+    Assert(preview.SelectedWeapon.damage == 1_000_000_000_000L, "Damage overflowed.");
+    Assert(before.Damage == 100 && before.Revision < preview.Snapshots().Single().Revision,
+        "An existing snapshot changed in place.");
+});
+Check("Simulation and clearing work on empty and populated previews", () =>
+{
+    var preview = new DebugPreviewState();
+    preview.SimulateDamage(0);
+    preview.NextPlayer();
+    preview.NextWeapon();
+    Assert(!preview.RemovePlayer() && !preview.RemoveWeapon(), "Empty removals reported success.");
+    preview.AddPlayer(); preview.AddWeapon(10, "A");
+    preview.AddPlayer(); preview.AddWeapon(20, "B");
+    preview.SimulateDamage(0);
+    Assert(preview.Snapshots().All(p => p.Damage > 100), "Simulation skipped a player.");
+    preview.Clear();
+    Assert(preview.Count == 0 && preview.SelectedPlayerId == null && preview.SelectedWeapon == null,
+        "Clear left stale selection or data.");
+});
 Console.WriteLine($"All {passed} regression checks passed.");
 

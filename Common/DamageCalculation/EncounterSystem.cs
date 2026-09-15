@@ -15,7 +15,7 @@ public sealed class EncounterSystem : ModSystem
     public FightContext Current { get; private set; }
     private long nextId;
     private HashSet<long> bossInstances = [];
-    private static MainPanel Panel => Main.dedServ ? null : ModContent.GetInstance<MainSystem>()?.state?.container?.panel;
+    private static MainSystem UI => Main.dedServ ? null : ModContent.GetInstance<MainSystem>();
 
     public override void OnWorldLoad() => Reset();
     public override void OnWorldUnload() => Reset();
@@ -31,7 +31,7 @@ public sealed class EncounterSystem : ModSystem
         nextId = 0;
         bossInstances.Clear();
         State.Reset();
-        Panel?.Reset();
+        UI?.PresentEncounter(true);
     }
 
     public override void PostUpdateNPCs()
@@ -114,9 +114,7 @@ public sealed class EncounterSystem : ModSystem
         if (!changed && Current is { IsAlive: false } && context.IsAlive)
             return;
         Current = context;
-        if (changed)
-            Panel?.Reset();
-        Panel?.SetFight(context);
+        UI?.PresentEncounter(changed);
         if (Main.netMode == NetmodeID.Server)
             PacketSender.Context(context);
     }
@@ -145,13 +143,7 @@ public sealed class EncounterSystem : ModSystem
         RefreshPanel();
     }
 
-    public void RefreshPanel()
-    {
-        if (Panel == null)
-            return;
-        Panel.SetPlayers(State.VisiblePlayers().ToArray(), Main.netMode == NetmodeID.SinglePlayer);
-        Panel.SetFight(Current);
-    }
+    public void RefreshPanel() => UI?.PresentEncounter();
 
     public void SendSync(int toClient)
     {

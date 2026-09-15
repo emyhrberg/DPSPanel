@@ -19,13 +19,20 @@ namespace DPSPanel.UI
 
         public ToggleButton()
         {
-            Width.Set(30f, 0f);
-            Height.Set(30f, 0f);
-            Top.Set(4f, 0f);
-            Left.Set(4f, 0f);
+            ApplyLayout();
 
             img = Ass.ToggleButton.Value;
             imgHighlighted = Ass.ToggleButtonHighlighted.Value;
+        }
+
+        public void ApplyLayout()
+        {
+            Width.Set(System.Math.Max(1, DPSPanelLayout.ToggleWidth), 0);
+            Height.Set(System.Math.Max(1, DPSPanelLayout.ToggleHeight), 0);
+            MaxHeight.Set(float.MaxValue, 0);
+            Top.Set(DPSPanelLayout.ToggleTop, 0);
+            Left.Set(DPSPanelLayout.ToggleLeft, 0);
+            Recalculate();
         }
 
         protected override void DrawSelf(SpriteBatch sb)
@@ -40,7 +47,7 @@ namespace DPSPanel.UI
             base.DrawSelf(sb);
 
             // Get the dimensions of the element
-            const float scale = 0.8f; // Scale factor
+            float scale = System.Math.Max(0.01f, DPSPanelLayout.ToggleIconScale);
             CalculatedStyle dims = GetDimensions();
             Vector2 pos = new(dims.X + (dims.Width - img.Width * scale) / 2f,
                               dims.Y + (dims.Height - img.Height * scale) / 2f);
@@ -89,7 +96,7 @@ namespace DPSPanel.UI
             base.LeftMouseUp(evt);
 
             // Check if the mouse moved significantly during the click
-            if (Vector2.Distance(clickStartPosition, evt.MousePosition) > 5f) // Threshold for drag
+            if (Vector2.Distance(clickStartPosition, evt.MousePosition) > DPSPanelLayout.DragThreshold)
             {
                 isDragging = true;
             }
@@ -111,7 +118,7 @@ namespace DPSPanel.UI
                 {
                     // clear
                     MainSystem sys = ModContent.GetInstance<MainSystem>();
-                    ModContent.GetInstance<EncounterSystem>().ClearVisible();
+                    sys.ClearDisplay();
                     return;
                 }
 

@@ -38,7 +38,7 @@ Mods: {
 				}
 
 				TrackUnknownDamage: {
-					Label: "Track Unknown Damage"
+					Label: Track Unknown Damage
 					Tooltip:
 						'''
 						Some projectiles have an unknown damage source. 
