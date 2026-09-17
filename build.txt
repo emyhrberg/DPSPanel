@@ -1,6 +1,6 @@
 displayName = DPSPanel
 author = Erky
-version = 0.7
+version = 0.8
 side=both
 hideCode = true
 hideResources = true

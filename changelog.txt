@@ -1,4 +1,2 @@
-v0.7:
-- Fix damage tracking code
-- Fix weapon lists tied to the wrong player
-- Fixed bar spacing and panel height issues
+v0.8:
+- Try fix dragging
