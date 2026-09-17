@@ -58,7 +58,7 @@ public sealed class ScrollableRows : UIElement
             PlayerDamagePanel popup => popup.IsVisible,
             _ => false
         };
-        if (visible && ContainsPoint(Main.MouseScreen / Main.UIScale))
+        if (visible && ContainsPoint(MainSystem.PointerPosition))
         {
             Main.LocalPlayer.mouseInterface = true;
             Terraria.GameInput.PlayerInput.LockVanillaMouseScroll("DPSPanel");

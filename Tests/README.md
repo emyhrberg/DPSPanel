@@ -11,7 +11,9 @@ They cover player ownership, complete weapon-list replacement, stale/repeated pa
 new encounters, clear baselines, reused player slots, large damage totals, malformed
 packets, bar/panel heights and stable ordering during hovering. They also cover live-layout
 versioning, appearance changes, custom row geometry, height limits, scroll clamping, and
-debug-fixture ownership, selection, deletion and immutable snapshots (36 checks total).
+debug-fixture ownership, selection, deletion and immutable snapshots. Drag checks cover
+click jitter, grab offsets at five resolutions and five UI scales, dragging outside the
+panel, quick release, returning to the press point, and cancelled capture (44 checks total).
 
 See [DEBUGGING.md](../DEBUGGING.md) for all numpad controls and the C# Hot Reload workflow.
 
@@ -37,6 +39,15 @@ profile. Use the updated 0.6.2 mod on the server and every client.
    the mouse. Drag the panel at a non-default UI scale and verify its saved position.
 7. Leave/rejoin the world and disconnect/reconnect a multiplayer player. Old weapons
    must not carry over into the new world, encounter, or player slot.
+8. Repeat at 100%, 125%, 150% and 200% UI scale on different resolutions. Click the
+   header without moving: its position must remain unchanged. Drag from a corner,
+   the middle of a bar, and the toggle: the original grab point must follow the cursor.
+9. Drag outside the original panel and release; drag away and back to the starting
+   point before releasing. Neither action should accidentally toggle the panel.
+   Alt-tab or resize while holding the mouse, then release and return: dragging must stop.
+10. Disable panel dragging and verify clicks still toggle. Ctrl/Alt-click should clear
+    or open settings without moving the panel. Drag a test-player row, remove it with
+    Num2 while still holding the mouse, then release: the panel must stop following it.
 
 ## Encounter behavior
 

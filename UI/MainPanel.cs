@@ -139,7 +139,7 @@ public sealed class MainPanel : UIPanel
 
     private bool PointerOverRow()
     {
-        Vector2 mouse = Main.MouseScreen / Main.UIScale;
+        Vector2 mouse = MainSystem.PointerPosition;
         return IsDisplayed && rows.ContainsPoint(mouse) && playerBars.Values.Any(bar => bar.ContainsPoint(mouse));
     }
 
@@ -163,8 +163,8 @@ public sealed class MainPanel : UIPanel
         float contentHeight = singleplayer
             ? PanelLayout.RowsHeight(weaponBars.Count, DPSPanelLayout.WeaponBarHeight, DPSPanelLayout.WeaponRowGap)
             : PanelLayout.RowsHeight(playerBars.Count, DPSPanelLayout.PlayerBarHeight, DPSPanelLayout.PlayerRowGap);
-        float screenHeight = Parent?.Parent?.GetInnerDimensions().Height ?? Main.screenHeight / Math.Max(0.1f, Main.UIScale);
-        float screenWidth = Parent?.Parent?.GetInnerDimensions().Width ?? Main.screenWidth / Math.Max(0.1f, Main.UIScale);
+        float screenHeight = Parent?.Parent?.GetInnerDimensions().Height ?? MainSystem.ViewportSize.Y;
+        float screenWidth = Parent?.Parent?.GetInnerDimensions().Width ?? MainSystem.ViewportSize.X;
         float top = Math.Max(DPSPanelLayout.ScreenMargin, Parent?.GetDimensions().Y ?? 0);
         var metrics = PanelLayout.Measure(contentHeight, header + PaddingTop + PaddingBottom,
             DPSPanelLayout.MainMinHeight, DPSPanelLayout.MainMaxHeight, screenHeight - top - DPSPanelLayout.ScreenMargin);

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DPSPanel.Common.Configs;
 using DPSPanel.Common.DamageCalculation;
+using Terraria.GameInput;
 using Terraria.ID;
 using Terraria.UI;
 #if DEBUG
@@ -20,6 +21,12 @@ public sealed class MainSystem : ModSystem
     private Vector2 screenSize;
     private float uiScale;
     private bool rebuildRequested = true;
+    private GameTime lastGameTime = new();
+
+    // UserInterface.Update already reads the UI-scaled mouse supplied by Terraria.
+    // Use our own interface's sample; ActiveInstance may belong to another mod between frames.
+    internal static Vector2 PointerPosition => ModContent.GetInstance<MainSystem>()?.ui?.MousePosition ?? Main.MouseScreen;
+    internal static Vector2 ViewportSize => PlayerInput.OriginalScreenSize / System.Math.Max(0.1f, Main.UIScale);
 
     public override void PostSetupContent()
     {
@@ -35,18 +42,25 @@ public sealed class MainSystem : ModSystem
 
     public override void UpdateUI(GameTime gameTime)
     {
+        lastGameTime = gameTime;
         DPSPanelLayout.Update();
         if (state == null)
             return;
         var c = Config.Conf.C;
         var current = new PanelAppearance(c.Theme, c.Width, c.DamageDisplay,
             c.ShowPlayerIcons, c.ShowBossIcon, c.ShowTooltips);
-        var screen = new Vector2(Main.screenWidth, Main.screenHeight);
+        var screen = PlayerInput.OriginalScreenSize;
+        bool viewportChanged = screenSize != screen || uiScale != Main.UIScale;
+        if (viewportChanged || Main.gameMenu || !Main.hasFocus)
+            state.container.CancelPointer();
+        // Main calls UpdateUI after PlayerInput.SetZoom_UI: input is already in UI pixels.
+        // Select this interface before recalculation/hit testing, just as Draw does.
+        ui.Use();
         if (rebuildRequested || appearance != current || layoutVersion != DPSPanelLayout.Version ||
-            screenSize != screen || uiScale != Main.UIScale)
+            viewportChanged)
         {
             // Config callbacks may run before the UI exists. Rebuild together on the UI thread.
-            if (!state.container.dragging)
+            if (!state.container.IsPointerCaptured)
             {
                 state.Recalculate();
                 state.container.toggleButton.ApplyLayout();
@@ -104,6 +118,12 @@ public sealed class MainSystem : ModSystem
         appearance = null;
     }
 
+    public override void OnWorldUnload()
+    {
+        state?.container.CancelPointer();
+        ui?.EscapeElements();
+    }
+
     public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
     {
         int index = layers.FindIndex(layer => layer.Name == "Vanilla: Mouse Text");
@@ -112,7 +132,8 @@ public sealed class MainSystem : ModSystem
         layers.Insert(index, new LegacyGameInterfaceLayer("DPSPanel: MainSystem", () =>
         {
             if (!Main.gameMenu)
-                ui?.Draw(Main.spriteBatch, new GameTime());
+                // The UI layer already begins the batch with Main.UIScaleMatrix.
+                ui?.Draw(Main.spriteBatch, lastGameTime);
             return true;
         }, InterfaceScaleType.UI));
     }

@@ -19,6 +19,6 @@ public sealed class MainState : UIState
     public override void Update(GameTime gameTime)
     {
         base.Update(gameTime);
-        container.panel.UpdateHover(Main.MouseScreen / Main.UIScale);
+        container.panel.UpdateHover(MainSystem.PointerPosition);
     }
 }

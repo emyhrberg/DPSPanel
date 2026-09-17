@@ -13,6 +13,7 @@
     <Compile Include="../Common/DamageCalculation/Classes/FightState.cs" Link="FightState.cs" />
     <Compile Include="../Networking/FightPacketCodec.cs" Link="FightPacketCodec.cs" />
     <Compile Include="../Core/Utilities/PanelLayout.cs" Link="PanelLayout.cs" />
+    <Compile Include="../Core/Utilities/PanelDragState.cs" Link="PanelDragState.cs" />
     <Compile Include="../UI/DPSPanelLayout.cs" Link="DPSPanelLayout.cs" />
     <Compile Include="../UI/PanelAppearance.cs" Link="PanelAppearance.cs" />
     <Compile Include="../Core/Debug/DebugPreviewState.cs" Link="DebugPreviewState.cs" />

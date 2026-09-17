@@ -93,3 +93,16 @@ leave during daytime.
 Automated checks: `dotnet run --project Tests/DPSPanel.RegressionTests.csproj`.
 These exercise data and layout calculations; actual rendering, key input and applying Hot Reload
 still need an in-game development session.
+
+## Dragging and UI coordinates
+
+tModLoader calls `UpdateUI` after `PlayerInput.SetZoom_UI()`. Consequently, `UIMouseEvent.MousePosition`
+and this panel's `UserInterface.MousePosition` are already in UI pixels. Dragging, hover and scrolling
+use that same interface sample without dividing by `UIScale` a second time. Viewport sizes use the
+UI root or `PlayerInput.OriginalScreenSize / Main.UIScale`, never a rescaled `Main.screenWidth`.
+
+The `InterfaceScaleType.UI` layer supplies the sprite batch with `Main.UIScaleMatrix`; the panel
+does not start a second batch. A press preserves the saved alignment until movement exceeds
+`DragThreshold`. Once dragging starts, returning to the press point does not turn it into a click.
+The pointer remains captured outside the panel and is released even if the pressed row disappears.
+Focus loss, hiding the panel's inventory-only UI, and viewport changes cancel capture.

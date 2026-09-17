@@ -323,5 +323,89 @@ Check("Simulation and clearing work on empty and populated previews", () =>
     Assert(preview.Count == 0 && preview.SelectedPlayerId == null && preview.SelectedWeapon == null,
         "Clear left stale selection or data.");
 });
+Check("Pressing and releasing without movement does not start a drag", () =>
+{
+    var drag = new PanelDragState();
+    drag.Begin(425, 118, 400, 100);
+    Assert(drag.PointerDown && !drag.IsDragging, "Mouse-down moved the panel immediately.");
+    Assert(drag.Move(425, 118, 5) == null, "An unchanged cursor produced a position update.");
+    drag.End();
+    Assert(!drag.PointerDown && !drag.IsDragging && !drag.SuppressClick, "A normal click was treated as dragging.");
+});
+Check("Small click jitter leaves the panel's anchored position untouched", () =>
+{
+    var drag = new PanelDragState();
+    drag.Begin(425, 118, 400, 100);
+    Assert(drag.Move(428, 122, 5) == null, "Movement within the threshold started dragging.");
+    Assert(drag.Move(425, 118, 5) == null, "Returning from jitter started dragging.");
+    drag.End();
+    Assert(!drag.SuppressClick, "Jitter suppressed the toggle click.");
+});
+Check("Dragging preserves the grab point across resolutions and UI scales", () =>
+{
+    foreach (var resolution in new[] { (1280f, 720f), (1920f, 1080f), (2560f, 1440f), (3440f, 1440f), (3840f, 2160f) })
+        foreach (float scale in new[] { 0.75f, 1f, 1.25f, 1.5f, 2f })
+        {
+            float panelX = resolution.Item1 / scale * 0.4f;
+            float panelY = resolution.Item2 / scale * 0.2f;
+            // Terraria has already applied this conversion before delivering UIMouseEvent/UpdateUI.
+            float physicalX = (panelX + 25) * scale;
+            float physicalY = (panelY + 18) * scale;
+            float mouseX = physicalX / scale;
+            float mouseY = physicalY / scale;
+            var drag = new PanelDragState();
+            drag.Begin(mouseX, mouseY, panelX, panelY);
+            Assert(drag.Move(mouseX, mouseY, 5) == null, $"Initial jump at UI scale {scale}.");
+            var position = drag.Move((physicalX + 120) / scale, (physicalY + 60) / scale, 5);
+            Assert(position.HasValue && Math.Abs(position.Value.X - panelX - 120 / scale) < 0.001f &&
+                Math.Abs(position.Value.Y - panelY - 60 / scale) < 0.001f, $"Grab offset changed at UI scale {scale}.");
+        }
+});
+Check("The first drag movement keeps an off-center grab point", () =>
+{
+    var drag = new PanelDragState();
+    drag.Begin(537, 142, 400, 100);
+    var position = drag.Move(548, 161, 5);
+    Assert(position == (411f, 119f), "The panel snapped its corner or center to the cursor.");
+});
+Check("Returning to the press point after dragging never becomes a toggle click", () =>
+{
+    var drag = new PanelDragState();
+    drag.Begin(425, 118, 400, 100);
+    drag.Move(700, 400, 5);
+    Assert(drag.Move(425, 118, 5) == (400f, 100f), "Drag stopped when the cursor returned to its start.");
+    drag.End();
+    Assert(drag.SuppressClick, "A completed drag was converted into a toggle click.");
+});
+Check("Captured dragging continues outside the original panel and stops on release", () =>
+{
+    var drag = new PanelDragState();
+    drag.Begin(425, 118, 400, 100);
+    Assert(drag.Move(1600, 900, 5) == (1575f, 882f), "Leaving the panel lost the captured pointer.");
+    drag.End();
+    Assert(drag.Move(1700, 950, 5) == null && !drag.PointerDown, "Dragging continued after mouse-up.");
+});
+Check("A quick drag can apply its final position on the release event", () =>
+{
+    var drag = new PanelDragState();
+    drag.Begin(425, 118, 400, 100);
+    var released = drag.Move(600, 200, 5);
+    drag.End();
+    Assert(released == (575f, 182f) && drag.SuppressClick, "Release between update frames lost the drag.");
+});
+Check("Focus loss and viewport changes cancel capture without a later phantom click", () =>
+{
+    foreach (bool moveFirst in new[] { false, true })
+    {
+        var drag = new PanelDragState();
+        drag.Begin(425, 118, 400, 100);
+        if (moveFirst) drag.Move(600, 200, 5);
+        drag.End(cancelled: true);
+        Assert(!drag.PointerDown && !drag.IsDragging && drag.SuppressClick && drag.Move(1000, 500, 5) == null,
+            "Cancelled capture continued moving or fired a click.");
+        drag.Begin(620, 218, 600, 200);
+        Assert(drag.Move(630, 228, 5) == (610f, 210f), "A new press reused the cancelled grab offset.");
+    }
+});
 Console.WriteLine($"All {passed} regression checks passed.");
 

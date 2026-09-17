@@ -75,8 +75,8 @@ public sealed class PlayerDamagePanel : UIPanel
         PaddingBottom = Math.Max(0, DPSPanelLayout.PopupPaddingBottom);
         BackgroundColor = LayoutColors.From(DPSPanelLayout.PopupBackground);
         BorderColor = LayoutColors.From(DPSPanelLayout.PanelBorder);
-        float screenWidth = Parent?.GetInnerDimensions().Width ?? Main.screenWidth / Math.Max(0.1f, Main.UIScale);
-        float screenHeight = Parent?.GetInnerDimensions().Height ?? Main.screenHeight / Math.Max(0.1f, Main.UIScale);
+        float screenWidth = Parent?.GetInnerDimensions().Width ?? MainSystem.ViewportSize.X;
+        float screenHeight = Parent?.GetInnerDimensions().Height ?? MainSystem.ViewportSize.Y;
         Width.Set(Math.Min(Math.Max(50, SizeHelper.GetWidthFromConfig() * DPSPanelLayout.PopupWidthMultiplier),
             Math.Max(50, screenWidth - DPSPanelLayout.ScreenMargin * 2)), 0);
         float contentHeight = PanelLayout.RowsHeight(bars.Count, DPSPanelLayout.WeaponBarHeight, DPSPanelLayout.WeaponRowGap);

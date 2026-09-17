@@ -1,16 +1,21 @@
 using System;
 using DPSPanel.Common.Configs;
+using Microsoft.Xna.Framework.Input;
 using Terraria.UI;
 
 namespace DPSPanel.UI;
 
 public sealed class MainContainer : UIElement
 {
-    public bool dragging;
-    private Vector2 dragOffset;
+    private readonly PanelDragState drag = new();
+    private bool canMovePanel;
+    public bool dragging => drag.IsDragging && canMovePanel;
+    public bool IsPointerCaptured => drag.PointerDown;
+    public bool SuppressToggleClick => drag.SuppressClick;
     public ToggleButton toggleButton;
     public MainPanel panel;
     public bool panelVisible = true;
+    private bool IsAvailable => panel.HideWhenInventoryOpen || Main.playerInventory;
 
     public MainContainer()
     {
@@ -32,22 +37,34 @@ public sealed class MainContainer : UIElement
     public override void LeftMouseDown(UIMouseEvent evt)
     {
         base.LeftMouseDown(evt);
-        if (!Config.Conf.C.MakePanelDraggable || !ContainsPoint(evt.MousePosition))
+        if (Parent == null || !Main.hasFocus || !ContainsPoint(evt.MousePosition))
             return;
-        dragging = true;
         var dims = GetDimensions();
-        var parent = Parent.GetInnerDimensions();
-        dragOffset = evt.MousePosition - new Vector2(dims.X, dims.Y);
-        HAlign = 0;
-        Left.Set(dims.X - parent.X, 0);
-        Top.Set(dims.Y - parent.Y, 0);
-        panel.HidePopup();
+        drag.Begin(evt.MousePosition.X, evt.MousePosition.Y, dims.X, dims.Y);
+        canMovePanel = Config.Conf.C.MakePanelDraggable &&
+            !Main.keyState.IsKeyDown(Keys.LeftControl) && !Main.keyState.IsKeyDown(Keys.RightControl) &&
+            !Main.keyState.IsKeyDown(Keys.LeftAlt) && !Main.keyState.IsKeyDown(Keys.RightAlt);
+        // A press alone must not change alignment, position, popup state or the saved position.
         Main.LocalPlayer.mouseInterface = true;
+    }
+
+    private void MovePointer(Vector2 mouse)
+    {
+        var position = drag.Move(mouse.X, mouse.Y, DPSPanelLayout.DragThreshold);
+        if (!canMovePanel || position is not { } point)
+            return;
+        var parent = Parent.GetInnerDimensions();
+        HAlign = 0;
+        Left.Set(Math.Clamp(point.X - parent.X, 0, Math.Max(0, parent.Width - Width.Pixels)), 0);
+        Top.Set(Math.Clamp(point.Y - parent.Y, 0, Math.Max(0, parent.Height - Height.Pixels)), 0);
+        panel.HidePopup();
+        Recalculate();
+        panel.ApplyLayout();
     }
 
     public void ClampToScreen()
     {
-        if (Parent == null || dragging)
+        if (Parent == null || IsPointerCaptured)
             return;
         var screen = Parent.GetInnerDimensions();
         float margin = Math.Max(0, DPSPanelLayout.ScreenMargin);
@@ -62,9 +79,19 @@ public sealed class MainContainer : UIElement
     public override void LeftMouseUp(UIMouseEvent evt)
     {
         base.LeftMouseUp(evt);
-        if (!dragging)
+        if (!IsPointerCaptured)
             return;
-        dragging = false;
+        if (Main.hasFocus && IsAvailable)
+            MovePointer(evt.MousePosition);
+        FinishPointer(!Main.hasFocus || !IsAvailable);
+    }
+
+    private void FinishPointer(bool cancelled)
+    {
+        bool moved = dragging;
+        drag.End(cancelled);
+        if (!moved || Parent == null)
+            return;
         var parent = Parent.GetInnerDimensions();
         float horizontal = Left.Pixels / Math.Max(1, parent.Width - Width.Pixels);
         float vertical = Top.Pixels / Math.Max(1, parent.Height);
@@ -76,26 +103,38 @@ public sealed class MainContainer : UIElement
         ModContent.GetInstance<MainSystem>().RequestRebuild();
     }
 
+    public void CancelPointer()
+    {
+        if (IsPointerCaptured)
+            FinishPointer(true);
+    }
+
     public override void Update(GameTime gameTime)
     {
         if (Parent == null)
             return;
-        if (dragging)
+        if (IsPointerCaptured)
         {
-            var parent = Parent.GetInnerDimensions();
-            Vector2 mouse = Main.MouseScreen / Main.UIScale;
-            Left.Set(Math.Clamp(mouse.X - dragOffset.X - parent.X, 0, Math.Max(0, parent.Width - Width.Pixels)), 0);
-            Top.Set(Math.Clamp(mouse.Y - dragOffset.Y - parent.Y, 0, Math.Max(0, parent.Height - Height.Pixels)), 0);
-            Recalculate();
-            panel.ApplyLayout();
-            Main.LocalPlayer.mouseInterface = true;
+            if (!Main.hasFocus || !IsAvailable || canMovePanel && !Config.Conf.C.MakePanelDraggable)
+                CancelPointer();
+            else
+            {
+                // UserInterface supplied the same coordinates to LeftMouseDown. Do not scale again.
+                MovePointer(MainSystem.PointerPosition);
+                Main.LocalPlayer.mouseInterface = true;
+                // A row can be removed during a drag, preventing its mouse-up from bubbling here.
+                if (!Main.mouseLeft)
+                    FinishPointer(false);
+            }
         }
+        if (IsAvailable && ContainsPoint(MainSystem.PointerPosition))
+            Main.LocalPlayer.mouseInterface = true;
         base.Update(gameTime);
     }
 
     public override bool ContainsPoint(Vector2 point)
     {
-        if (!panel.HideWhenInventoryOpen && !Main.playerInventory)
+        if (!IsAvailable)
             return false;
         return panelVisible ? base.ContainsPoint(point) : toggleButton.ContainsPoint(point);
     }
